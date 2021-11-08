@@ -23,4 +23,9 @@ class Trip extends Model
 
     }
 
+    public function scopeGetTripsForUser($query)
+    {
+        return $query->where('id_user',6);
+    }
+
 }
