@@ -28,8 +28,9 @@ const Login = (props) => {
                 axios.post("http://127.0.0.1:8000/api/login", values)
                     .then(response => {
                             if (response.data !== 0) {
-                                console.log("login")
+                                console.log("login");
                                 dispatch(login({
+                                    id_user: response.data,
                                     email: formik.values.email,
                                     password: formik.values.password,
                                     loggedIn: true,
@@ -43,7 +44,6 @@ const Login = (props) => {
             } catch (error) {
                 console.error(error);
             }
-
         },
     });
 

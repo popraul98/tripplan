@@ -25,6 +25,7 @@ Route::post("/login", [\App\Http\Controllers\UserController::class, 'login']);
 //Trips
 Route::post('/get-trips', [\App\Http\Controllers\TripController::class, 'index']);
 Route::post('/create-trip', [\App\Http\Controllers\TripController::class, 'create']);
+Route::delete('/delete-trip/{id}', [\App\Http\Controllers\TripController::class, 'destroy']);
 
 
 

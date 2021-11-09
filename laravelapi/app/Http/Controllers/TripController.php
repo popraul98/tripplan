@@ -12,9 +12,13 @@ class TripController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $req)
     {
-        $trips = Trip::GetTripsForUser()->get();
+
+        $id_user = $req->input('id_user');
+
+
+        $trips = Trip::GetTripsForUser($id_user)->get();
 
         return response()->json([
             'trips' => $trips,
@@ -42,8 +46,8 @@ class TripController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request $request0
+11111     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
@@ -92,6 +96,11 @@ class TripController extends Controller
      */
     public function destroy($id)
     {
-        //
+//        $id_trip = $id->input('id_trip');
+
+        $trip = Trip::find($id);
+        $trip->delete();
+
+        return "Deleted";
     }
 }

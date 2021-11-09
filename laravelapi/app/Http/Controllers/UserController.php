@@ -31,7 +31,7 @@ class UserController extends Controller
         if (!Hash::check($password, $user->password)) {
             return 0;
         } else {
-            echo $user->name;
+            echo $user->id;
         }
     }
 }
