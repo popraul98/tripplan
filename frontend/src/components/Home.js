@@ -6,7 +6,8 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import {useState, useEffect} from "react";
-import AddTripModal from "./AddTripModal"
+import AddTripModal from "./AddTripModal";
+import Select from "react-select";
 
 const Home = (props) => {
 
@@ -18,7 +19,22 @@ const Home = (props) => {
         dispatch(logout());
     };
 
+    //sort trips
+    const options = [
+        {value: 'trips_by_last_date', label: 'sort by Last Added'},
+        {value: 'trips_by_name', label: 'sort by Name'},
+        {value: 'trips_by_start_date', label: 'sort by Start Date'}
+    ]
+
+    const [typeSort, setTypeSort] = useState(options[0].value)
+
+    const handleSort = (e) => {
+        setTypeSort(e.target.value)
+        getTrips()
+    }
+     // -------
     const [trips, setTrips] = useState([])
+
     const getTrips = async () => {
         const tripsFromServer = await fetchTrips()
         setTrips(tripsFromServer)
@@ -32,7 +48,16 @@ const Home = (props) => {
     const fetchTrips = async () => {
         const res = await axios.post("http://127.0.0.1:8000/api/get-trips/", user)
         const data = await res.data
-        return data.trips
+        // console.log(data)
+
+        if(typeSort === "trips_by_last_date")
+        return data.trips_by_last_date
+
+        if(typeSort === "trips_by_name")
+            return data.trips_by_name
+
+        if(typeSort === "trips_by_start_date")
+            return data.trips_by_start_date
     }
 
     //delete Trip from Server
@@ -43,25 +68,55 @@ const Home = (props) => {
                     getTrips()
                 }
             )
-
     }
 
+
+    //modal add trip
     const [modalIsOpen, setModalIsOpen] = useState(false)
+
+    const handleCloseModal = () => {
+        setModalIsOpen(false)
+        getTrips();
+    }
+
+    //counter days left
+    const counterDaysLeft = (date) => {
+        const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+        date = new Date(date);
+        let dateToday = new Date();
+        const utc1 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+        const utc2 = Date.UTC(dateToday.getFullYear(), dateToday.getMonth(), dateToday.getDate());
+        // console.log(Math.floor(((utc1 - utc2) / _MS_PER_DAY) + 1))
+        return Math.floor(((utc1 - utc2) / _MS_PER_DAY) + 1);
+    }
+
 
     return (
         <div className="content-center bg-gray-100 p-2">
             <h1>Welcome <span className="font-bold">{user.email}</span></h1>
             <div className="p-5">
 
-                <AddTripModal open={modalIsOpen} onClose={() => setModalIsOpen(false)}>
+                <AddTripModal open={modalIsOpen} onClose={handleCloseModal}>
                     Add a new Trip
                 </AddTripModal>
-                <button
-                    className="bg-gray-400 hover:bg-gray-600 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline"
-                    onClick={() => setModalIsOpen(true)}
-                >
-                    <AddIcon/>Add a new Trips
-                </button>
+                <div className="flex justify-between">
+                    <button
+                        className="bg-gray-400 hover:bg-gray-600 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline"
+                        onClick={() => setModalIsOpen(true)}
+                    >
+                        <AddIcon/>Add a new Trips
+                    </button>
+                    <select className="border border-gray-300 pl-3 mb-2 rounded-xl text-gray-700"
+                            value={typeSort}
+                            onChange={(e) => handleSort(e)}
+                    >
+                        <option disabled>Sort by:</option>
+                        {options.map((option) => (
+                            <option value={option.value}>{option.label}</option>
+                        ))}
+                    </select>
+                    {/*<Select options={options}/>*/}
+                </div>
 
                 <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8 ">
@@ -95,7 +150,9 @@ const Home = (props) => {
                                     <tr>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm font-medium text-gray-900">
-                                                {trip.destination}
+                                                {trip.destination} <span
+                                                className="font-light text-xs text-gray-600">
+                                                {counterDaysLeft(trip.start_date) > 0 ? "( " + counterDaysLeft(trip.start_date) + " days left )" : ""}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">

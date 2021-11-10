@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Trip;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TripController extends Controller
 {
@@ -18,10 +19,14 @@ class TripController extends Controller
         $id_user = $req->input('id_user');
 
 
-        $trips = Trip::GetTripsForUser($id_user)->get();
+        $trips_by_last_date = Trip::GetTripsSortByLastAdded($id_user)->get();
+        $trips_by_name = Trip::GetTripsSortByNameDestination($id_user)->get();
+        $trips_by_start_date = Trip::GetTripsSortByStartDate($id_user)->get();
 
         return response()->json([
-            'trips' => $trips,
+            'trips_by_last_date' => $trips_by_last_date,
+            'trips_by_name' => $trips_by_name,
+            'trips_by_start_date' => $trips_by_start_date,
         ]);
     }
 
@@ -32,26 +37,32 @@ class TripController extends Controller
      */
     public function create()
     {
-        $attributes = request();
 
-        Trip::create([
-            'id_user' => $attributes['id_user'],
-            'destination' => $attributes['destination'],
-            'start_date' => $attributes['start_date'],
-            'end_date' => $attributes['end_date'],
-            'comment' => $attributes['comment']
-        ]);
+
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request0
-11111     * @return \Illuminate\Http\Response
+     * 11111     * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $req)
     {
-        //
+        $id_user = $req->input("id_user");
+        $destination = $req->input("destination");
+        $start_date = $req->input("start_date");
+        $end_date = $req->input("end_date");
+        $comment = $req->input("comment");
+
+
+        DB::table('trips')->insert([
+            'id_user' => $id_user,
+            'destination' => $destination,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'comment' => $comment,
+        ]);
     }
 
     /**

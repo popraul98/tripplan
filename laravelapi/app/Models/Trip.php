@@ -23,9 +23,20 @@ class Trip extends Model
 
     }
 
-    public function scopeGetTripsForUser($query, $id_user)
+    //get trips for specific USER
+    public function scopeGetTripsSortByLastAdded($query, $id_user)
     {
-        return $query->where('id_user',$id_user);
+        return $query->where('id_user', $id_user);
+    }
+
+    public function scopeGetTripsSortByNameDestination($query, $id_user)
+    {
+        return $query->where('id_user', $id_user)->orderBy('destination', "DESC");
+    }
+
+    public function scopeGetTripsSortByStartDate($query, $id_user)
+    {
+        return $query->where('id_user', $id_user)->orderBy('start_date', "ASC");
     }
 
 }
