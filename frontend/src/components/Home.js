@@ -5,8 +5,9 @@ import {login, logout, selectUser} from "../features/userSlice";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
-import {useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import AddTripModal from "./AddTripModal";
+import DetailsDestination from "./DetailsDestination";
 import Select from "react-select";
 
 const Home = (props) => {
@@ -22,21 +23,22 @@ const Home = (props) => {
     //sort trips
     const options = [
         {value: 'trips_by_last_date', label: 'sort by Last Added'},
-        {value: 'trips_by_name', label: 'sort by Name'},
-        {value: 'trips_by_start_date', label: 'sort by Start Date'}
+        {value: 'trips_by_name', label: 'sort by Name ASC'},
+        {value: 'trips_by_start_date', label: 'sort by Start Date DESC'}
     ]
 
     const [typeSort, setTypeSort] = useState(options[0].value)
 
     const handleSort = (e) => {
         setTypeSort(e.target.value)
-        getTrips()
+        getTrips(e.target.value)
     }
-     // -------
+
+    // -------
     const [trips, setTrips] = useState([])
 
-    const getTrips = async () => {
-        const tripsFromServer = await fetchTrips()
+    const getTrips = async (sort_type) => {
+        const tripsFromServer = await fetchTrips(sort_type)
         setTrips(tripsFromServer)
     }
 
@@ -45,19 +47,35 @@ const Home = (props) => {
     }, [])
 
     //get Trips from server
-    const fetchTrips = async () => {
+    const fetchTrips = async (sort_type) => {
         const res = await axios.post("http://127.0.0.1:8000/api/get-trips/", user)
         const data = await res.data
-        // console.log(data)
+        console.log(sort_type)
 
-        if(typeSort === "trips_by_last_date")
-        return data.trips_by_last_date
+        if (!sort_type) {
+            console.log(data.trips_by_last_date, "1")
+            return data.trips_by_last_date
+            // setTypeSort("trips_by_last_date")
+        }
 
-        if(typeSort === "trips_by_name")
+
+        if (sort_type === "trips_by_last_date") {
+            console.log(data.trips_by_last_date, "1")
+            return data.trips_by_last_date
+        }
+
+
+        if (sort_type === "trips_by_name") {
+            console.log(data.trips_by_name, "2")
             return data.trips_by_name
+        }
 
-        if(typeSort === "trips_by_start_date")
+
+        if (sort_type === "trips_by_start_date") {
+            console.log(data.trips_by_start_date, "3")
             return data.trips_by_start_date
+        }
+        return data
     }
 
     //delete Trip from Server
@@ -71,15 +89,34 @@ const Home = (props) => {
     }
 
 
-    //modal add trip
-    const [modalIsOpen, setModalIsOpen] = useState(false)
+    //Modal Add Trip
+    const [modalAddTripOpen, setModalAddTripOpen] = useState(false)
 
-    const handleCloseModal = () => {
-        setModalIsOpen(false)
+    const handleCloseAddTripModal = () => {
+        setModalAddTripOpen(false)
         getTrips();
     }
 
-    //counter days left
+    //Modal Details Destination
+    const [modalDetailsDest, setModalDetailsDest] = useState(false)
+
+    const handleCloseDetailsDest = () => {
+        setModalDetailsDest(false)
+    }
+
+    const [tripModalDetailsDest, setTripModalDetailsDest] = useState(null)
+
+    const handleOnClick = (id_trip) => {
+        for (let i = 0; i < trips.length; i++) {
+            if (trips[i].id == id_trip) {
+                setTripModalDetailsDest(trips[i]);
+                break;
+            }
+        }
+        setModalDetailsDest(true);
+    }
+
+    //Counter Days Left
     const counterDaysLeft = (date) => {
         const _MS_PER_DAY = 1000 * 60 * 60 * 24;
         date = new Date(date);
@@ -96,18 +133,29 @@ const Home = (props) => {
             <h1>Welcome <span className="font-bold">{user.email}</span></h1>
             <div className="p-5">
 
-                <AddTripModal open={modalIsOpen} onClose={handleCloseModal}>
+                {/*---MODALS---*/}
+                <AddTripModal open={modalAddTripOpen} onClose={handleCloseAddTripModal}>
                     Add a new Trip
                 </AddTripModal>
+
+                <DetailsDestination
+                    open={modalDetailsDest}
+                    trip={tripModalDetailsDest}
+                    onClose={handleCloseDetailsDest}
+                >
+                    Details
+                </DetailsDestination>
+
                 <div className="flex justify-between">
                     <button
                         className="bg-gray-400 hover:bg-gray-600 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline"
-                        onClick={() => setModalIsOpen(true)}
+                        onClick={() => setModalAddTripOpen(true)}
                     >
                         <AddIcon/>Add a new Trips
                     </button>
+
                     <select className="border border-gray-300 pl-3 mb-2 rounded-xl text-gray-700"
-                            value={typeSort}
+                        // value={typeSort}
                             onChange={(e) => handleSort(e)}
                     >
                         <option disabled>Sort by:</option>
@@ -115,7 +163,6 @@ const Home = (props) => {
                             <option value={option.value}>{option.label}</option>
                         ))}
                     </select>
-                    {/*<Select options={options}/>*/}
                 </div>
 
                 <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -141,7 +188,8 @@ const Home = (props) => {
                                         Comment
                                     </th>
                                     <th scope="col" className="relative px-6 py-3">
-                                        <span className="sr-only">Edit</span>
+                                        <span
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">Actions</span>
                                     </th>
                                 </tr>
                                 </thead>
@@ -164,11 +212,17 @@ const Home = (props) => {
                                         {trip.end_date}
                                      </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate ">
-                                            {trip.comment}
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <p className="truncate w-1/3">{trip.comment}</p>
                                         </td>
                                         <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
-                                            <a href="#" className="text-indigo-600 hover:text-indigo-900"> Edit</a>
+                                            <button
+                                                className="font-semibold mb-1 mr-2 text-indigo-600 hover:text-indigo-900"
+                                                onClick={() => handleOnClick(trip.id)}
+                                            >
+                                                Details
+                                            </button>
+                                            <a href="#" className="text-indigo-600 hover:text-indigo-900 mr-1">Edit</a>
                                             <DeleteIcon
                                                 className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
                                                 onClick={() => deleteTrip(trip.id)}
@@ -193,6 +247,7 @@ const Home = (props) => {
             >
                 LogOut
             </button>
+
         </div>
     )
 }

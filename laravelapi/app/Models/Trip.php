@@ -31,12 +31,12 @@ class Trip extends Model
 
     public function scopeGetTripsSortByNameDestination($query, $id_user)
     {
-        return $query->where('id_user', $id_user)->orderBy('destination', "DESC");
+        return $query->where('id_user', $id_user)->orderBy('destination', "ASC");
     }
 
     public function scopeGetTripsSortByStartDate($query, $id_user)
     {
-        return $query->where('id_user', $id_user)->orderBy('start_date', "ASC");
+        return $query->where('id_user', $id_user)->orderBy('start_date', "DESC");
     }
 
 }
