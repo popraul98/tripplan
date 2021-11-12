@@ -33,5 +33,6 @@ class UserController extends Controller
         } else {
             echo $user->id;
         }
+
     }
 }

@@ -43,13 +43,14 @@ export default function DetailsDestination({open, children, onClose, trip}) {
                             height="250"
                             frameBorder="0"
                             src={"https://www.google.com/maps/embed/v1/place?key=AIzaSyD1viFL9PIqRrQ159iA5-pGQ_mKQn-tt14&q=" + trip.destination }>
+                            Map Loading
                         </iframe>
 
                     </div>
                 </div>
 
                 <button
-                    className="float-right bg-gray-600 rounded-xl text-sm hover:bg-gray-600 border px-2 m-5 text-white"
+                    className="float-right bg-gray-600 rounded-xl text-sm hover:bg-gray-300 hover:text-gray-800 border px-2 m-5 text-white"
                     onClick={onClose}
                 >
                     Close

@@ -45,8 +45,13 @@ export default function AddTripModal({open, children, onClose}) {
         console.log(trip)
         const res = await axios.post("http://127.0.0.1:8000/api/create-trip", trip)
             .then(response => {
+                setTrip({
+                    id_user: user.id_user,
+                    destination: "",
+                    start_date: formatDate(new Date()),
+                    end_date: formatDate(new Date()),
+                    comment: ""})
                 setAddedSuccessfully(true)
-
             }).catch(error => {
                     console.log(error, "error")
                 }
@@ -76,7 +81,8 @@ export default function AddTripModal({open, children, onClose}) {
 
                     />
 
-                    <label className="block text-gray-700 text-sm font-semibold mb-1">Start Date</label>
+                    <label className="block text-gray-700 text-sm font-semibold mb-1">Start Date <span
+                        className="text-sm text-gray-600 font-light">(year-month-day)</span></label>
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 mb-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         placeholder="Start Date"
@@ -85,7 +91,8 @@ export default function AddTripModal({open, children, onClose}) {
                         onChange={(e) => onInputChange(e)}
                     />
 
-                    <label className="block text-gray-700 text-sm font-semibold mb-1">End Date</label>
+                    <label className="block text-gray-700 text-sm font-semibold mb-1">End Date <span
+                        className="text-sm text-gray-600 font-light">(year-month-day)</span></label>
                     <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 mb-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         placeholder="End Date"

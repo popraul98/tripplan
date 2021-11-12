@@ -19,9 +19,9 @@ class TripController extends Controller
         $id_user = $req->input('id_user');
 
 
-        $trips_by_last_date = Trip::GetTripsSortByLastAdded($id_user)->get();
-        $trips_by_name = Trip::GetTripsSortByNameDestination($id_user)->get();
-        $trips_by_start_date = Trip::GetTripsSortByStartDate($id_user)->get();
+        $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at','DESC')->get();
+        $trips_by_name = Trip::byUser($id_user)->orderBy('destination','DESC')->get();
+        $trips_by_start_date = Trip::byUser($id_user)->orderBy('start_date','ASC')->get();
 
         return response()->json([
             'trips_by_last_date' => $trips_by_last_date,

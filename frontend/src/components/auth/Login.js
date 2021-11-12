@@ -5,12 +5,13 @@ import * as Yup from 'yup';
 import {BrowserRouter as Router, Routes, Route, Link, useNavigate} from "react-router-dom";
 import Register from "./Register";
 import Home from "../Home";
-import {useDispatch} from "react-redux";
-import {login} from "../../features/userSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {login, selectUser} from "../../features/userSlice";
 
 const Login = (props) => {
 
     const dispatch = useDispatch();
+    const user = useSelector(selectUser);
 
     const formik = useFormik({
         initialValues: {
@@ -102,10 +103,11 @@ const Login = (props) => {
                     >
                         Login
                     </button>
+                    <a href="/resetPassword" className="underline text-sm text-gray-600 m-2">Do you forgot your password?</a>
+
                 </div>
                 <div className="text-sm mt-4 text-gray-500 mb-2">You don't have an account yet?</div>
                 <div className="mt text-sm">
-
                     <nav>
                         <Link
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
