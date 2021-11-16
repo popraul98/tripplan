@@ -23,7 +23,7 @@ export default function AddTripModal({open, children, onClose}) {
     }
 
     const [trip, setTrip] = useState({
-        id_user: user.id_user,
+        id_user: user.user.id,
         destination: "",
         start_date: formatDate(new Date()),
         end_date: formatDate(new Date()),
@@ -46,7 +46,7 @@ export default function AddTripModal({open, children, onClose}) {
         const res = await axios.post("http://127.0.0.1:8000/api/create-trip", trip)
             .then(response => {
                 setTrip({
-                    id_user: user.id_user,
+                    id_user: user.user,
                     destination: "",
                     start_date: formatDate(new Date()),
                     end_date: formatDate(new Date()),

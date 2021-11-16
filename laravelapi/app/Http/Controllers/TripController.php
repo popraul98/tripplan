@@ -15,12 +15,12 @@ class TripController extends Controller
      */
     public function index(Request $req)
     {
-
-        $id_user = $req->input('id_user');
+        //required id user
+        $id_user = $req->input('user.id');
 
 
         $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at','DESC')->get();
-        $trips_by_name = Trip::byUser($id_user)->orderBy('destination','DESC')->get();
+        $trips_by_name = Trip::byUser($id_user)->orderBy('destination','ASC')->get();
         $trips_by_start_date = Trip::byUser($id_user)->orderBy('start_date','ASC')->get();
 
         return response()->json([

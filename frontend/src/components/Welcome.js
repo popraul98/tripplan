@@ -4,7 +4,7 @@ import Login from "./auth/Login";
 import Home from "./Home";
 import {useSelector} from "react-redux";
 import {selectUser} from "../features/userSlice";
-import ResetPassword from "./auth/ResetPassword";
+import ResetPasswordRequest from "./auth/ResetPasswordRequest";
 
 function Welcome() {
 
@@ -12,14 +12,7 @@ function Welcome() {
 
     return (
         <div className="">
-            {user ? <Home/> : <Login/>}
-            <Routes>
-                <Route path="/register" element={<Register/>}/>
-                <Route path="/login" element={<Login/>}/>
-                <Route path="/home" element={<Home/>}/>
-                <Route path="/welcome" element={<Welcome/>}/>
-                <Route path="/resetPassword" element={<ResetPassword/>}/>
-            </Routes>
+            WELCOME PAGE
         </div>
     );
 }

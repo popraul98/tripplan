@@ -1,10 +1,30 @@
 import axios from "axios";
+import {useState} from "react";
+import {error} from "autoprefixer/lib/utils";
 
-const ResetPassword = () => {
+const ResetPasswordRequest = () => {
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const [email, setEmail] = useState(null)
+    const [messageStatus, setMessageStatus] = useState("")
+
+    const handleChange = (e) => {
+        setEmail(e.target.value)
     }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const em = {email}
+        const res = await axios.post("http://127.0.0.1:8000/api/reset-password-request", em)
+            .then(response => {
+                console.log(response.data.message)
+                setMessageStatus(response.data.message)
+            }).catch(error => {
+                console.log(error.message);
+            })
+
+    }
+
 
     return (
 
@@ -20,6 +40,7 @@ const ResetPassword = () => {
                     name="email"
                     type="text"
                     placeholder="Email"
+                    onChange={handleChange}
                 />
                 <button
                     className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline">Submit
@@ -30,4 +51,4 @@ const ResetPassword = () => {
 
 }
 
-export default ResetPassword
+export default ResetPasswordRequest

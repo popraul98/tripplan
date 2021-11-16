@@ -10,7 +10,8 @@ const Register = (props) => {
         initialValues: {
             name: "",
             email: "",
-            password: ""
+            password: "",
+            password_confirm: ""
         },
         validationSchema: Yup.object({
             name: Yup.string()
@@ -99,6 +100,27 @@ const Register = (props) => {
                     </div>
 
                 </div>
+                <div className="mb-5">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                        Confirm Password
+                    </label>
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        id="confirm_password"
+                        name="password_confirm"
+                        type="password_confirm"
+                        placeholder="password_confirm"
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.password_confirm}
+                    />
+                    <div className="text-xs text-red-400 ml-1">
+                        {formik.touched.password_confirm && formik.errors.password_confirm ? (
+                            <div>{formik.errors.password_confirm}</div>
+                        ) : null}
+                    </div>
+
+                </div>
                 {/*<div className="">*/}
                 {/*    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirm_Password">*/}
                 {/*        Password*/}
@@ -128,7 +150,7 @@ const Register = (props) => {
                     <nav>
                         <Link
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                            to="/login"
+                            to="/"
                         >
                             Login
                         </Link>

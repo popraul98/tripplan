@@ -2,7 +2,7 @@ import {useState} from "react";
 import axios from "axios";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
-import {BrowserRouter as Router, Routes, Route, Link, useNavigate} from "react-router-dom";
+import {BrowserRouter as Router, Routes, Route, Link, useNavigate, Redict} from "react-router-dom";
 import Register from "./Register";
 import Home from "../Home";
 import {useDispatch, useSelector} from "react-redux";
@@ -30,13 +30,12 @@ const Login = (props) => {
                     .then(response => {
                             if (response.data !== 0) {
                                 console.log("login");
+                                console.log(response.data.user.id)
                                 dispatch(login({
-                                    id_user: response.data,
-                                    email: formik.values.email,
-                                    password: formik.values.password,
+                                    user: response.data.user,
+                                    token: response.data.token,
                                     loggedIn: true,
                                 }));
-
                             } else {
                                 console.log("BAD")
                             }
@@ -49,6 +48,7 @@ const Login = (props) => {
     });
 
     return (
+
         <div className="flex justify-center h-screen items-center ">
 
             <form className="bg-white shadow-2xl rounded px-8 pt-6 pb-8 mb-4 bg-gray-100 "
@@ -103,7 +103,8 @@ const Login = (props) => {
                     >
                         Login
                     </button>
-                    <a href="/resetPassword" className="underline text-sm text-gray-600 m-2">Do you forgot your password?</a>
+                    <a href="/resetPassword" className="underline text-sm text-gray-600 m-2">Do you forgot your
+                        password?</a>
 
                 </div>
                 <div className="text-sm mt-4 text-gray-500 mb-2">You don't have an account yet?</div>
@@ -125,6 +126,7 @@ const Login = (props) => {
             </form>
         </div>
     )
+
 }
 
 export default Login
