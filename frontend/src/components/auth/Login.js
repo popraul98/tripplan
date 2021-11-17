@@ -2,7 +2,7 @@ import {useState} from "react";
 import axios from "axios";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
-import {BrowserRouter as Router, Routes, Route, Link, useNavigate, Redict} from "react-router-dom";
+import {BrowserRouter as Router, Routes, Route, Link, useNavigate, Navigate} from "react-router-dom";
 import Register from "./Register";
 import Home from "../Home";
 import {useDispatch, useSelector} from "react-redux";
@@ -12,6 +12,7 @@ const Login = (props) => {
 
     const dispatch = useDispatch();
     const user = useSelector(selectUser);
+    const navigate = useNavigate();
 
     const formik = useFormik({
         initialValues: {
@@ -28,17 +29,20 @@ const Login = (props) => {
             try {
                 axios.post("http://127.0.0.1:8000/api/login", values)
                     .then(response => {
+
                             if (response.data !== 0) {
                                 console.log("login");
-                                console.log(response.data.user.id)
+                                // console.log(response.data.user.id)
                                 dispatch(login({
                                     user: response.data.user,
                                     token: response.data.token,
                                     loggedIn: true,
                                 }));
+                                navigate("/home")
                             } else {
                                 console.log("BAD")
                             }
+
                         }
                     )
             } catch (error) {
@@ -103,7 +107,7 @@ const Login = (props) => {
                     >
                         Login
                     </button>
-                    <a href="/resetPassword" className="underline text-sm text-gray-600 m-2">Do you forgot your
+                    <a href="/resetPasswordRequest" className="underline text-sm text-gray-600 m-2">Do you forgot your
                         password?</a>
 
                 </div>

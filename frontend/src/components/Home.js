@@ -11,14 +11,19 @@ import DetailsDestination from "./DetailsDestination";
 import Select from "react-select";
 import Login from "./auth/Login";
 
+
 const Home = (props) => {
 
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+
     const handleLogOut = (e) => {
         e.preventDefault();
 
         dispatch(logout());
+        navigate('/')
     };
 
     //sort trips
@@ -52,7 +57,7 @@ const Home = (props) => {
         console.log("this is user")
         const res = await axios.post("http://127.0.0.1:8000/api/get-trips/", user)
         const data = await res.data
-        // console.log(sort_type)
+
 
         if (!sort_type) {
             console.log(data.trips_by_last_date, "1")
@@ -239,6 +244,7 @@ const Home = (props) => {
                                             have any records</span> : ""}
 
                                 </table>
+
                             </div>
                         </div>
                     </div>

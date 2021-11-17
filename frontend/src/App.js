@@ -4,13 +4,15 @@ import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
 import Home from "./components/Home";
 import ResetPasswordRequest from "./components/auth/ResetPasswordRequest";
+import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 
 function App() {
     return (
        <Routes>
            <Route path="/register" element={<Register/>}/>
            <Route path="/home" element={<Home/>}/>
-           <Route path="/resetPassword" element={<ResetPasswordRequest/>}/>
+           <Route path="/resetPasswordRequest" element={<ResetPasswordRequest/>}/>
+           <Route path="/resetPasswordForm/:token" element={<ResetPasswordForm/>}/>
            <Route path="/" exact element={<Login/>}/>
            {/*<Route path="/welcome" element={<Welcome/>}/>*/}
        </Routes>

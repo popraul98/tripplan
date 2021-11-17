@@ -3,10 +3,13 @@ import {useFormik} from "formik";
 import * as Yup from 'yup';
 import {BrowserRouter as Router, Routes, Route, Link} from "react-router-dom";
 import Login from "./Login";
+import {useState} from "react";
 
 const Register = (props) => {
 
-    const formik = useFormik({
+    const [messageStatus, setMessageStatus] = useState("")
+
+    const new_user = useFormik({
         initialValues: {
             name: "",
             email: "",
@@ -26,6 +29,11 @@ const Register = (props) => {
             console.log(values)
             try {
                 axios.post("http://127.0.0.1:8000/api/register", values)
+                    .then(response => {
+
+                        //show message to user
+                        setMessageStatus('You have been registered')
+                    })
             } catch (error) {
                 console.error(error);
             }
@@ -37,7 +45,7 @@ const Register = (props) => {
     return (
         <div className="flex justify-center h-screen items-center ">
             <form className="bg-white shadow-2xl rounded px-8 pt-6 pb-8 mb-4 bg-gray-100"
-                  onSubmit={formik.handleSubmit}>
+                  onSubmit={new_user.handleSubmit}>
                 <h3 className="font-bold text-xl mb-6">Register</h3>
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
@@ -49,13 +57,13 @@ const Register = (props) => {
                         name="name"
                         type="text"
                         placeholder="Name"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.name}
+                        onChange={new_user.handleChange}
+                        onBlur={new_user.handleBlur}
+                        value={new_user.values.name}
                     />
                     <div className="text-xs text-red-400 ml-1">
-                        {formik.touched.name && formik.errors.name ? (
-                            <div>{formik.errors.name}</div>
+                        {new_user.touched.name && new_user.errors.name ? (
+                            <div>{new_user.errors.name}</div>
                         ) : null}
                     </div>
                 </div>
@@ -69,13 +77,13 @@ const Register = (props) => {
                         name="email"
                         type="text"
                         placeholder="Email"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.email}
+                        onChange={new_user.handleChange}
+                        onBlur={new_user.handleBlur}
+                        value={new_user.values.email}
                     />
                     <div className="text-xs text-red-400 ml-1">
-                        {formik.touched.email && formik.errors.email ? (
-                            <div>{formik.errors.email}</div>
+                        {new_user.touched.email && new_user.errors.email ? (
+                            <div>{new_user.errors.email}</div>
                         ) : null}
                     </div>
                 </div>
@@ -89,13 +97,13 @@ const Register = (props) => {
                         name="password"
                         type="password"
                         placeholder="password"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.password}
+                        onChange={new_user.handleChange}
+                        onBlur={new_user.handleBlur}
+                        value={new_user.values.password}
                     />
                     <div className="text-xs text-red-400 ml-1">
-                        {formik.touched.password && formik.errors.password ? (
-                            <div>{formik.errors.password}</div>
+                        {new_user.touched.password && new_user.errors.password ? (
+                            <div>{new_user.errors.password}</div>
                         ) : null}
                     </div>
 
@@ -108,15 +116,15 @@ const Register = (props) => {
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="confirm_password"
                         name="password_confirm"
-                        type="password_confirm"
+                        type="password"
                         placeholder="password_confirm"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.password_confirm}
+                        onChange={new_user.handleChange}
+                        onBlur={new_user.handleBlur}
+                        value={new_user.values.password_confirm}
                     />
                     <div className="text-xs text-red-400 ml-1">
-                        {formik.touched.password_confirm && formik.errors.password_confirm ? (
-                            <div>{formik.errors.password_confirm}</div>
+                        {new_user.touched.password_confirm && new_user.errors.password_confirm ? (
+                            <div>{new_user.errors.password_confirm}</div>
                         ) : null}
                     </div>
 
@@ -143,7 +151,7 @@ const Register = (props) => {
                         Register
                     </button>
                 </div>
-                <div className="text-green-500">You have been registered!</div>
+                <div className="text-green-500">{messageStatus}</div>
                 <div className="text-sm mt-4 text-gray-500 mb-2">You already have an account?</div>
                 <div className="mt text-sm">
 

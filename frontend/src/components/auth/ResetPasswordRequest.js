@@ -1,6 +1,5 @@
 import axios from "axios";
 import {useState} from "react";
-import {error} from "autoprefixer/lib/utils";
 
 const ResetPasswordRequest = () => {
 
@@ -42,9 +41,16 @@ const ResetPasswordRequest = () => {
                     placeholder="Email"
                     onChange={handleChange}
                 />
-                <button
-                    className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline">Submit
-                </button>
+                <div className="flex justify-between">
+                    <button
+                        className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline">Submit
+                    </button>
+                    <a
+                        href="/"
+                        className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline">Go
+                        back to Login
+                    </a>
+                </div>
             </div>
         </form>
     )

@@ -120,7 +120,7 @@ class UserController extends Controller
         $user->save();
 
         return response([
-            'message' => "Succes"
+            'message' => "Your password was changed successfully!"
         ]);
     }
 }
