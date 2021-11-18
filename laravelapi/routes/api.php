@@ -18,9 +18,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-//user
+//user Login/Register/etc.
 Route::post("/register", [\App\Http\Controllers\UserController::class, 'register']);
 Route::post("/login", [\App\Http\Controllers\UserController::class, 'login']);
+Route::post("/logout", [\App\Http\Controllers\UserController::class, 'logout']);
+
 Route::get("/get-user", [\App\Http\Controllers\UserController::class, 'getUser'])->middleware('auth:api');
 Route::post("/reset-password-request", [\App\Http\Controllers\UserController::class, 'resetPasswordRequest']);
 Route::post("/reset-password", [\App\Http\Controllers\UserController::class, 'resetPassword']);

@@ -18,7 +18,7 @@ const Home = (props) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-
+    //logOut
     const handleLogOut = (e) => {
         e.preventDefault();
 

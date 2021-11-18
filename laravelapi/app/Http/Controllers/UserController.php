@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Psy\Util\Str;
 
+use Laravel\Passport\TokenRepository;
+use Laravel\Passport\RefreshTokenRepository;
+
+use Lcobucci\JWT\Encoding\JoseEncoder;
+use Lcobucci\JWT\Token\Parser;
+
 class UserController extends Controller
 {
     function register(RegisterRequest $req)
@@ -41,6 +47,7 @@ class UserController extends Controller
                 /** @var User $user */
                 $user = Auth::user();
                 $token = $user->createToken('app')->accessToken;
+
                 return response([
                     'message' => 'success',
                     'token' => $token,
@@ -58,6 +65,34 @@ class UserController extends Controller
             'message' => 'Invalid username/password'
         ], 401);
 
+    }
+
+    //Token-ul pe care il primesc din requst nu pot sa il transmit
+    //mai departe pentru a revoke('id), nu corespunde cu id-ul din DB.
+    //
+    //Functia imi da id-ul care face match-ul in DB => pot sa dau revoke('id)
+    public function getTokenId($tokenFromRequest)
+    {
+        $token = $tokenFromRequest->input('id');
+
+        return (new Parser(new JoseEncoder()))->parse($token)->claims()->all()['jti'];
+    }
+
+    public function logout(Request $req)
+    {
+        $tokenId = $this->getTokenId($req);
+
+        $tokenRepository = app(TokenRepository::class);
+        try {
+            $tokenRepository->revokeAccessToken($tokenId);
+            return response([
+                'message' => "You are log out successfully!"
+            ]);
+        } catch (\Exception $exception) {
+            return response([
+                'message' => $exception->getMessage()
+            ], 400);
+        }
     }
 
     public function getUser()
