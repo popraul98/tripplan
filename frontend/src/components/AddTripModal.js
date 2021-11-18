@@ -5,7 +5,7 @@ import {selectUser} from "../features/userSlice";
 import DatePicker from 'react-date-picker';
 
 export default function AddTripModal({open, children, onClose}) {
-    console.log("open modal add trip:", open)
+    // console.log("open modal add trip:", open)
 
     const user = useSelector(selectUser);
     const [addedSuccessfully, setAddedSuccessfully] = useState(false)

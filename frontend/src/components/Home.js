@@ -19,12 +19,44 @@ const Home = (props) => {
     const navigate = useNavigate();
 
     //logOut
-    const handleLogOut = (e) => {
+    const handleLogOut = async (e) => {
         e.preventDefault();
 
-        dispatch(logout());
-        navigate('/')
+        let id = user.token;
+
+        //invalidate token after log out
+        const res = await axios.post("http://127.0.0.1:8000/api/logout", {id})
+            .then(response => {
+                dispatch(logout());
+                navigate('/')
+                alert(response.data.message)
+            })
+
     };
+
+    //check token for user
+    const checkToken = async () => {
+        let token = user.token
+        if(token !== null)
+
+        console.log("la asta da")
+        const res = await axios.get("http://127.0.0.1:8000/api/get-user", {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        }).then(response => {
+            // console.log(response)
+            if(response.status === 200)
+                getTrips()
+            console.log("Token Valabil")
+
+        }).catch(error => {
+
+            console.log(error)
+            alert("Token Invalid")
+            handleLogOut();
+        });
+    }
 
     //sort trips
     const options = [
@@ -40,7 +72,16 @@ const Home = (props) => {
         getTrips(e.target.value)
     }
 
-    // -------
+
+    // get trips for user
+    useEffect(() => {
+        console.log("use effects")
+        checkToken()
+        // getTrips()
+
+    }, [user])
+
+
     const [trips, setTrips] = useState([])
 
     const getTrips = async (sort_type) => {
@@ -48,37 +89,32 @@ const Home = (props) => {
         setTrips(tripsFromServer)
     }
 
-    useEffect(() => {
-        getTrips()
-    }, [user])
-
     //get Trips from server
     const fetchTrips = async (sort_type) => {
-        console.log("this is user")
         const res = await axios.post("http://127.0.0.1:8000/api/get-trips/", user)
         const data = await res.data
 
 
         if (!sort_type) {
-            console.log(data.trips_by_last_date, "1")
+            // console.log(data.trips_by_last_date, "1")
             return data.trips_by_last_date
         }
 
 
         if (sort_type === "trips_by_last_date") {
-            console.log(data.trips_by_last_date, "1")
+            // console.log(data.trips_by_last_date, "1")
             return data.trips_by_last_date
         }
 
 
         if (sort_type === "trips_by_name") {
-            console.log(data.trips_by_name, "2")
+            // console.log(data.trips_by_name, "2")
             return data.trips_by_name
         }
 
 
         if (sort_type === "trips_by_start_date") {
-            console.log(data.trips_by_start_date, "3")
+            // console.log(data.trips_by_start_date, "3")
             return data.trips_by_start_date
         }
         return data

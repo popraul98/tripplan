@@ -31,7 +31,7 @@ class UserController extends Controller
                 'password' => Hash::make($req->input('password')),
             ]);
         } catch (\Exception $exception) {
-            return response([
+            return response()->json([
                 'message' => $exception->getMessage()
             ], 400);
         }
@@ -48,20 +48,20 @@ class UserController extends Controller
                 $user = Auth::user();
                 $token = $user->createToken('app')->accessToken;
 
-                return response([
+                return response()->json([
                     'message' => 'success',
                     'token' => $token,
                     'user' => $user,
                 ]);
             }
         } catch (\Exception $exception) {
-            return response([
+            return response()->json([
                 'message' => $exception->getMessage()
             ], 400);
         }
 
 
-        return response([
+        return response()->json([
             'message' => 'Invalid username/password'
         ], 401);
 
@@ -85,11 +85,11 @@ class UserController extends Controller
         $tokenRepository = app(TokenRepository::class);
         try {
             $tokenRepository->revokeAccessToken($tokenId);
-            return response([
+            return response()->json([
                 'message' => "You are log out successfully!"
             ]);
         } catch (\Exception $exception) {
-            return response([
+            return response()->json([
                 'message' => $exception->getMessage()
             ], 400);
         }
@@ -105,7 +105,7 @@ class UserController extends Controller
         $email = $req->input('email');
 
         if (User::where('email', $email)->doesntExist()) {
-            return response([
+            return response()->json([
                 'message' => 'User don\'t exists!'
             ], 404);
         }
@@ -124,11 +124,11 @@ class UserController extends Controller
                 $message->subject('Reset your passoword');
             });
 
-            return response([
+            return response()->json([
                 'message' => 'Check your email!'
             ]);
         } catch (\Exception $exception) {
-            return response([
+            return response()->json([
                 'message' => $exception->getMessage()
             ]);
         }
@@ -139,14 +139,14 @@ class UserController extends Controller
         $token = $req->input('token');
 
         if (!$passwordResets = DB::table('password_resets')->where('token', $token)->first()) {
-            return response([
+            return response()->json([
                 'message' => 'Invalid Token!'
             ], 400);
         }
 
         /** @var User $user */
         if (!$user = User::where('email', $passwordResets->email)->first()) {
-            return response([
+            return response()->json([
                 'message' => 'User don\'t exist!'
             ], 400);
         }
@@ -154,7 +154,7 @@ class UserController extends Controller
         $user->password = Hash::make($req->input('password'));
         $user->save();
 
-        return response([
+        return response()->json([
             'message' => "Your password was changed successfully!"
         ]);
     }
