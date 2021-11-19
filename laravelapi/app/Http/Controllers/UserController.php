@@ -73,14 +73,14 @@ class UserController extends Controller
     //Functia imi da id-ul care face match-ul in DB => pot sa dau revoke('id)
     public function getTokenId($tokenFromRequest)
     {
-        $token = $tokenFromRequest->input('id');
-
-        return (new Parser(new JoseEncoder()))->parse($token)->claims()->all()['jti'];
+        return (new Parser(new JoseEncoder()))->parse($tokenFromRequest)->claims()->all()['jti'];
     }
 
     public function logout(Request $req)
     {
-        $tokenId = $this->getTokenId($req);
+        $token = $req->input('id');
+
+        $tokenId = $this->getTokenId($token);
 
         $tokenRepository = app(TokenRepository::class);
         try {
@@ -121,7 +121,7 @@ class UserController extends Controller
             //SEND EMAIL
             Mail::send('Mails.resetPassword', ['token' => $token], function (\Illuminate\Mail\Message $message) use ($email) {
                 $message->to($email);
-                $message->subject('Reset your passoword');
+                $message->subject('Reset your password');
             });
 
             return response()->json([
@@ -132,6 +132,23 @@ class UserController extends Controller
                 'message' => $exception->getMessage()
             ]);
         }
+    }
+
+    public function checkTokenResetPassword(Request $req)
+    {
+        $token = $req->input('token');
+
+        if (!$tokenCheck = DB::table('password_resets')->where('token', $token)->first()) {
+            return response()->json([
+                'message' => 'Invalid Token!'
+            ], 400);
+        }else {
+            return response()->json([
+                'value'=>true,
+                'message'=>'Valid Token'
+            ]);
+        }
+
     }
 
     public function resetPassword(ResetRequest $req)

@@ -5,7 +5,7 @@ import {login, logout, selectUser} from "../features/userSlice";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, ComponentLifecycle} from "react";
 import AddTripModal from "./AddTripModal";
 import DetailsDestination from "./DetailsDestination";
 import Select from "react-select";
@@ -36,26 +36,24 @@ const Home = (props) => {
 
     //check token for user
     const checkToken = async () => {
-        let token = user.token
-        if(token !== null)
+        let tokenId = user.token
+        if (tokenId != null) {
+            const res = await axios.get("http://127.0.0.1:8000/api/get-user", {
+                headers: {
+                    Authorization: "Bearer " + tokenId
+                }
+            }).then(response => {
+                if (response.status === 200) {
+                    console.log("Token Valabil")
+                    return true
+                }
+            }).catch(error => {
 
-        console.log("la asta da")
-        const res = await axios.get("http://127.0.0.1:8000/api/get-user", {
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        }).then(response => {
-            // console.log(response)
-            if(response.status === 200)
-                getTrips()
-            console.log("Token Valabil")
-
-        }).catch(error => {
-
-            console.log(error)
-            alert("Token Invalid")
-            handleLogOut();
-        });
+                console.log(error)
+                alert("Token Invalid")
+                handleLogOut();
+            });
+        }
     }
 
     //sort trips
@@ -72,12 +70,12 @@ const Home = (props) => {
         getTrips(e.target.value)
     }
 
-
     // get trips for user
     useEffect(() => {
-        console.log("use effects")
-        checkToken()
-        // getTrips()
+        console.log("UseEffects")
+        if (user != null)
+            if (checkToken())
+                getTrips()
 
     }, [user])
 
@@ -272,7 +270,7 @@ const Home = (props) => {
                                                 />
                                             </td>
                                         </tr>
-                                    )) : ""}
+                                    )) : null}
                                     </tbody>
                                     {trips.length === 0 ?
                                         <span className=" p-4 bg-gray-100 flex flex justify-between text-gray-500">You

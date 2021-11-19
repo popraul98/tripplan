@@ -25,6 +25,7 @@ Route::post("/logout", [\App\Http\Controllers\UserController::class, 'logout']);
 
 Route::get("/get-user", [\App\Http\Controllers\UserController::class, 'getUser'])->middleware('auth:api');
 Route::post("/reset-password-request", [\App\Http\Controllers\UserController::class, 'resetPasswordRequest']);
+Route::post("/check-token-resetPassword", [\App\Http\Controllers\UserController::class, 'checkTokenResetPassword']);
 Route::post("/reset-password", [\App\Http\Controllers\UserController::class, 'resetPassword']);
 
 //Trips

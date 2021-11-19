@@ -1,5 +1,5 @@
 import axios from "axios";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 
 const ResetPasswordForm = () => {
@@ -19,6 +19,20 @@ const ResetPasswordForm = () => {
         console.log(token);
 
     };
+
+    useEffect(() => {
+        checkToken()
+    })
+
+    const checkToken = async () => {
+        console.log("check Token...")
+        const res = await axios.post("http://127.0.0.1:8000/api/check-token-resetPassword", token)
+            .then(response => {
+                console.log(response)
+            }).catch(error => {
+                console.log(error.message);
+            })
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
