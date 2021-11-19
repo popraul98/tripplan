@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ForgotRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\ResetRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use http\Message;
 use Illuminate\Http\Request;
@@ -51,7 +52,7 @@ class UserController extends Controller
                 return response()->json([
                     'message' => 'success',
                     'token' => $token,
-                    'user' => $user,
+                    'user' => new UserResource($user),
                 ]);
             }
         } catch (\Exception $exception) {
@@ -140,12 +141,13 @@ class UserController extends Controller
 
         if (!$tokenCheck = DB::table('password_resets')->where('token', $token)->first()) {
             return response()->json([
-                'message' => 'Invalid Token!'
+                'message' => 'Invalid Token!',
+                'value' => false,
             ], 400);
-        }else {
+        } else {
             return response()->json([
-                'value'=>true,
-                'message'=>'Valid Token'
+                'value' => true,
+                'message' => 'Valid Token'
             ]);
         }
 
@@ -170,6 +172,11 @@ class UserController extends Controller
 
         $user->password = Hash::make($req->input('password'));
         $user->save();
+
+        //invalidate token when password was reseted
+        DB::table('password_resets')
+            ->where('token', $token)
+            ->update(['token' => 0]);
 
         return response()->json([
             'message' => "Your password was changed successfully!"

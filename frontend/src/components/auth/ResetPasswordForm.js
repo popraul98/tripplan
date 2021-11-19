@@ -1,8 +1,11 @@
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const ResetPasswordForm = () => {
+
+    const navigate = useNavigate();
 
     //take parameter from url - token
     let {token} = useParams();
@@ -25,11 +28,14 @@ const ResetPasswordForm = () => {
     })
 
     const checkToken = async () => {
-        console.log("check Token...")
-        const res = await axios.post("http://127.0.0.1:8000/api/check-token-resetPassword", token)
+        console.log("check Token..")
+        const res = await axios.post("http://127.0.0.1:8000/api/check-token-resetPassword", {token})
             .then(response => {
-                console.log(response)
+                console.log(response.data)
+
             }).catch(error => {
+                alert("Token Invalid! \ Go back to Login")
+                navigate("/")
                 console.log(error.message);
             })
     }

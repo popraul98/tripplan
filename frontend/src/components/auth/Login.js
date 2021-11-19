@@ -32,7 +32,8 @@ const Login = (props) => {
 
                             if (response.data !== 0) {
                                 console.log("login");
-                                // console.log(response.data.user.id)
+                                console.log(response.data)
+
                                 dispatch(login({
                                     user: response.data.user,
                                     token: response.data.token,
