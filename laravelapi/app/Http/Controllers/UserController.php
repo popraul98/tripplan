@@ -8,6 +8,7 @@ use App\Http\Requests\ResetRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use http\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -111,9 +112,21 @@ class UserController extends Controller
                 $token = null;
                 return Auth::user();
             } else {
-                return response()->json([
-                    'message' => 'Token time has expired. Please log in again.'
-                ], 400);
+
+                //create refresh token
+                $http = new Client();
+
+                $response = $http->post('http://localhost:3000/oauth/token', [
+                    'form_params' => [
+                        'grant_type' => 'refresh_token',
+                        'refresh_token' => 'the-refresh-token',
+                        'client_id' => 'client-id',
+                        'client_secret' => 'client-secret',
+                        'scope' => '',
+                    ],
+                ]);
+
+                return $response;
             }
         } catch (\Exception $exception) {
             return response()->json([
