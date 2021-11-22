@@ -20,18 +20,17 @@ const Home = (props) => {
 
     //logOut
     const handleLogOut = async (e) => {
-        e.preventDefault();
+        // e.preventDefault();
 
-        let id = user.token;
+        let token = user.token;
 
         //invalidate token after log out
-        const res = await axios.post("http://127.0.0.1:8000/api/logout", {id})
+        const res = await axios.post("http://127.0.0.1:8000/api/logout", {token})
             .then(response => {
                 dispatch(logout());
                 navigate('/')
                 alert(response.data.message)
             })
-
     };
 
     //check token for user
@@ -43,14 +42,13 @@ const Home = (props) => {
                     Authorization: "Bearer " + tokenId
                 }
             }).then(response => {
-                if (response.status === 200) {
+                if (response.status === 200 ||  response.status === 201) {
                     console.log("Token Valabil")
                     return true
                 }
             }).catch(error => {
-
                 console.log(error)
-                alert("Token Invalid")
+                alert("Token InvalidX")
                 handleLogOut();
             });
         }

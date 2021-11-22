@@ -7,6 +7,7 @@ use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\ResetRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Carbon\Carbon;
 use http\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -79,7 +80,7 @@ class UserController extends Controller
 
     public function logout(Request $req)
     {
-        $token = $req->input('id');
+        $token = $req->input('token');
 
         $tokenId = $this->getTokenId($token);
 
@@ -96,9 +97,30 @@ class UserController extends Controller
         }
     }
 
-    public function getUser()
+    //verifica si pentru revoked
+    public function getUser(Request $req)
     {
-        return Auth::user();
+        $header = $req->bearerToken();
+        $tokenId = $this->getTokenId($header);
+        try {
+            $token = DB::table('oauth_access_tokens')
+                ->where('id', $tokenId)
+                ->whereDate('expires_at', '>', Carbon::now())
+                ->first();
+            if ($token) {
+                $token = null;
+                return Auth::user();
+            } else {
+                return response()->json([
+                    'message' => 'Token time has expired. Please log in again.'
+                ], 400);
+            }
+        } catch (\Exception $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], 404);
+        }
+
     }
 
     public function resetPasswordRequest(ForgotRequest $req)
