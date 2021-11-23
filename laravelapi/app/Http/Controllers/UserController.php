@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Psy\Util\Str;
 
@@ -50,12 +51,37 @@ class UserController extends Controller
                 /** @var User $user */
                 $user = Auth::user();
                 $token = $user->createToken('app')->accessToken;
+                $client = DB::table('oauth_clients')
+                    ->where('password_client', true)
+                    ->first();
 
-                return response()->json([
-                    'message' => 'success',
-                    'token' => $token,
-                    'user' => new UserResource($user),
+//                $http = new Client();
+//                $response = $http->post(url('oauth/token'), array(
+//                    'form_params' => array(
+//                        'grant_type' => 'password',
+//                        'client_id' => $client->id,
+//                        'client_secret' => $client->secret,
+//                        'email' => $req['email'],
+//                        'password' => $req['password']
+//                    )));
+//                return json_decode($response->getBody(), true);
+
+                $response = Http::asForm()->post('http://localhost:3000/oauth/token', [
+                    'grant_type' => 'password',
+                    'client_id' => $client->id,
+                    'client_secret' => $client->secret,
+                    'email' => $req->input('email'),
+                    'password' => $req->input('password'),
+                    'scope' => '*',
                 ]);
+
+                return $response->json();
+
+//                return response()->json([
+//                    'message' => 'success',
+//                    'token' => $token,
+//                    'user' => new UserResource($user),
+//                ]);
             }
         } catch (\Exception $exception) {
             return response()->json([
@@ -113,20 +139,31 @@ class UserController extends Controller
                 return Auth::user();
             } else {
 
-                //create refresh token
-                $http = new Client();
+//                $http = new GuzzleHttp\Client;
+//
+//                $response = $http->post('http://localhost:3000/oauth/token', [
+//                    'form_params' => [
+//                        'grant_type' => 'authorization_code',
+//                        'client_id' => '5',
+//                        'client_secret' => 'R04JdQoijxxrtmQVRwVR0vrGoNQiOssfLaXVeJIH',
+//                        'redirect_uri' => 'http://localhost:3000/get-token',
+//                        'code' => $req->code,
+//                    ],
+//                ]);
+//
+//                return json_decode((string)$response->getBody(), true);
 
-                $response = $http->post('http://localhost:3000/oauth/token', [
-                    'form_params' => [
-                        'grant_type' => 'refresh_token',
-                        'refresh_token' => 'the-refresh-token',
-                        'client_id' => 'client-id',
-                        'client_secret' => 'client-secret',
-                        'scope' => '',
-                    ],
+                $response = Http::asForm()->post('http://localhost:3000/oauth/token', [
+                    'grant_type' => 'refresh_token',
+                    'refresh_token' => 'the-refresh-token',
+                    'client_id' => 6,
+                    'client_secret' => 'R04JdQoijxxrtmQVRwVR0vrGoNQiOssfLaXVeJIH',
+                    'scope' => '',
                 ]);
 
-                return $response;
+                return $response->json();
+
+                return  "false";
             }
         } catch (\Exception $exception) {
             return response()->json([

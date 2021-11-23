@@ -23,6 +23,36 @@ Route::post("/register", [\App\Http\Controllers\UserController::class, 'register
 Route::post("/login", [\App\Http\Controllers\UserController::class, 'login']);
 Route::post("/logout", [\App\Http\Controllers\UserController::class, 'logout']);
 
+//Route::get('redirect', function () {
+//    Route::get('/redirect', function () {
+//        $query = http_build_query([
+//            'client_id' => '5',
+//            'redirect_uri' => 'http://localhost:3000/callback',
+//            'response_type' => 'code',
+//            'scope' => '',
+//        ]);
+//
+//        return redirect('http://localhost:3000/oauth/authorize?' . $query);
+//    });
+//})->name('get-token');
+//
+//Route::get('/callback', function (Request $request) {
+//    $http = new GuzzleHttp\Client;
+//
+//    $response = $http->post('http://localhost:3000/oauth/token', [
+//        'form_params' => [
+//            'grant_type' => 'authorization_code',
+//            'client_id' => '5',
+//            'client_secret' => 'R04JdQoijxxrtmQVRwVR0vrGoNQiOssfLaXVeJIH',
+//            'redirect_uri' => 'http://localhost:3000/callback',
+//            'code' => $request->code,
+//        ],
+//    ]);
+//
+//    return json_decode((string) $response->getBody(), true);
+//});
+
+
 Route::get("/get-user", [\App\Http\Controllers\UserController::class, 'getUser'])->middleware('auth:api');
 Route::post("/reset-password-request", [\App\Http\Controllers\UserController::class, 'resetPasswordRequest']);
 Route::post("/check-token-resetPassword", [\App\Http\Controllers\UserController::class, 'checkTokenResetPassword']);
