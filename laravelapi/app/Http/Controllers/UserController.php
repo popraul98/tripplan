@@ -46,36 +46,28 @@ class UserController extends Controller
 
     function login(Request $req)
     {
+
         try {
             if (Auth::attempt($req->only('email', 'password'))) {
                 /** @var User $user */
                 $user = Auth::user();
-                $token = $user->createToken('app')->accessToken;
+                //old token
+//                $token = $user->createToken('app')->accessToken;
                 $client = DB::table('oauth_clients')
                     ->where('password_client', true)
                     ->first();
 
-//                $http = new Client();
-//                $response = $http->post(url('oauth/token'), array(
-//                    'form_params' => array(
-//                        'grant_type' => 'password',
-//                        'client_id' => $client->id,
-//                        'client_secret' => $client->secret,
-//                        'email' => $req['email'],
-//                        'password' => $req['password']
-//                    )));
-//                return json_decode($response->getBody(), true);
-
-                $response = Http::asForm()->post('http://localhost:3000/oauth/token', [
-                    'grant_type' => 'password',
-                    'client_id' => $client->id,
-                    'client_secret' => $client->secret,
-                    'email' => $req->input('email'),
-                    'password' => $req->input('password'),
-                    'scope' => '*',
+                $http = new \GuzzleHttp\Client;
+                $response = $http->post('http://127.0.0.1:8001/oauth/token', [
+                    'form_params' => [
+                        'grant_type' => 'password',
+                        'client_id' => $client->id,
+                        'client_secret' => $client->secret,
+                        'username' => $req['email'],
+                        'password' => $req['password']
+                    ],
                 ]);
-
-                return $response->json();
+                return $response->getBody();
 
 //                return response()->json([
 //                    'message' => 'success',
@@ -127,45 +119,44 @@ class UserController extends Controller
     //verifica si pentru revoked
     public function getUser(Request $req)
     {
-        $header = $req->bearerToken();
-        $tokenId = $this->getTokenId($header);
+        $access_token_header = $this->getTokenId($req->bearerToken());
+//        dd($access_token_header);
         try {
-            $token = DB::table('oauth_access_tokens')
-                ->where('id', $tokenId)
-                ->whereDate('expires_at', '>', Carbon::now())
+
+            $access_token = DB::table('oauth_access_tokens')
+                ->where('id', $access_token_header)
                 ->first();
-            if ($token) {
+            $refresh_token = DB::table('oauth_refresh_tokens')
+                ->where('access_token_id', $access_token_header)
+                ->first();
+
+            //verificare token-uri nu sunt revoked
+            if ($access_token->revoked == 1 || $refresh_token->revoked == 1) {
+                return "token revoked... LOGIN NEEDED";
+            }
+
+            // '<' - expirat
+            //Daca access_token & refresh_token sunt available returneaza USER (resources)
+            if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at > Carbon::now()) {
                 $token = null;
                 return Auth::user();
-            } else {
-
-//                $http = new GuzzleHttp\Client;
-//
-//                $response = $http->post('http://localhost:3000/oauth/token', [
-//                    'form_params' => [
-//                        'grant_type' => 'authorization_code',
-//                        'client_id' => '5',
-//                        'client_secret' => 'R04JdQoijxxrtmQVRwVR0vrGoNQiOssfLaXVeJIH',
-//                        'redirect_uri' => 'http://localhost:3000/get-token',
-//                        'code' => $req->code,
-//                    ],
+            }
+            if ($refresh_token->expires_at > Carbon::now()&& $access_token->expires_at < Carbon::now() ) {
+                return "Acces Token Expirat";
+//                $response = Http::asForm()->post('http://localhost:8001/oauth/token', [
+//                    'grant_type' => 'refresh_token',
+//                    'refresh_token' => $refresh_token,
+//                    'client_id' => 6,
+//                    'client_secret' => 'R04JdQoijxxrtmQVRwVR0vrGoNQiOssfLaXVeJIH',
+//                    'scope' => '',
 //                ]);
 //
-//                return json_decode((string)$response->getBody(), true);
-
-                $response = Http::asForm()->post('http://localhost:3000/oauth/token', [
-                    'grant_type' => 'refresh_token',
-                    'refresh_token' => 'the-refresh-token',
-                    'client_id' => 6,
-                    'client_secret' => 'R04JdQoijxxrtmQVRwVR0vrGoNQiOssfLaXVeJIH',
-                    'scope' => '',
-                ]);
-
-                return $response->json();
-
-                return  "false";
+//                return $response->json();
             }
-        } catch (\Exception $exception) {
+
+
+        } catch
+        (\Exception $exception) {
             return response()->json([
                 'message' => $exception->getMessage()
             ], 404);
