@@ -16,7 +16,7 @@ class TripController extends Controller
     public function index(Request $req)
     {
         //required id user
-        $id_user = $req->input('user.id');
+        $id_user = $req->input('user_id');
 
 
         $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at','DESC')->get();

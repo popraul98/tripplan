@@ -12,44 +12,63 @@ import Select from "react-select";
 import Login from "./auth/Login";
 
 
-const Home = (props) => {
+const Home = () => {
 
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [sentMessage, setSentMessage] = useState(false);
 
     //logOut
     const handleLogOut = async (e) => {
         // e.preventDefault();
 
-        let token = user.token;
-
-        //invalidate token after log out
+        let token = user.access_token;
+        // invalidate token after log out
         const res = await axios.post("http://127.0.0.1:8000/api/logout", {token})
             .then(response => {
                 dispatch(logout());
-                navigate('/')
-                alert(response.data.message)
+                // console.log(sentMessage,'sent MEssage')
+                if (e == true) {
+                    console.log("aiciiciii")
+                    navigate('/', {state: {message: "Your session expired!"}});
+                } else {
+                    navigate('/');
+                }
+
+
+                // alert(response.data.message)
             })
     };
 
     //check token for user
     const checkToken = async () => {
-        let tokenId = user.token
+        let tokenId = user.access_token;
+
         if (tokenId != null) {
             const res = await axios.get("http://127.0.0.1:8000/api/get-user", {
                 headers: {
-                    Authorization: "Bearer " + tokenId
+                    Authorization: "Bearer " + tokenId,
+                    refresh_token: user.refresh_token,
                 }
             }).then(response => {
-                if (response.status === 200 ||  response.status === 201) {
+                if (response.status === 200 || response.status === 201) {
                     console.log("Token Valabil")
+                    if (response.data.value == true) {
+                        dispatch(login({
+                            user: response.data.user,
+                            access_token: response.data.tokens.access_token,
+                            refresh_token: response.data.tokens.refresh_token,
+                            loggedIn: true,
+                        }));
+                    }
                     return true
                 }
             }).catch(error => {
                 console.log(error)
-                alert("Token InvalidX")
-                handleLogOut();
+                setSentMessage(true);
+                // alert("Token InvalidX")
+                handleLogOut(true);
             });
         }
     }
@@ -72,8 +91,9 @@ const Home = (props) => {
     useEffect(() => {
         console.log("UseEffects")
         if (user != null)
-            if (checkToken())
+            if (checkToken()) {
                 getTrips()
+            }
 
     }, [user])
 
@@ -87,7 +107,9 @@ const Home = (props) => {
 
     //get Trips from server
     const fetchTrips = async (sort_type) => {
-        const res = await axios.post("http://127.0.0.1:8000/api/get-trips/", user)
+
+        let user_id = user.user.id
+        const res = await axios.post("http://127.0.0.1:8000/api/get-trips/", {user_id})
         const data = await res.data
 
 

@@ -66,14 +66,15 @@ class UserController extends Controller
                         'username' => $req['email'],
                         'password' => $req['password']
                     ],
-                ]);
-                return $response->getBody();
 
-//                return response()->json([
-//                    'message' => 'success',
-//                    'token' => $token,
-//                    'user' => new UserResource($user),
-//                ]);
+                ]);
+                $tokens = $response->getBody()->getContents();
+
+                return response()->json([
+                    'message' => 'success',
+                    'tokens' => json_decode($tokens),
+                    'user' => new UserResource($user),
+                ]);
             }
         } catch (\Exception $exception) {
             return response()->json([
@@ -101,11 +102,14 @@ class UserController extends Controller
     {
         $token = $req->input('token');
 
-        $tokenId = $this->getTokenId($token);
+        $access_token = $this->getTokenId($token);
 
         $tokenRepository = app(TokenRepository::class);
         try {
-            $tokenRepository->revokeAccessToken($tokenId);
+            $tokenRepository->revokeAccessToken($access_token);
+            DB::table('oauth_refresh_tokens')
+                ->where('access_token_id', $access_token)
+                ->update(['revoked' => 1]);
             return response()->json([
                 'message' => "You are log out successfully!"
             ]);
@@ -117,41 +121,66 @@ class UserController extends Controller
     }
 
     //verifica si pentru revoked
+    //params [ Authorization - access token-ul, refresh_token]
     public function getUser(Request $req)
     {
+        $user = Auth::user();
         $access_token_header = $this->getTokenId($req->bearerToken());
-//        dd($access_token_header);
-        try {
+        $client = DB::table('oauth_clients')
+            ->where('password_client', true)
+            ->first();
 
+        try {
             $access_token = DB::table('oauth_access_tokens')
                 ->where('id', $access_token_header)
                 ->first();
+
             $refresh_token = DB::table('oauth_refresh_tokens')
                 ->where('access_token_id', $access_token_header)
                 ->first();
 
-            //verificare token-uri nu sunt revoked
+            $refresh_token_decrypt = $req->header('refresh_token');
+
+            //verificare token-uri daca sunt revoked
             if ($access_token->revoked == 1 || $refresh_token->revoked == 1) {
-                return "token revoked... LOGIN NEEDED";
+                return response()->json([
+                    'message' => 'Token Revoked... LOGIN NEEDED',
+                    'value' => false,
+                ], 400);
             }
 
-            // '<' - expirat
             //Daca access_token & refresh_token sunt available returneaza USER (resources)
             if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at > Carbon::now()) {
                 $token = null;
                 return Auth::user();
             }
-            if ($refresh_token->expires_at > Carbon::now()&& $access_token->expires_at < Carbon::now() ) {
-                return "Acces Token Expirat";
-//                $response = Http::asForm()->post('http://localhost:8001/oauth/token', [
-//                    'grant_type' => 'refresh_token',
-//                    'refresh_token' => $refresh_token,
-//                    'client_id' => 6,
-//                    'client_secret' => 'R04JdQoijxxrtmQVRwVR0vrGoNQiOssfLaXVeJIH',
-//                    'scope' => '',
-//                ]);
-//
-//                return $response->json();
+
+            // '<' - expirat
+            if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at < Carbon::now()) {
+//                return "Access Token Expirat";
+
+                $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
+                    'grant_type' => 'refresh_token',
+                    'refresh_token' => $refresh_token_decrypt,
+                    'client_id' => $client->id,
+                    'client_secret' => $client->secret,
+                    'scope' => '',
+                ]);
+
+                $tokens = $response->getBody()->getContents();
+
+                return response()->json([
+                    'message' => 'tokens refreshed',
+                    'value' => true,
+                    'tokens' => json_decode($tokens),
+                    'user' => new UserResource($user),
+                ]);
+            }
+            if ($refresh_token->expires_at < Carbon::now()) {
+                return response()->json([
+                    'message' => 'Refresh Token Expired! Need login!',
+                    'value' => false,
+                ], 400);
             }
 
 

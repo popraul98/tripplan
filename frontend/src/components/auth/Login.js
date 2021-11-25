@@ -1,8 +1,8 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
-import {BrowserRouter as Router, Routes, Route, Link, useNavigate, Navigate} from "react-router-dom";
+import {BrowserRouter as Router, Routes, Route, Link, useNavigate,useLocation, Navigate} from "react-router-dom";
 import Register from "./Register";
 import Home from "../Home";
 import {useDispatch, useSelector} from "react-redux";
@@ -13,6 +13,7 @@ const Login = (props) => {
     const dispatch = useDispatch();
     const user = useSelector(selectUser);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const formik = useFormik({
         initialValues: {
@@ -33,10 +34,12 @@ const Login = (props) => {
                             if (response.data !== 0) {
                                 console.log("login");
                                 console.log(response.data)
+                                console.log(response.data.access_token)
 
                                 dispatch(login({
                                     user: response.data.user,
-                                    token: response.data.token,
+                                    access_token: response.data.tokens.access_token,
+                                    refresh_token: response.data.tokens.refresh_token,
                                     loggedIn: true,
                                 }));
                                 navigate("/home")
@@ -58,6 +61,9 @@ const Login = (props) => {
 
             <form className="bg-white shadow-2xl rounded px-8 pt-6 pb-8 mb-4 bg-gray-100 "
                   onSubmit={formik.handleSubmit}>
+                <div className="text-red-400">
+                    {location.state  ? location.state.message : ""}
+                </div>
                 <h3 className="font-bold text-xl mb-6">Login</h3>
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
