@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends JsonResource
+class TripResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +16,11 @@ class UserResource extends JsonResource
     {
 //        return parent::toArray($request);
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
-            'trips' => TripResource::collection($this->trips)
+
+            'destination' => $this->destination,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+            'comment' => $this->comment,
         ];
     }
 }

@@ -19,41 +19,35 @@ const Home = () => {
     const navigate = useNavigate();
     const [sentMessage, setSentMessage] = useState(false);
 
-    //logOut
+    //logOut & invalidate token after logout
     const handleLogOut = async (e) => {
-        // e.preventDefault();
+        let token_access = user.access_token;
 
-        let token = user.access_token;
-        // invalidate token after log out
-        const res = await axios.post("http://127.0.0.1:8000/api/logout", {token})
+        const res = await axios.post("http://127.0.0.1:8000/api/logout", {token_access})
             .then(response => {
                 dispatch(logout());
-                // console.log(sentMessage,'sent MEssage')
                 if (e == true) {
-                    console.log("aiciiciii")
                     navigate('/', {state: {message: "Your session expired!"}});
                 } else {
                     navigate('/');
                 }
-
-
-                // alert(response.data.message)
             })
     };
 
-    //check token for user
+    //Check token for user and receive User with Trips (also refresh token)
     const checkToken = async () => {
-        let tokenId = user.access_token;
-
-        if (tokenId != null) {
+        if (user.access_token != null) {
             const res = await axios.get("http://127.0.0.1:8000/api/get-user", {
                 headers: {
-                    Authorization: "Bearer " + tokenId,
+                    Authorization: "Bearer " + user.access_token,
                     refresh_token: user.refresh_token,
                 }
             }).then(response => {
                 if (response.status === 200 || response.status === 201) {
                     console.log("Token Valabil")
+                    console.log(response.data.data)
+
+                    //if we have a new refresh token
                     if (response.data.value == true) {
                         dispatch(login({
                             user: response.data.user,
@@ -67,7 +61,6 @@ const Home = () => {
             }).catch(error => {
                 console.log(error)
                 setSentMessage(true);
-                // alert("Token InvalidX")
                 handleLogOut(true);
             });
         }

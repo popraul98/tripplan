@@ -2,11 +2,13 @@ import axios from "axios";
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
+import "./css/styles.css";
 
 const ResetPasswordForm = () => {
 
     const navigate = useNavigate();
-    const [showForm, setShowForm] = useState(true)
+    const [showForm, setShowForm] = useState(null)
+
     //take parameter from url - token
     let {token} = useParams();
 
@@ -24,7 +26,9 @@ const ResetPasswordForm = () => {
     };
 
     useEffect(() => {
-        setShowForm(checkToken())
+        checkToken()
+
+        console.log(showForm)
 
     })
 
@@ -32,12 +36,12 @@ const ResetPasswordForm = () => {
         console.log("check Token..")
         const res = await axios.post("http://127.0.0.1:8000/api/check-token-resetPassword", {token})
             .then(response => {
-                console.log(response.data.value)
-                return true
+                // console.log(response.data.value)
+                setShowForm(true)
             }).catch(error => {
+                console.log(error.message);
                 alert("Token Invalid! \ Go back to Login")
                 navigate("/")
-                console.log(error.message);
             })
     }
 
@@ -60,9 +64,9 @@ const ResetPasswordForm = () => {
             })
 
     }
-
+    if (showForm == true)
         return (
-            <div form={showForm} className="bg-white shadow-2xl rounded px-8 pt-6 pb-8 mb-4 bg-gray-100 ">
+            <div className="bg-white shadow-2xl rounded px-8 pt-6 pb-8 mb-4 bg-gray-100 ">
                 <form onSubmit={handleSubmit}>
                     <h3>Reset Your Password</h3>
                     <div className="mb-4">
@@ -106,6 +110,17 @@ const ResetPasswordForm = () => {
             </div>
         )
 
+    if (showForm == null)
+        return (
+            <div className="flex items-center justify-center h-screen">
+
+                <div className="loader">
+
+
+                </div>
+
+            </div>
+        )
 
 }
 
