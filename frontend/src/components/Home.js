@@ -45,28 +45,45 @@ const Home = () => {
             }).then(response => {
                 if (response.status === 200 || response.status === 201) {
                     console.log("Token Valabil")
-                    console.log(response.data.data)
-
-                    //if we have a new refresh token
-                    if (response.data.value == true) {
-                        dispatch(login({
-                            user: response.data.user,
-                            access_token: response.data.tokens.access_token,
-                            refresh_token: response.data.tokens.refresh_token,
-                            loggedIn: true,
-                        }));
-                    }
                     return true
                 }
             }).catch(error => {
-                console.log(error)
-                setSentMessage(true);
-                handleLogOut(true);
+                console.log(error.response)
+                if (error.response.data.value == true) {
+                    requestNewRefreshToken(user.refresh_token)
+                    console.log(error.response.data, 'intra aici')
+                }
+
+                if (error.response.data.value == false) {
+                    setSentMessage(true);
+                    handleLogOut(true);
+                }
             });
         }
     }
 
-    //sort trips
+    const requestNewRefreshToken = async (refresh_token) => {
+        const res = await axios.get("http://127.0.0.1:8000/api/refresh_token", {
+            headers: {
+                refresh_token: refresh_token
+            }
+        }).then(response => {
+                //if we have a new refresh token
+                if (response.data.value == true) {
+                    dispatch(login({
+                        user: response.data.user,
+                        access_token: response.data.tokens.access_token,
+                        refresh_token: response.data.tokens.refresh_token,
+                        loggedIn: true,
+                    }));
+                }
+            }
+        ).catch(error => {
+
+        });
+    }
+
+//sort trips
     const options = [
         {value: 'trips_by_last_date', label: 'sort by Last Added'},
         {value: 'trips_by_name', label: 'sort by Name ASC'},
@@ -80,7 +97,7 @@ const Home = () => {
         getTrips(e.target.value)
     }
 
-    // get trips for user
+// get trips for user
     useEffect(() => {
         console.log("UseEffects")
         if (user != null)
@@ -98,7 +115,7 @@ const Home = () => {
         setTrips(tripsFromServer)
     }
 
-    //get Trips from server
+//get Trips from server
     const fetchTrips = async (sort_type) => {
 
         let user_id = user.user.id
@@ -131,7 +148,7 @@ const Home = () => {
         return data
     }
 
-    //delete Trip from Server
+//delete Trip from Server
     const deleteTrip = async (id_trip) => {
         await axios.delete("http://localhost:8000/api/delete-trip/" + id_trip)
             .then(response => {
@@ -142,7 +159,7 @@ const Home = () => {
     }
 
 
-    //Modal Add Trip
+//Modal Add Trip
     const [modalAddTripOpen, setModalAddTripOpen] = useState(false)
 
     const handleCloseAddTripModal = () => {
@@ -150,7 +167,7 @@ const Home = () => {
         getTrips();
     }
 
-    //Modal Details Destination
+//Modal Details Destination
     const [modalDetailsDest, setModalDetailsDest] = useState(false)
 
     const handleCloseDetailsDest = () => {
@@ -169,7 +186,7 @@ const Home = () => {
         setModalDetailsDest(true);
     }
 
-    //Counter Days Left
+//Counter Days Left
     const counterDaysLeft = (date) => {
         const _MS_PER_DAY = 1000 * 60 * 60 * 24;
         date = new Date(date);

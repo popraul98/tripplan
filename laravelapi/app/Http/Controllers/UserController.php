@@ -142,7 +142,7 @@ class UserController extends Controller
                 return response()->json([
                     'message' => 'Token Revoked... LOGIN NEEDED',
                     'value' => false,
-                ], 400);
+                ], 401);
             }
 
             //Daca access_token & refresh_token sunt available returneaza USER (resources)
@@ -153,28 +153,17 @@ class UserController extends Controller
 
             if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at < Carbon::now()) {
 
-                $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
-                    'grant_type' => 'refresh_token',
-                    'refresh_token' => $refresh_token_decrypt,
-                    'client_id' => $client->id,
-                    'client_secret' => $client->secret,
-                    'scope' => '',
-                ]);
-                $tokens = $response->getBody()->getContents();
-
                 return response()->json([
-                    'message' => 'tokens refreshed',
+                    'message' => 'Refresh_token needed',
                     'value' => true,
-                    'tokens' => json_decode($tokens),
-                    'user' => new UserResource($user),
-                ]);
+                ], 401);
             }
 
             if ($refresh_token->expires_at < Carbon::now()) {
                 return response()->json([
                     'message' => 'Refresh Token Expired! Need login!',
                     'value' => false,
-                ], 400);
+                ], 401);
             }
 
         } catch
@@ -183,7 +172,30 @@ class UserController extends Controller
                 'message' => $exception->getMessage()
             ], 404);
         }
+    }
 
+    public function refreshToken(Request $req)
+    {
+        $client = DB::table('oauth_clients')
+            ->where('password_client', true)
+            ->first();
+
+        $refresh_token_decrypt = $req->header('refresh_token');
+
+        $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refresh_token_decrypt,
+            'client_id' => $client->id,
+            'client_secret' => $client->secret,
+            'scope' => '',
+        ]);
+        $tokens = $response->getBody()->getContents();
+
+        return response()->json([
+            'message' => 'tokens refreshed',
+            'value' => true,
+            'tokens' => json_decode($tokens),
+        ]);
     }
 
     public function resetPasswordRequest(ForgotRequest $req)
