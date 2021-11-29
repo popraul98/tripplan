@@ -126,51 +126,44 @@ class UserController extends Controller
             ->where('password_client', true)
             ->first();
 
-        try {
-            $access_token = DB::table('oauth_access_tokens')
-                ->where('id', $access_token_header)
-                ->first();
 
-            $refresh_token = DB::table('oauth_refresh_tokens')
-                ->where('access_token_id', $access_token_header)
-                ->first();
+        $access_token = DB::table('oauth_access_tokens')
+            ->where('id', $access_token_header)
+            ->first();
 
-            $refresh_token_decrypt = $req->header('refresh_token');
+        $refresh_token = DB::table('oauth_refresh_tokens')
+            ->where('access_token_id', $access_token_header)
+            ->first();
 
-            //verificare token-uri daca sunt revoked
-            if ($access_token->revoked == 1 || $refresh_token->revoked == 1) {
-                return response()->json([
-                    'message' => 'Token Revoked... LOGIN NEEDED',
-                    'value' => false,
-                ], 401);
-            }
+        $refresh_token_decrypt = $req->header('refresh_token');
 
-            //Daca access_token & refresh_token sunt available returneaza USER (resources)
-            if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at > Carbon::now()) {
-                $token = null;
-                return new UserResource($user);
-            }
-
-            if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at < Carbon::now()) {
-
-                return response()->json([
-                    'message' => 'Refresh_token needed',
-                    'value' => true,
-                ], 401);
-            }
-
-            if ($refresh_token->expires_at < Carbon::now()) {
-                return response()->json([
-                    'message' => 'Refresh Token Expired! Need login!',
-                    'value' => false,
-                ], 401);
-            }
-
-        } catch
-        (\Exception $exception) {
+        //verificare token-uri daca sunt revoked
+        if ($access_token->revoked == 1 || $refresh_token->revoked == 1) {
             return response()->json([
-                'message' => $exception->getMessage()
-            ], 404);
+                'message' => 'Token Revoked... LOGIN NEEDED',
+                'value' => false,
+            ], 401);
+        }
+
+        //Daca access_token & refresh_token sunt available returneaza USER (resources)
+        if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at > Carbon::now()) {
+            $token = null;
+            return new UserResource($user);
+        }
+
+        if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at < Carbon::now()) {
+
+            return response()->json([
+                'message' => 'Access Token Expired......Refresh_token needed',
+                'value' => true,
+            ], 401);
+        }
+
+        if ($refresh_token->expires_at < Carbon::now()) {
+            return response()->json([
+                'message' => 'Refresh Token Expired! Need login!',
+                'value' => false,
+            ], 401);
         }
     }
 
@@ -181,21 +174,28 @@ class UserController extends Controller
             ->first();
 
         $refresh_token_decrypt = $req->header('refresh_token');
+        try {
+            $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
+                'grant_type' => 'refresh_token',
+                'refresh_token' => $refresh_token_decrypt,
+                'client_id' => $client->id,
+                'client_secret' => $client->secret,
+                'scope' => '',
+            ]);
+            $tokens = $response->getBody()->getContents();
 
-        $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
-            'grant_type' => 'refresh_token',
-            'refresh_token' => $refresh_token_decrypt,
-            'client_id' => $client->id,
-            'client_secret' => $client->secret,
-            'scope' => '',
-        ]);
-        $tokens = $response->getBody()->getContents();
+            return response()->json([
+                'message' => 'tokens refreshed',
+                'value' => true,
+                'tokens' => json_decode($tokens),
+            ]);
 
-        return response()->json([
-            'message' => 'tokens refreshed',
-            'value' => true,
-            'tokens' => json_decode($tokens),
-        ]);
+        } catch (\Exception $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ]);
+        }
+
     }
 
     public function resetPasswordRequest(ForgotRequest $req)

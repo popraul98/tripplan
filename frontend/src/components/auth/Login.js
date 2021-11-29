@@ -2,11 +2,11 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
-import {BrowserRouter as Router, Routes, Route, Link, useNavigate,useLocation, Navigate} from "react-router-dom";
+import {BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation, Navigate} from "react-router-dom";
 import Register from "./Register";
 import Home from "../Home";
 import {useDispatch, useSelector} from "react-redux";
-import {login, selectUser} from "../../features/userSlice";
+import {login, selectUser, authorization} from "../../features/userSlice";
 
 const Login = (props) => {
 
@@ -38,10 +38,12 @@ const Login = (props) => {
 
                                 dispatch(login({
                                     user: response.data.user,
-                                    access_token: response.data.tokens.access_token,
-                                    refresh_token: response.data.tokens.refresh_token,
                                     loggedIn: true,
                                 }));
+                                dispatch(authorization({
+                                    access_token: response.data.tokens.access_token,
+                                    refresh_token: response.data.tokens.refresh_token,
+                                }))
                                 navigate("/home")
                             } else {
                                 console.log("BAD")
@@ -62,7 +64,7 @@ const Login = (props) => {
             <form className="bg-white shadow-2xl rounded px-8 pt-6 pb-8 mb-4 bg-gray-100 "
                   onSubmit={formik.handleSubmit}>
                 <div className="text-red-400">
-                    {location.state  ? location.state.message : ""}
+                    {location.state ? location.state.message : ""}
                 </div>
                 <h3 className="font-bold text-xl mb-6">Login</h3>
                 <div className="mb-4">

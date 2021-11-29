@@ -1,7 +1,7 @@
 import {Link, Navigate, Route, Routes} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {login, logout, selectUser} from "../features/userSlice";
+import {login, logout, selectUser, authorization, selectTokens} from "../features/userSlice";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
@@ -15,13 +15,14 @@ import Login from "./auth/Login";
 const Home = () => {
 
     const user = useSelector(selectUser);
+    const tokens = useSelector(selectTokens)
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [sentMessage, setSentMessage] = useState(false);
 
     //logOut & invalidate token after logout
     const handleLogOut = async (e) => {
-        let token_access = user.access_token;
+        let token_access = tokens.access_token;
 
         const res = await axios.post("http://127.0.0.1:8000/api/logout", {token_access})
             .then(response => {
@@ -36,11 +37,11 @@ const Home = () => {
 
     //Check token for user and receive User with Trips (also refresh token)
     const checkToken = async () => {
-        if (user.access_token != null) {
+        if (tokens.access_token != null) {
             const res = await axios.get("http://127.0.0.1:8000/api/get-user", {
                 headers: {
-                    Authorization: "Bearer " + user.access_token,
-                    refresh_token: user.refresh_token,
+                    Authorization: "Bearer " + tokens.access_token,
+                    refresh_token: tokens.refresh_token,
                 }
             }).then(response => {
                 if (response.status === 200 || response.status === 201) {
@@ -48,13 +49,12 @@ const Home = () => {
                     return true
                 }
             }).catch(error => {
-                console.log(error.response)
                 if (error.response.data.value == true) {
-                    requestNewRefreshToken(user.refresh_token)
-                    console.log(error.response.data, 'intra aici')
+                    console.log('refreshing Tokens')
+                    return requestNewRefreshToken(tokens.refresh_token)
                 }
-
-                if (error.response.data.value == false) {
+                console.log(error.response.status, 'error get user')
+                if (error.response.status == 401) {
                     setSentMessage(true);
                     handleLogOut(true);
                 }
@@ -69,18 +69,15 @@ const Home = () => {
             }
         }).then(response => {
                 //if we have a new refresh token
+                console.log('Tokens was refreshed!')
                 if (response.data.value == true) {
-                    dispatch(login({
-                        user: response.data.user,
+                    dispatch(authorization({
                         access_token: response.data.tokens.access_token,
                         refresh_token: response.data.tokens.refresh_token,
-                        loggedIn: true,
                     }));
                 }
             }
-        ).catch(error => {
-
-        });
+        )
     }
 
 //sort trips
