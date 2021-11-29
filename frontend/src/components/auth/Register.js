@@ -3,18 +3,21 @@ import {useFormik} from "formik";
 import * as Yup from 'yup';
 import {BrowserRouter as Router, Routes, Route, Link} from "react-router-dom";
 import Login from "./Login";
-import {useState} from "react";
+import React, {useEffect, useState} from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Register = (props) => {
 
-    const [messageStatus, setMessageStatus] = useState("")
+    const [messageStatus, setMessageStatus] = useState("");
+    const [errorsMessage, setErrorsMessages] = useState("");
 
     const new_user = useFormik({
         initialValues: {
             name: "",
             email: "",
             password: "",
-            password_confirm: ""
+            password_confirm: "",
+            errors_messages: "",
         },
         validationSchema: Yup.object({
             name: Yup.string()
@@ -26,27 +29,52 @@ const Register = (props) => {
                 .required('Required'),
         }),
         onSubmit: values => {
-            console.log(values)
-            try {
-                axios.post("http://127.0.0.1:8000/api/register", values)
-                    .then(response => {
 
-                        //show message to user
-                        setMessageStatus('You have been registered')
-                    })
-            } catch (error) {
-                console.error(error);
-            }
-
+            axios.post("http://127.0.0.1:8000/api/register", values)
+                .then(response => {
+                    setMessageStatus('You have been registered')
+                }).catch(function (error) {
+                if (error.response) {
+                    console.log(error.response.data.errors.email, 'errors from server')
+                    setErrorsMessages(JSON.parse(error.response.data.errors));
+                    console.log(error.response.data.errors[0])
+                    // new_user.values.errors_messages = error.response.data.errors
+                    // console.log(new_user.values.errors_messages, 'errors_mes')
+                }
+            })
         },
     });
+
+    // useEffect(() => {
+    //     console.log("UseEffects")
+    //     // new_user.values.errors_messages = "";
+    //
+    // }, [new_user.values.errors_messages])
 
 
     return (
         <div className="flex justify-center h-screen items-center ">
             <form className="bg-white shadow-2xl rounded px-8 pt-6 pb-8 mb-4 bg-gray-100"
                   onSubmit={new_user.handleSubmit}>
-                <h3 className="font-bold text-xl mb-6">Register</h3>
+                <h3 className="font-bold text-xl mb-3">Register</h3>
+                {/*<div className="ease-out duration-100 text-sm text-red-400">*/}
+                {/*    {new_user.values.errors_messages.email}*/}
+                {/*</div>*/}
+                {/*<div className="ease-out duration-100 text-sm text-red-400">*/}
+                {/*    {new_user.values.errors_messages.password}*/}
+                {/*</div>*/}
+                {/*<div className="ease-out duration-100 text-sm text-red-400">*/}
+                {/*    {new_user.values.errors_messages.password_confirm}*/}
+                {/*</div>*/}
+                {/*<div className="ease-out duration-100 text-sm text-red-400">*/}
+                {/*    {errorsMessage}*/}
+                {/*</div>*/}
+                {/*{errorsMessage.length > 0 ? errorsMessage.map((error) => (*/}
+                {/*    <div className="ease-out duration-100 text-sm text-red-400">*/}
+                {/*        {errorsMessage}*/}
+                {/*    </div>*/}
+                {/*)) : null}*/}
+
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
                         Name

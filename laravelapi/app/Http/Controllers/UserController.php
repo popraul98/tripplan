@@ -40,7 +40,6 @@ class UserController extends Controller
             ], 400);
         }
 
-
         return $user;
     }
 

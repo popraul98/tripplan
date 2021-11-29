@@ -19,42 +19,37 @@ const Login = (props) => {
         initialValues: {
             email: "",
             password: "",
+            error_messages: "",
         },
         validationSchema: Yup.object({
             email: Yup.string().email('Invalid email address').required('Required'),
-            password: Yup.string()
-                .max(20, 'Must be 20 characters or less')
-                .required('Required'),
+            password: Yup.string().max(20, 'Must be 20 characters or less').required('Required'),
         }),
-        onSubmit: values => {
-            try {
-                axios.post("http://127.0.0.1:8000/api/login", values)
-                    .then(response => {
+        onSubmit: async values => {
+            console.log("login submit")
 
-                            if (response.data !== 0) {
-                                console.log("login");
-                                console.log(response.data)
-                                console.log(response.data.access_token)
+            const res = await axios.post("http://127.0.0.1:8000/api/login", values)
+                .then(response => {
+                        console.log("login");
+                        dispatch(login({
+                            user: response.data.user,
+                            loggedIn: true,
+                        }));
+                        dispatch(authorization({
+                            access_token: response.data.tokens.access_token,
+                            refresh_token: response.data.tokens.refresh_token,
+                        }))
+                        navigate("/home")
+                    }
+                ).catch(function (error) {
+                    if (error.response) {
+                        console.log(error.response.data.message, 'error00');
+                        formik.values.error_messages = error.response.data.message;
+                    }
+                    console.log(formik.values.error_messages, 'error_messages');
 
-                                dispatch(login({
-                                    user: response.data.user,
-                                    loggedIn: true,
-                                }));
-                                dispatch(authorization({
-                                    access_token: response.data.tokens.access_token,
-                                    refresh_token: response.data.tokens.refresh_token,
-                                }))
-                                navigate("/home")
-                            } else {
-                                console.log("BAD")
-                            }
-
-                        }
-                    )
-            } catch (error) {
-                console.error(error);
-            }
-        },
+                })
+        }
     });
 
     return (
@@ -87,7 +82,7 @@ const Login = (props) => {
                         ) : null}
                     </div>
                 </div>
-                <div className="mb-5">
+                <div className="mb-3">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
                         Password
                     </label>
@@ -106,7 +101,10 @@ const Login = (props) => {
                             <div>{formik.errors.password}</div>
                         ) : null}
                     </div>
+                </div>
 
+                <div className="ease-out duration-100 text-sm text-red-400">
+                    {formik.values.error_messages}
                 </div>
 
                 <div className="flex items-center justify-between">
