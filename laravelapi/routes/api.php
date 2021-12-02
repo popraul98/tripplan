@@ -35,5 +35,8 @@ Route::post('/get-trips', [\App\Http\Controllers\TripController::class, 'index']
 Route::post('/create-trip', [\App\Http\Controllers\TripController::class, 'store']);
 Route::delete('/delete-trip/{id}', [\App\Http\Controllers\TripController::class, 'destroy']);
 
+//admin. handle users
+Route::post('/get-list-users', [\App\Http\Controllers\AdminPageController::class, 'index']);
+
 
 

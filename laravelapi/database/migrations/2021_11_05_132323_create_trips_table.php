@@ -21,6 +21,11 @@ class CreateTripsTable extends Migration
             $table->timestamp('end_date')->nullable();
             $table->text('comment')->nullable();
             $table->timestamps();
+
+            $table->foreign('id_user')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 

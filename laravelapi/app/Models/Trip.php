@@ -23,7 +23,6 @@ class Trip extends Model
 
     }
 
-
     public function scopeByUser($query, $id_user)
     {
         return $query->where('id_user',$id_user);

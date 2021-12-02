@@ -18,6 +18,8 @@ const Home = () => {
     const tokens = useSelector(selectTokens)
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    //message for expired session
     const [sentMessage, setSentMessage] = useState(false);
 
     //logOut & invalidate token after logout
@@ -112,7 +114,7 @@ const Home = () => {
         setTrips(tripsFromServer)
     }
 
-//get Trips from server
+    //get Trips from server
     const fetchTrips = async (sort_type) => {
 
         let user_id = user.user.id
@@ -197,7 +199,8 @@ const Home = () => {
     if (user != null)
         return (
             <div className="content-center bg-gray-100 p-2">
-                <h1>Welcome <span className="font-bold">{user.user.name}</span></h1>
+                <h1>Welcome <span className="font-bold">{user.user.name}</span>.
+                    You are login as an <span className="font-bold">{user.user.role.name_role}</span></h1>
                 <div className="p-5">
 
                     {/*---MODALS---*/}

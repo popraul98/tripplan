@@ -39,7 +39,12 @@ const Login = (props) => {
                             access_token: response.data.tokens.access_token,
                             refresh_token: response.data.tokens.refresh_token,
                         }))
-                        navigate("/home")
+                        if (user.user.role.id === 3)
+                            navigate("/home")
+                        if (user.user.role.id === 2)
+                            navigate("/admin")
+                        if (user.user.role.id === 1)
+                            navigate("/super-admin")
                     }
                 ).catch(function (error) {
                     if (error.response) {

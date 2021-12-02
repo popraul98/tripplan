@@ -21,7 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'user_role',
+        'id_role',
         'password',
     ];
 
@@ -32,7 +32,12 @@ class User extends Authenticatable
 
     public function role()
     {
-        return $this->belongsTo(UserRole::class);
+        return $this->belongsTo(UserRole::class, 'id_role');
+    }
+
+    public function scopeGetAllUsers($query)
+    {
+        return $query->where('id_role', 3);
     }
 
     /**
