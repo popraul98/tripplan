@@ -21,12 +21,18 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'user_role',
         'password',
     ];
 
     public function trips()
     {
-        return $this->hasMany(Trip::class,'id_user');
+        return $this->hasMany(Trip::class, 'id_user');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(UserRole::class);
     }
 
     /**

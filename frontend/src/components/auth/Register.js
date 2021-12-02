@@ -9,7 +9,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 const Register = (props) => {
 
     const [messageStatus, setMessageStatus] = useState("");
-    const [errorsMessage, setErrorsMessages] = useState("");
+    const [errorsMessage, setErrorsMessages] = useState([]);
 
     const new_user = useFormik({
         initialValues: {
@@ -17,7 +17,6 @@ const Register = (props) => {
             email: "",
             password: "",
             password_confirm: "",
-            errors_messages: "",
         },
         validationSchema: Yup.object({
             name: Yup.string()
@@ -35,11 +34,8 @@ const Register = (props) => {
                     setMessageStatus('You have been registered')
                 }).catch(function (error) {
                 if (error.response) {
-                    console.log(error.response.data.errors.email, 'errors from server')
-                    setErrorsMessages(JSON.parse(error.response.data.errors));
-                    console.log(error.response.data.errors[0])
-                    // new_user.values.errors_messages = error.response.data.errors
-                    // console.log(new_user.values.errors_messages, 'errors_mes')
+                    setErrorsMessages(error.response.data.errors);
+                    console.log(errorsMessage, 'errorsMessage')
                 }
             })
         },
@@ -49,7 +45,7 @@ const Register = (props) => {
     //     console.log("UseEffects")
     //     // new_user.values.errors_messages = "";
     //
-    // }, [new_user.values.errors_messages])
+    // }, [errorsMessage])
 
 
     return (
@@ -57,23 +53,12 @@ const Register = (props) => {
             <form className="bg-white shadow-2xl rounded px-8 pt-6 pb-8 mb-4 bg-gray-100"
                   onSubmit={new_user.handleSubmit}>
                 <h3 className="font-bold text-xl mb-3">Register</h3>
-                {/*<div className="ease-out duration-100 text-sm text-red-400">*/}
-                {/*    {new_user.values.errors_messages.email}*/}
-                {/*</div>*/}
-                {/*<div className="ease-out duration-100 text-sm text-red-400">*/}
-                {/*    {new_user.values.errors_messages.password}*/}
-                {/*</div>*/}
-                {/*<div className="ease-out duration-100 text-sm text-red-400">*/}
-                {/*    {new_user.values.errors_messages.password_confirm}*/}
-                {/*</div>*/}
-                {/*<div className="ease-out duration-100 text-sm text-red-400">*/}
-                {/*    {errorsMessage}*/}
-                {/*</div>*/}
-                {/*{errorsMessage.length > 0 ? errorsMessage.map((error) => (*/}
-                {/*    <div className="ease-out duration-100 text-sm text-red-400">*/}
-                {/*        {errorsMessage}*/}
-                {/*    </div>*/}
-                {/*)) : null}*/}
+                <div className="ease-out duration-100 text-sm text-red-400">
+                    {errorsMessage != null ? errorsMessage.email : null}
+                </div>
+                <div className="ease-out duration-100 text-sm text-red-400">
+                    {errorsMessage != null ? errorsMessage.password_confirm : null}
+                </div>
 
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
