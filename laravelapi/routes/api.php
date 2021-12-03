@@ -37,6 +37,7 @@ Route::delete('/delete-trip/{id}', [\App\Http\Controllers\TripController::class,
 
 //admin. handle users
 Route::post('/get-list-users', [\App\Http\Controllers\AdminPageController::class, 'index']);
+Route::delete('/delete-user/{id}', [\App\Http\Controllers\AdminPageController::class, 'deleteUser']);
 
 
 

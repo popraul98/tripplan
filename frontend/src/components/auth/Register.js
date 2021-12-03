@@ -32,6 +32,8 @@ const Register = (props) => {
             axios.post("http://127.0.0.1:8000/api/register", values)
                 .then(response => {
                     setMessageStatus('You have been registered')
+                    setErrorsMessages([]);
+
                 }).catch(function (error) {
                 if (error.response) {
                     setErrorsMessages(error.response.data.errors);
@@ -41,11 +43,14 @@ const Register = (props) => {
         },
     });
 
-    // useEffect(() => {
-    //     console.log("UseEffects")
-    //     // new_user.values.errors_messages = "";
-    //
-    // }, [errorsMessage])
+    useEffect(() => {
+        console.log("UseEffects")
+        new_user.values.name = "";
+        new_user.values.email = "";
+        new_user.values.password = "";
+        new_user.values.password_confirm = "";
+
+    }, [messageStatus])
 
 
     return (

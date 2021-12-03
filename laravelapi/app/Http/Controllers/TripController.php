@@ -107,7 +107,6 @@ class TripController extends Controller
      */
     public function destroy($id)
     {
-//        $id_trip = $id->input('id_trip');
 
         $trip = Trip::find($id);
         $trip->delete();

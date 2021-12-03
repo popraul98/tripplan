@@ -120,50 +120,51 @@ class UserController extends Controller
     public function getUser(Request $req)
     {
         $user = Auth::user();
-        $access_token_header = $this->getTokenId($req->bearerToken());
-        $client = DB::table('oauth_clients')
-            ->where('password_client', true)
-            ->first();
-
-
-        $access_token = DB::table('oauth_access_tokens')
-            ->where('id', $access_token_header)
-            ->first();
-
-        $refresh_token = DB::table('oauth_refresh_tokens')
-            ->where('access_token_id', $access_token_header)
-            ->first();
-
-        $refresh_token_decrypt = $req->header('refresh_token');
-
-        //verificare token-uri daca sunt revoked
-        if ($access_token->revoked == 1 || $refresh_token->revoked == 1) {
-            return response()->json([
-                'message' => 'Token Revoked... LOGIN NEEDED',
-                'value' => false,
-            ], 401);
-        }
-
-        //Daca access_token & refresh_token sunt available returneaza USER (resources)
-        if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at > Carbon::now()) {
-            $token = null;
-            return new UserResource($user);
-        }
-
-        if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at < Carbon::now()) {
-
-            return response()->json([
-                'message' => 'Access Token Expired......Refresh_token needed',
-                'value' => true,
-            ], 401);
-        }
-
-        if ($refresh_token->expires_at < Carbon::now()) {
-            return response()->json([
-                'message' => 'Refresh Token Expired! Need login!',
-                'value' => false,
-            ], 401);
-        }
+        return $user;
+//        $access_token_header = $this->getTokenId($req->bearerToken());
+//        $client = DB::table('oauth_clients')
+//            ->where('password_client', true)
+//            ->first();
+//
+//
+//        $access_token = DB::table('oauth_access_tokens')
+//            ->where('id', $access_token_header)
+//            ->first();
+//
+//        $refresh_token = DB::table('oauth_refresh_tokens')
+//            ->where('access_token_id', $access_token_header)
+//            ->first();
+//
+//        $refresh_token_decrypt = $req->header('refresh_token');
+//
+//        //verificare token-uri daca sunt revoked
+//        if ($access_token->revoked == 1 || $refresh_token->revoked == 1) {
+//            return response()->json([
+//                'message' => 'Token Revoked... LOGIN NEEDED',
+//                'value' => false,
+//            ], 401);
+//        }
+//
+//        //Daca access_token & refresh_token sunt available returneaza USER (resources)
+//        if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at > Carbon::now()) {
+//            $token = null;
+//            return new UserResource($user);
+//        }
+//
+//        if ($refresh_token->expires_at > Carbon::now() && $access_token->expires_at < Carbon::now()) {
+//
+//            return response()->json([
+//                'message' => 'Access Token Expired......Refresh_token needed',
+//                'value' => true,
+//            ], 401);
+//        }
+//
+//        if ($refresh_token->expires_at < Carbon::now()) {
+//            return response()->json([
+//                'message' => 'Refresh Token Expired! Need login!',
+//                'value' => false,
+//            ], 401);
+//        }
     }
 
     public function refreshToken(Request $req)

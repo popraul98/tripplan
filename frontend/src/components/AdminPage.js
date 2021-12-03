@@ -88,11 +88,11 @@ const AdminPage = () => {
         if (user != null)
             if (checkToken()) {
                 getListUsers()
+                console.log(listUsers)
             }
-
-
     }, [user])
 
+    //get list of users
     const getListUsers = async () => {
         const usersFromServer = await fetchListUsers()
         setListUsers(usersFromServer)
@@ -100,8 +100,18 @@ const AdminPage = () => {
 
     const fetchListUsers = async () => {
         const res = await axios.post("http://127.0.0.1:8000/api/get-list-users")
-        const data = await res.data.all_users
-        return data
+        return await res.data.all_users
+    }
+
+
+//delete USER and all his trips
+    const deleteUser = async (id_user) => {
+        await axios.delete("http://localhost:8000/api/delete-user/" + id_user)
+            .then(response => {
+                    console.log('Deleted')
+                    getListUsers()
+                }
+            )
     }
 
     if (user != null)
@@ -142,37 +152,41 @@ const AdminPage = () => {
                                     </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                    <tr>
-                                        <td className="px-4 py-4 whitespace-nowrap">
-                                            <p className="text-sm font-medium text-gray-900">
-                                                RAUL POP
-                                            </p>
-                                        </td>
-                                        <td className="px-4 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">react@gmail.com</div>
-                                        </td>
-                                        <td className="px-4 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">29-11-2021</div>
-                                        </td>
-                                        <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
-                                            <button
-                                                className="font-semibold mb-1 mr-2 text-indigo-600 hover:text-indigo-900"
-                                                // onClick={() => handleOnClick(trip.id)}
-                                            >
-                                                Details
-                                            </button>
-                                            <a href="#"
-                                               className="text-indigo-600 hover:text-indigo-900 mr-1">Edit</a>
-                                            <DeleteIcon
-                                                className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
-                                                // onClick={() => deleteTrip(trip.id)}
-                                            />
-                                        </td>
-                                    </tr>
+                                    {listUsers.length > 0 ? listUsers.map((user) => (
+                                        <tr>
+                                            <td className="px-4 py-4 whitespace-nowrap">
+                                                <p className="text-sm font-medium text-gray-900">
+                                                    {user.name}
+                                                </p>
+                                            </td>
+                                            <td className="px-4 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">{user.email}</div>
+                                            </td>
+                                            <td className="px-4 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">{user.created_at}</div>
+                                            </td>
+                                            <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
+                                                {/*<button*/}
+                                                {/*    className="font-semibold mb-1 mr-2 text-indigo-600 hover:text-indigo-900"*/}
+                                                {/*    // onClick={() => handleOnClick(trip.id)}*/}
+                                                {/*>*/}
+                                                {/*    Details*/}
+                                                {/*</button>*/}
+                                                {/*<a href="#"*/}
+                                                {/*   className="text-indigo-600 hover:text-indigo-900 mr-1">Edit</a>*/}
+                                                <DeleteIcon
+                                                    className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
+                                                    onClick={() => deleteUser(user.id)}
+                                                />
+                                            </td>
+                                        </tr>
+                                    )) : null}
+
                                     </tbody>
-                                    {/*<span className=" p-4 bg-gray-100 flex flex justify-between text-gray-500">*/}
-                                    {/*    You don't have any user registered*/}
-                                    {/*</span>*/}
+                                    {listUsers.length === 0 ?
+                                        <span className=" p-4 bg-gray-100 flex flex justify-between text-gray-500">
+                                        You don't have any user registered
+                                    </span> : ""}
                                 </table>
                             </div>
                         </div>
