@@ -39,6 +39,7 @@ const Home = () => {
 
     //Check token for user and receive User with Trips (also refresh token)
     const checkToken = async () => {
+
         if (tokens.access_token != null) {
             const res = await axios.get("http://127.0.0.1:8000/api/get-user", {
                 headers: {
@@ -50,36 +51,46 @@ const Home = () => {
                     console.log("Token Valabil")
                     return true
                 }
-            }).catch(error => {
-                if (error.response.data.value == true) {
-                    console.log('refreshing Tokens')
-                    return requestNewRefreshToken(tokens.refresh_token)
-                }
-                console.log(error.response.status, 'error get user')
+            }).catch(function (error) {
+                console.log(error.response.status, 'response statussss')
                 if (error.response.status == 401) {
-                    setSentMessage(true);
-                    handleLogOut(true);
+                    return false;
+
                 }
             });
+
+            if (res === false) {
+                const response = await requestNewRefreshToken(tokens.refresh_token);
+            }
         }
     }
 
+
+    //Refresh token if needed
     const requestNewRefreshToken = async (refresh_token) => {
-        const res = await axios.get("http://127.0.0.1:8000/api/refresh_token", {
+        await axios.get("http://127.0.0.1:8000/api/refresh_token", {
             headers: {
                 refresh_token: refresh_token
             }
         }).then(response => {
                 //if we have a new refresh token
                 console.log('Tokens was refreshed!')
-                if (response.data.value == true) {
+                if (response.data.value === true) {
                     dispatch(authorization({
                         access_token: response.data.tokens.access_token,
                         refresh_token: response.data.tokens.refresh_token,
                     }));
                 }
             }
-        )
+        ).catch(function (error) {
+            console.log(error.response.status, "refresh token request error")
+            if (error.response.status === 401) {
+                console.log('You gonna be logout')
+                setSentMessage(true);
+                handleLogOut(true);
+            }
+
+        });
     }
 
 //sort trips

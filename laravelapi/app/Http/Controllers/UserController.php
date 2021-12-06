@@ -174,6 +174,7 @@ class UserController extends Controller
             ->first();
 
         $refresh_token_decrypt = $req->header('refresh_token');
+
         try {
             $response = Http::asForm()->post('http://127.0.0.1:8001/oauth/token', [
                 'grant_type' => 'refresh_token',
@@ -182,8 +183,15 @@ class UserController extends Controller
                 'client_secret' => $client->secret,
                 'scope' => '',
             ]);
+
+//            dd($response);
             $tokens = $response->getBody()->getContents();
 
+            if ($tokens === "") {
+                return response()->json([
+                    'message' => 'Refresh token expired!',
+                ], 401);
+            }
             return response()->json([
                 'message' => 'tokens refreshed',
                 'value' => true,
@@ -193,7 +201,7 @@ class UserController extends Controller
         } catch (\Exception $exception) {
             return response()->json([
                 'message' => $exception->getMessage()
-            ]);
+            ], 401);
         }
 
     }

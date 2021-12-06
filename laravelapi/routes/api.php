@@ -39,5 +39,8 @@ Route::delete('/delete-trip/{id}', [\App\Http\Controllers\TripController::class,
 Route::post('/get-list-users', [\App\Http\Controllers\AdminPageController::class, 'index']);
 Route::delete('/delete-user/{id}', [\App\Http\Controllers\AdminPageController::class, 'deleteUser']);
 
-
+Route::post('/test', function (Request $req) {
+    $user = \App\Models\User::find($req->input("id_user"));
+    return $user->role->name_role;
+});
 
