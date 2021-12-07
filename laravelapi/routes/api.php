@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Console\Kernel;
+use App\Http\Middleware;
+use App\Http\Middleware\IsAdmin;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -35,12 +39,14 @@ Route::post('/get-trips', [\App\Http\Controllers\TripController::class, 'index']
 Route::post('/create-trip', [\App\Http\Controllers\TripController::class, 'store']);
 Route::delete('/delete-trip/{id}', [\App\Http\Controllers\TripController::class, 'destroy']);
 
-//admin. handle users
+//admin. handle userss
 Route::post('/get-list-users', [\App\Http\Controllers\AdminPageController::class, 'index']);
-Route::delete('/delete-user/{id}', [\App\Http\Controllers\AdminPageController::class, 'deleteUser']);
+Route::delete('/delete-user/{id}', [\App\Http\Controllers\AdminPageController::class, 'deleteUser'])
+    ->middleware(['auth:api', 'isAdmin']);
 
-Route::post('/test', function (Request $req) {
-    $user = \App\Models\User::find($req->input("id_user"));
-    return $user->role->name_role;
-});
+
+//test
+Route::post('/test', function (Request $request) {
+    return "pam";
+})->middleware(['auth:api', 'isAdmin']);
 

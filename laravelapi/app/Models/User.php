@@ -36,6 +36,14 @@ class User extends Authenticatable
         return $this->belongsTo(UserRole::class, 'id_role');
     }
 
+    public function isAdmin()
+    {
+        if ($this->role->id === 2) {
+            return true;
+        }
+        return false;
+    }
+
     public function scopeGetAllUsers($query)
     {
         return $query->where('id_role', 3);

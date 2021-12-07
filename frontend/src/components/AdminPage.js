@@ -25,17 +25,16 @@ const AdminPage = () => {
 
     //logOut & invalidate token after logout
     const handleLogOut = async (e) => {
-        let token_access = tokens.access_token;
-
-        const res = await axios.post("http://127.0.0.1:8000/api/logout", {token_access})
-            .then(response => {
-                dispatch(logout());
-                if (e == true) {
-                    navigate('/', {state: {message: "Your session expired!"}});
-                } else {
-                    navigate('/');
-                }
-            })
+        if (tokens.access_token) {
+            let token_access = tokens.access_token;
+            const res = await axios.post("http://127.0.0.1:8000/api/logout", {token_access})
+        }
+        dispatch(logout());
+        if (e == true) {
+            navigate('/', {state: {message: "Your session expired!"}});
+        } else {
+            navigate('/');
+        }
     };
 
     //Check token for user and receive User with Trips (also refresh token)
@@ -54,7 +53,7 @@ const AdminPage = () => {
                 }
             }).catch(function (error) {
                 console.log(error.response.status, 'response statussss')
-                if (error.response.status == 401) {
+                if (error.response.status === 401) {
                     return false;
 
                 }
@@ -63,6 +62,10 @@ const AdminPage = () => {
             if (res === false) {
                 const response = await requestNewRefreshToken(tokens.refresh_token);
             }
+        } else {
+            console.log('You gonna be logout, Token doesn t exist')
+            setSentMessage(true);
+            handleLogOut(true);
         }
     }
 
@@ -83,7 +86,7 @@ const AdminPage = () => {
                 }
             }
         ).catch(function (error) {
-            console.log(error.response.status, "refresh token request error")
+            console.log(error.response.status, "refresh token expired error")
             if (error.response.status === 401) {
                 console.log('You gonna be logout')
                 setSentMessage(true);
@@ -116,7 +119,12 @@ const AdminPage = () => {
 
 //delete USER and all his trips
     const deleteUser = async (id_user) => {
-        await axios.delete("http://localhost:8000/api/delete-user/" + id_user)
+        await axios.delete("http://localhost:8000/api/delete-user/" + id_user, {
+            headers: {
+                Authorization: "Bearer " + tokens.access_token,
+                refresh_token: tokens.refresh_token,
+            }
+        })
             .then(response => {
                     console.log('Deleted')
                     getListUsers()
