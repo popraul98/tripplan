@@ -63,7 +63,7 @@ const AdminPage = () => {
                 const response = await requestNewRefreshToken(tokens.refresh_token);
             }
         } else {
-            console.log('You gonna be logout, Token doesn t exist')
+            console.log('You gonna be logout, Token doesn\'t exist')
             setSentMessage(true);
             handleLogOut(true);
         }
@@ -96,6 +96,10 @@ const AdminPage = () => {
         });
     }
 
+    const makeSureAccessTokenIsAvabile = async () => {
+        await checkToken();
+    }
+
     // get trips for user
     useEffect(() => {
         console.log("UseEffects")
@@ -119,6 +123,7 @@ const AdminPage = () => {
 
 //delete USER and all his trips
     const deleteUser = async (id_user) => {
+        await makeSureAccessTokenIsAvabile();
         await axios.delete("http://localhost:8000/api/delete-user/" + id_user, {
             headers: {
                 Authorization: "Bearer " + tokens.access_token,
