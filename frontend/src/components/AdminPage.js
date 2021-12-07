@@ -98,6 +98,7 @@ const AdminPage = () => {
 
     const makeSureAccessTokenIsAvabile = async () => {
         await checkToken();
+        return true
     }
 
     // get trips for user
@@ -123,18 +124,18 @@ const AdminPage = () => {
 
 //delete USER and all his trips
     const deleteUser = async (id_user) => {
-        await makeSureAccessTokenIsAvabile();
-        await axios.delete("http://localhost:8000/api/delete-user/" + id_user, {
-            headers: {
-                Authorization: "Bearer " + tokens.access_token,
-                refresh_token: tokens.refresh_token,
-            }
-        })
-            .then(response => {
-                    console.log('Deleted')
-                    getListUsers()
+        if (await makeSureAccessTokenIsAvabile())
+            await axios.delete("http://localhost:8000/api/delete-user/" + id_user, {
+                headers: {
+                    Authorization: "Bearer " + tokens.access_token,
+                    refresh_token: tokens.refresh_token,
                 }
-            )
+            })
+                .then(response => {
+                        console.log('Deleted')
+                        getListUsers()
+                    }
+                )
     }
 
     if (user != null)
