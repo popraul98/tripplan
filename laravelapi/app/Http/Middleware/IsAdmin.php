@@ -28,7 +28,6 @@ class IsAdmin
          */
 
         $user = Auth::user();
-
         if ($user->isAdmin()) {
             return $next($request);
         } else {

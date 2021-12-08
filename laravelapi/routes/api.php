@@ -39,14 +39,16 @@ Route::post('/get-trips', [\App\Http\Controllers\TripController::class, 'index']
 Route::post('/create-trip', [\App\Http\Controllers\TripController::class, 'store']);
 Route::delete('/delete-trip/{id}', [\App\Http\Controllers\TripController::class, 'destroy']);
 
-//admin. handle userss
-Route::post('/get-list-users', [\App\Http\Controllers\AdminPageController::class, 'index']);
-Route::delete('/delete-user/{id}', [\App\Http\Controllers\AdminPageController::class, 'deleteUser'])
-    ->middleware(['auth:api', 'isAdmin']);
+//admin. handle users
+
+Route::group(["middleware" => ['auth:api', 'isAdmin']], function () {
+    Route::get('/get-list-users', [\App\Http\Controllers\AdminPageController::class, 'index']);
+    Route::delete('/delete-user/{id}', [\App\Http\Controllers\AdminPageController::class, 'deleteUser']);
+});
 
 
 //test
 Route::post('/test', function (Request $request) {
     return "pam";
-})->middleware(['auth:api', 'isAdmin']);
+})->middleware(['isAdmin']);
 
