@@ -19,9 +19,9 @@ class TripController extends Controller
         $id_user = $req->input('user_id');
 
 
-        $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at','DESC')->get();
-        $trips_by_name = Trip::byUser($id_user)->orderBy('destination','ASC')->get();
-        $trips_by_start_date = Trip::byUser($id_user)->orderBy('start_date','ASC')->get();
+        $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at', 'DESC')->get();
+        $trips_by_name = Trip::byUser($id_user)->orderBy('destination', 'ASC')->get();
+        $trips_by_start_date = Trip::byUser($id_user)->orderBy('start_date', 'ASC')->get();
 
         return response()->json([
             'trips_by_last_date' => $trips_by_last_date,
@@ -105,7 +105,7 @@ class TripController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy()
+    public function destroy($id)
     {
 
         $trip = Trip::find($id);

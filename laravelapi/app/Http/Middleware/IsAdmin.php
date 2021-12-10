@@ -27,11 +27,16 @@ class IsAdmin
          * @return mixed
          */
 
-        $user = Auth::user();
-        if ($user->isAdmin()) {
-            return $next($request);
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->isAdmin()) {
+                return $next($request);
+            } else {
+                return response('Unauthorized.', 403);
+            }
         } else {
-            return response('Unauthorized.', 403);
+            return response("Unauthorized", 403);
         }
+
     }
 }

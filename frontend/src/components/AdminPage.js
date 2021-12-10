@@ -25,9 +25,7 @@ const AdminPage = () => {
 
     //logOut & invalidate token after logout
     const handleLogOut = async (e) => {
-        if (e !== true) {
-            await checkToken()
-        }
+        let recall = false
         if (tokens.access_token) {
             let token_access = (new_access_token ? new_access_token : tokens.access_token);
             const res = await axios.post("http://127.0.0.1:8000/api/logout", {token_access}, {
@@ -50,35 +48,35 @@ const AdminPage = () => {
     };
 
     //Check token for user and receive User with Trips (also refresh token)
-    const checkToken = async () => {
-        new_access_token = "";
-        new_access_token = "";
-        if (tokens.access_token != null) {
-            const need_refresh_token = await axios.get("http://127.0.0.1:8000/api/get-user", {
-                headers: {
-                    Authorization: "Bearer " + tokens.access_token,
-                    refresh_token: tokens.refresh_token,
-                }
-            }).then(function (response) {
-                if (response.status === 200 || response.status === 201) {
-                    console.log("Token Valabil")
-                    return false
-                }
-            }).catch(function (error) {
-                console.log(error.response.status, '=access_token')
-                if (error.response.status === 401) {
-                    return true;
-                }
-            });
-            if (need_refresh_token === true) {
-                return await requestNewRefreshToken(tokens.refresh_token);
-            }
-        } else {
-            console.log('You gonna be logout, Token doesn\'t exist')
-            setSentMessage(true);
-            handleLogOut(true);
-        }
-    }
+    // const checkToken = async () => {
+    //     new_access_token = "";
+    //     new_access_token = "";
+    //     if (tokens.access_token != null) {
+    //         const need_refresh_token = await axios.get("http://127.0.0.1:8000/api/get-user", {
+    //             headers: {
+    //                 Authorization: "Bearer " + tokens.access_token,
+    //                 refresh_token: tokens.refresh_token,
+    //             }
+    //         }).then(function (response) {
+    //             if (response.status === 200 || response.status === 201) {
+    //                 console.log("Token Valabil")
+    //                 return false
+    //             }
+    //         }).catch(function (error) {
+    //             console.log(error.response.status, '=access_token')
+    //             if (error.response.status === 401) {
+    //                 return true;
+    //             }
+    //         });
+    //         if (need_refresh_token === true) {
+    //             return await requestNewRefreshToken(tokens.refresh_token);
+    //         }
+    //     } else {
+    //         console.log('You gonna be logout, Token doesn\'t exist')
+    //         setSentMessage(true);
+    //         handleLogOut(true);
+    //     }
+    // }
 
     //Refresh token if needed
     const requestNewRefreshToken = async (refresh_token) => {
@@ -104,8 +102,8 @@ const AdminPage = () => {
                 console.log('You gonna be logout')
                 setSentMessage(true);
                 handleLogOut(true);
+                return 401
             }
-
         });
     }
 
@@ -113,33 +111,37 @@ const AdminPage = () => {
     useEffect(() => {
         console.log("UseEffects")
         if (user != null)
-            if (checkToken()) {
-                getListUsers()
-            }
-    }, [user])
+            getListUsers()
+    }, [tokens])
 
 
-
-    //get list of users
     const getListUsers = async () => {
-        const usersFromServer = await fetchListUsers()
-        setListUsers(usersFromServer)
-    }
+        let recall = false;
 
-    const fetchListUsers = async () => {
-        const res = await axios.get("http://127.0.0.1:8000/api/get-list-users", {
+        await axios.get("http://127.0.0.1:8000/api/get-list-users", {
             headers: {
                 Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
                 refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
             }
-        })
-        return await res.data.all_users
+        }).then(response => {
+            console.log("Token Valabil")
+            setListUsers(response.data.all_users)
+        }).catch(function (error) {
+            console.log(error.response.status, 'error server get users list')
+            if (error.response.status === 401) {
+                recall = true
+            }
+        });
+        if (recall) {
+            await requestNewRefreshToken(tokens.refresh_token)
+        }
     }
 
 
 //delete USER (and all his trips)
     const deleteUser = async (id_user) => {
-        await checkToken()
+        let recall = false;
+
         await axios.delete("http://localhost:8000/api/delete-user/" + id_user, {
             headers: {
                 Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
@@ -150,8 +152,15 @@ const AdminPage = () => {
                 getListUsers()
             }
         ).catch(function (error) {
-            console.log("Error Delete User")
+            console.log(error.response.status, "Error Delete User")
+            if (error.response.status === 401) {
+                recall = true
+            }
         });
+        if (recall) {
+            if (await requestNewRefreshToken(tokens.refresh_token) !== 401)
+                await deleteUser(id_user);
+        }
 
     }
 

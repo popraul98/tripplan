@@ -26,9 +26,7 @@ const Home = () => {
 
     //logOut & invalidate token after logout
     const handleLogOut = async (e) => {
-        if (e !== true) {
-            await checkToken()
-        }
+        let recall = false
         if (tokens.access_token) {
             let token_access = (new_access_token ? new_access_token : tokens.access_token);
             const res = await axios.post("http://127.0.0.1:8000/api/logout", {token_access}, {
@@ -51,35 +49,35 @@ const Home = () => {
     };
 
     //Check token for user and receive User with Trips (also refresh token)
-    const checkToken = async () => {
-        new_access_token = "";
-        new_access_token = "";
-        if (tokens.access_token != null) {
-            const need_refresh_token = await axios.get("http://127.0.0.1:8000/api/get-user", {
-                headers: {
-                    Authorization: "Bearer " + tokens.access_token,
-                    refresh_token: tokens.refresh_token,
-                }
-            }).then(function (response) {
-                if (response.status === 200 || response.status === 201) {
-                    console.log("Token Valabil")
-                    return false
-                }
-            }).catch(function (error) {
-                console.log(error.response.status, '=access_token')
-                if (error.response.status === 401) {
-                    return true;
-                }
-            });
-            if (need_refresh_token === true) {
-                return await requestNewRefreshToken(tokens.refresh_token);
-            }
-        } else {
-            console.log('You gonna be logout, Token doesn\'t exist')
-            setSentMessage(true);
-            handleLogOut(true);
-        }
-    }
+    // const checkToken = async () => {
+    //     new_access_token = "";
+    //     new_access_token = "";
+    //     if (tokens.access_token != null) {
+    //         const need_refresh_token = await axios.get("http://127.0.0.1:8000/api/get-user", {
+    //             headers: {
+    //                 Authorization: "Bearer " + tokens.access_token,
+    //                 refresh_token: tokens.refresh_token,
+    //             }
+    //         }).then(function (response) {
+    //             if (response.status === 200 || response.status === 201) {
+    //                 console.log("Token Valabil")
+    //                 return false
+    //             }
+    //         }).catch(function (error) {
+    //             console.log(error.response.status, '=access_token')
+    //             if (error.response.status === 401) {
+    //                 return true;
+    //             }
+    //         });
+    //         if (need_refresh_token === true) {
+    //             return await requestNewRefreshToken(tokens.refresh_token);
+    //         }
+    //     } else {
+    //         console.log('You gonna be logout, Token doesn\'t exist')
+    //         setSentMessage(true);
+    //         handleLogOut(true);
+    //     }
+    // }
 
     //Refresh token if needed
     const requestNewRefreshToken = async (refresh_token) => {
@@ -105,8 +103,8 @@ const Home = () => {
                 console.log('You gonna be logout')
                 setSentMessage(true);
                 handleLogOut(true);
+                return 401
             }
-
         });
     }
 
@@ -124,15 +122,12 @@ const Home = () => {
         getTrips(e.target.value)
     }
 
-// get trips for user
+    // get trips for user
     useEffect(() => {
         console.log("UseEffects")
         if (user != null)
-            if (checkToken()) {
-                getTrips()
-            }
-
-    }, [user])
+            getTrips()
+    }, [tokens])
 
 
     const [trips, setTrips] = useState([])
