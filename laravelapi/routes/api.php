@@ -22,14 +22,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-//user Login/Register/etc.
+
 Route::post("/register", [\App\Http\Controllers\UserController::class, 'register']);
 Route::post("/login", [\App\Http\Controllers\UserController::class, 'login']);
-Route::post("/logout", [\App\Http\Controllers\UserController::class, 'logout']);
 
-Route::get("/get-user", [\App\Http\Controllers\UserController::class, 'getUser'])->middleware('auth:api');
+Route::group(["middleware" => ['auth:api']], function () {
+    Route::post("/logout", [\App\Http\Controllers\UserController::class, 'logout']);
+    Route::get("/get-user", [\App\Http\Controllers\UserController::class, 'getUser']);
+});
+
 Route::get("/refresh_token", [\App\Http\Controllers\UserController::class, 'refreshToken']);
-
 Route::post("/reset-password-request", [\App\Http\Controllers\UserController::class, 'resetPasswordRequest']);
 Route::post("/check-token-resetPassword", [\App\Http\Controllers\UserController::class, 'checkTokenResetPassword']);
 Route::post("/reset-password", [\App\Http\Controllers\UserController::class, 'resetPassword']);
@@ -40,15 +42,8 @@ Route::post('/create-trip', [\App\Http\Controllers\TripController::class, 'store
 Route::delete('/delete-trip/{id}', [\App\Http\Controllers\TripController::class, 'destroy']);
 
 //admin. handle users
-
 Route::group(["middleware" => ['auth:api', 'isAdmin']], function () {
     Route::get('/get-list-users', [\App\Http\Controllers\AdminPageController::class, 'index']);
     Route::delete('/delete-user/{id}', [\App\Http\Controllers\AdminPageController::class, 'deleteUser']);
 });
-
-
-//test
-Route::post('/test', function (Request $request) {
-    return "pam";
-})->middleware(['isAdmin']);
 

@@ -39,7 +39,6 @@ const Login = (props) => {
                             access_token: response.data.tokens.access_token,
                             refresh_token: response.data.tokens.refresh_token,
                         }))
-                        console.log(response.data.user.role.id)
                         if (response.data.user.role.id === 3)
                             navigate("/home")
                         if (response.data.user.role.id === 2)

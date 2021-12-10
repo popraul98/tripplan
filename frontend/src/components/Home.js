@@ -18,16 +18,30 @@ const Home = () => {
     const tokens = useSelector(selectTokens)
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    let new_access_token = "";
+    let new_refresh_token = "";
 
     //message for expired session
     const [sentMessage, setSentMessage] = useState(false);
 
     //logOut & invalidate token after logout
     const handleLogOut = async (e) => {
-        if (tokens.access_token) {
-            let token_access = tokens.access_token;
-            const res = await axios.post("http://127.0.0.1:8000/api/logout", {token_access})
+        if (e !== true) {
+            await checkToken()
         }
+        if (tokens.access_token) {
+            let token_access = (new_access_token ? new_access_token : tokens.access_token);
+            const res = await axios.post("http://127.0.0.1:8000/api/logout", {token_access}, {
+                headers: {
+                    Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
+                    refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
+                }
+            }).catch(function (error) {
+                console.log(error)
+            });
+        }
+        new_access_token = "";
+        new_access_token = "";
         dispatch(logout());
         if (e == true) {
             navigate('/', {state: {message: "Your session expired!"}});
@@ -38,31 +52,30 @@ const Home = () => {
 
     //Check token for user and receive User with Trips (also refresh token)
     const checkToken = async () => {
-
+        new_access_token = "";
+        new_access_token = "";
         if (tokens.access_token != null) {
-            const res = await axios.get("http://127.0.0.1:8000/api/get-user", {
+            const need_refresh_token = await axios.get("http://127.0.0.1:8000/api/get-user", {
                 headers: {
                     Authorization: "Bearer " + tokens.access_token,
                     refresh_token: tokens.refresh_token,
                 }
-            }).then(response => {
+            }).then(function (response) {
                 if (response.status === 200 || response.status === 201) {
                     console.log("Token Valabil")
-                    return true
+                    return false
                 }
             }).catch(function (error) {
-                console.log(error.response.status, 'response statussss')
+                console.log(error.response.status, '=access_token')
                 if (error.response.status === 401) {
-                    return false;
-
+                    return true;
                 }
             });
-
-            if (res === false) {
-                const response = await requestNewRefreshToken(tokens.refresh_token);
+            if (need_refresh_token === true) {
+                return await requestNewRefreshToken(tokens.refresh_token);
             }
         } else {
-            console.log('You gonna be logout, Token doesn t exist')
+            console.log('You gonna be logout, Token doesn\'t exist')
             setSentMessage(true);
             handleLogOut(true);
         }
@@ -70,18 +83,20 @@ const Home = () => {
 
     //Refresh token if needed
     const requestNewRefreshToken = async (refresh_token) => {
-        await axios.get("http://127.0.0.1:8000/api/refresh_token", {
+        return await axios.get("http://127.0.0.1:8000/api/refresh_token", {
             headers: {
                 refresh_token: refresh_token
             }
-        }).then(response => {
+        }).then(function (response) {
                 //if we have a new refresh token
-                console.log('Tokens was refreshed!')
                 if (response.data.value === true) {
                     dispatch(authorization({
                         access_token: response.data.tokens.access_token,
                         refresh_token: response.data.tokens.refresh_token,
                     }));
+                    console.log('Tokens was refreshed!')
+                    new_access_token = response.data.tokens.access_token;
+                    new_refresh_token = response.data.tokens.refresh_token
                 }
             }
         ).catch(function (error) {

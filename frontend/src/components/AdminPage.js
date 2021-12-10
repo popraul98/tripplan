@@ -6,10 +6,9 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import React, {useState, useEffect, ComponentLifecycle} from "react";
-import AddTripModal from "./AddTripModal";
-import DetailsDestination from "./DetailsDestination";
 import Select from "react-select";
 import Login from "./auth/Login";
+
 
 const AdminPage = () => {
 
@@ -17,7 +16,8 @@ const AdminPage = () => {
     const tokens = useSelector(selectTokens)
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
+    let new_access_token = "";
+    let new_refresh_token = "";
     const [listUsers, setListUsers] = useState([]);
 
     //message for expired session
@@ -25,10 +25,22 @@ const AdminPage = () => {
 
     //logOut & invalidate token after logout
     const handleLogOut = async (e) => {
-        if (tokens.access_token) {
-            let token_access = tokens.access_token;
-            const res = await axios.post("http://127.0.0.1:8000/api/logout", {token_access})
+        if (e !== true) {
+            await checkToken()
         }
+        if (tokens.access_token) {
+            let token_access = (new_access_token ? new_access_token : tokens.access_token);
+            const res = await axios.post("http://127.0.0.1:8000/api/logout", {token_access}, {
+                headers: {
+                    Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
+                    refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
+                }
+            }).catch(function (error) {
+                console.log(error)
+            });
+        }
+        new_access_token = "";
+        new_access_token = "";
         dispatch(logout());
         if (e == true) {
             navigate('/', {state: {message: "Your session expired!"}});
@@ -39,7 +51,8 @@ const AdminPage = () => {
 
     //Check token for user and receive User with Trips (also refresh token)
     const checkToken = async () => {
-
+        new_access_token = "";
+        new_access_token = "";
         if (tokens.access_token != null) {
             const need_refresh_token = await axios.get("http://127.0.0.1:8000/api/get-user", {
                 headers: {
@@ -59,7 +72,6 @@ const AdminPage = () => {
             });
             if (need_refresh_token === true) {
                 return await requestNewRefreshToken(tokens.refresh_token);
-                // console.log(await requestNewRefreshToken(tokens.refresh_token))
             }
         } else {
             console.log('You gonna be logout, Token doesn\'t exist')
@@ -82,10 +94,8 @@ const AdminPage = () => {
                         refresh_token: response.data.tokens.refresh_token,
                     }));
                     console.log('Tokens was refreshed!')
-                    return {
-                        new_access_token: response.data.tokens.access_token,
-                        new_refresh_token: response.data.tokens.refresh_token,
-                    }
+                    new_access_token = response.data.tokens.access_token;
+                    new_refresh_token = response.data.tokens.refresh_token
                 }
             }
         ).catch(function (error) {
@@ -106,7 +116,9 @@ const AdminPage = () => {
             if (checkToken()) {
                 getListUsers()
             }
-    }, [user, tokens])
+    }, [user])
+
+
 
     //get list of users
     const getListUsers = async () => {
@@ -117,8 +129,8 @@ const AdminPage = () => {
     const fetchListUsers = async () => {
         const res = await axios.get("http://127.0.0.1:8000/api/get-list-users", {
             headers: {
-                Authorization: "Bearer " + tokens.access_token,
-                refresh_token: tokens.refresh_token,
+                Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
+                refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
             }
         })
         return await res.data.all_users
@@ -127,34 +139,20 @@ const AdminPage = () => {
 
 //delete USER (and all his trips)
     const deleteUser = async (id_user) => {
-        let new_tokens_available = await checkToken()
-        if (new_tokens_available) {
-            await axios.delete("http://localhost:8000/api/delete-user/" + id_user, {
-                headers: {
-                    Authorization: "Bearer " + new_tokens_available.new_access_token,
-                    refresh_token: new_tokens_available.new_refresh_token,
-                }
-            }).then(response => {
-                    console.log('Deleted')
-                    getListUsers()
-                }
-            ).catch(function (error) {
-                console.log("Error Delete User")
-            });
-        } else {
-            await axios.delete("http://localhost:8000/api/delete-user/" + id_user, {
-                headers: {
-                    Authorization: "Bearer " + tokens.access_token,
-                    refresh_token: tokens.refresh_token,
-                }
-            }).then(response => {
-                    console.log('Deleted')
-                    getListUsers()
-                }
-            ).catch(function (error) {
-                console.log("Error Delete User")
-            });
-        }
+        await checkToken()
+        await axios.delete("http://localhost:8000/api/delete-user/" + id_user, {
+            headers: {
+                Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
+                refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
+            }
+        }).then(response => {
+                console.log('Deleted')
+                getListUsers()
+            }
+        ).catch(function (error) {
+            console.log("Error Delete User")
+        });
+
     }
 
     if (user != null)

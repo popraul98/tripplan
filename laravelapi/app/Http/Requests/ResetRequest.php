@@ -14,6 +14,7 @@ class ResetRequest extends FormRequest
     public function authorize()
     {
         return true;
+        //
     }
 
     /**
