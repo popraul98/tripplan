@@ -17,7 +17,7 @@ function App() {
             <Route path="/resetPasswordRequest" element={<ResetPasswordRequest/>}/>
             <Route path="/resetPasswordForm/:token" element={<ResetPasswordForm/>}/>
             <Route path="/" exact element={<Login/>}/>
-            <Route path="/user/{id}" element={<DetailsDestination/>}/>
+            <Route path="/user" element={<DetailsDestination/>}/>
             {/*<Route path="/welcome" element={<Welcome/>}/>*/}
         </Routes>
     );

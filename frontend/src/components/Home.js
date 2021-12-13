@@ -278,8 +278,10 @@ const Home = () => {
                                                     className="font-semibold mb-1 mr-2 text-indigo-600 hover:text-indigo-900"
                                                     onClick={() => handleOnClick(trip.id)}
                                                 >
-                                                    Details
+                                                    <Link to="/user">Details
+                                                    </Link>
                                                 </button>
+
                                                 <a href="#"
                                                    className="text-indigo-600 hover:text-indigo-900 mr-1">Edit</a>
                                                 <DeleteIcon
