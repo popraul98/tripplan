@@ -44,6 +44,14 @@ class User extends Authenticatable
         return false;
     }
 
+    public function isUser()
+    {
+        if ($this->role->id === 3) {
+            return true;
+        }
+        return false;
+    }
+
     public function scopeGetAllUsers($query)
     {
         return $query->where('id_role', 3);

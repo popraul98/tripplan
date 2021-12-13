@@ -31,7 +31,11 @@ Route::group(["middleware" => ['auth:api']], function () {
     Route::get("/get-user", [\App\Http\Controllers\UserController::class, 'getUser']);
 
     //handle USER routes
-    Route::post('/get-trips', [\App\Http\Controllers\TripController::class, 'index']);
+    Route::group(["middleware" => ['isUser']], function () {
+        Route::post('/get-trips', [\App\Http\Controllers\TripController::class, 'index']);
+        Route::post('/create-trip', [\App\Http\Controllers\TripController::class, 'store']);
+        Route::delete('/delete-trip/{id_trip}', [\App\Http\Controllers\TripController::class, 'destroy']);
+    });
 
     //handle ADMIN routes
     Route::group(["middleware" => ['isAdmin']], function () {
@@ -44,10 +48,3 @@ Route::get("/refresh_token", [\App\Http\Controllers\UserController::class, 'refr
 Route::post("/reset-password-request", [\App\Http\Controllers\UserController::class, 'resetPasswordRequest']);
 Route::post("/check-token-resetPassword", [\App\Http\Controllers\UserController::class, 'checkTokenResetPassword']);
 Route::post("/reset-password", [\App\Http\Controllers\UserController::class, 'resetPassword']);
-
-Route::post('/create-trip', [\App\Http\Controllers\TripController::class, 'store']);
-Route::delete('/delete-trip/{id}', [\App\Http\Controllers\TripController::class, 'destroy']);
-
-
-
-

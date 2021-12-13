@@ -6,6 +6,7 @@ import Home from "./components/Home";
 import ResetPasswordRequest from "./components/auth/ResetPasswordRequest";
 import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import AdminPage from "./components/AdminPage";
+import DetailsDestination from "./components/DetailsDestination";
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
             <Route path="/resetPasswordRequest" element={<ResetPasswordRequest/>}/>
             <Route path="/resetPasswordForm/:token" element={<ResetPasswordForm/>}/>
             <Route path="/" exact element={<Login/>}/>
+            <Route path="/user/{id}" element={<DetailsDestination/>}/>
             {/*<Route path="/welcome" element={<Welcome/>}/>*/}
         </Routes>
     );

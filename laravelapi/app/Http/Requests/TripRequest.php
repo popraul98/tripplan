@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Trip;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class TripRequest extends FormRequest
 {
@@ -13,6 +15,13 @@ class TripRequest extends FormRequest
      */
     public function authorize()
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            $trip = Trip::find($this->route()->parameter('id_trip'));
+            if ($user->id == $trip->id_user)
+                return true;
+            return false;
+        }
         return false;
     }
 
@@ -24,7 +33,7 @@ class TripRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+//            'id' => 'integer|required',
         ];
     }
 }

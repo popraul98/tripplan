@@ -48,37 +48,6 @@ const Home = () => {
         }
     };
 
-    //Check token for user and receive User with Trips (also refresh token)
-    // const checkToken = async () => {
-    //     new_access_token = "";
-    //     new_access_token = "";
-    //     if (tokens.access_token != null) {
-    //         const need_refresh_token = await axios.get("http://127.0.0.1:8000/api/get-user", {
-    //             headers: {
-    //                 Authorization: "Bearer " + tokens.access_token,
-    //                 refresh_token: tokens.refresh_token,
-    //             }
-    //         }).then(function (response) {
-    //             if (response.status === 200 || response.status === 201) {
-    //                 console.log("Token Valabil")
-    //                 return false
-    //             }
-    //         }).catch(function (error) {
-    //             console.log(error.response.status, '=access_token')
-    //             if (error.response.status === 401) {
-    //                 return true;
-    //             }
-    //         });
-    //         if (need_refresh_token === true) {
-    //             return await requestNewRefreshToken(tokens.refresh_token);
-    //         }
-    //     } else {
-    //         console.log('You gonna be logout, Token doesn\'t exist')
-    //         setSentMessage(true);
-    //         handleLogOut(true);
-    //     }
-    // }
-
     //Refresh token if needed
     const requestNewRefreshToken = async (refresh_token) => {
         return await axios.get("http://127.0.0.1:8000/api/refresh_token", {
@@ -116,11 +85,13 @@ const Home = () => {
     ]
 
     const [typeSort, setTypeSort] = useState(options[0].value)
+    const [trips, setTrips] = useState([])
 
     const handleSort = (e) => {
         setTypeSort(e.target.value)
         getTrips(e.target.value)
     }
+
 
     // get trips for user
     useEffect(() => {
@@ -130,47 +101,45 @@ const Home = () => {
     }, [tokens])
 
 
-    const [trips, setTrips] = useState([])
-
-    const getTrips = async (sort_type) => {
-        const tripsFromServer = await fetchTrips(sort_type)
-        setTrips(tripsFromServer)
-    }
-
     //get Trips from server
-    const fetchTrips = async (sort_type) => {
-
+    const getTrips = async (sort_type) => {
+        let recall = false;
         let user_id = user.user.id
-        const res = await axios.post("http://127.0.0.1:8000/api/get-trips/", {user_id})
-        const data = await res.data
+        await axios.post("http://127.0.0.1:8000/api/get-trips/", {user_id}, {
+            headers: {
+                Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
+                refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
+            }
+        }).then(response => {
+            console.log("Token Valabil")
+            let data = response.data
 
-
-        if (!sort_type) {
-            // console.log(data.trips_by_last_date, "1")
-            return data.trips_by_last_date
+            if (!sort_type) {
+                // console.log(data.trips_by_last_date, "1")
+                setTrips(data.trips_by_last_date)
+            }
+            if (sort_type === "trips_by_last_date") {
+                // console.log(data.trips_by_last_date, "1")
+                setTrips(data.trips_by_last_date)
+            }
+            if (sort_type === "trips_by_name") {
+                // console.log(data.trips_by_name, "2")
+                setTrips(data.trips_by_name)
+            }
+            if (sort_type === "trips_by_start_date") {
+                // console.log(data.trips_by_start_date, "3")
+                setTrips(data.trips_by_start_date)
+            }
+        }).catch(function (error) {
+            console.log(error.response.status, 'error get trips')
+            recall = true;
+        });
+        if (recall) {
+            await requestNewRefreshToken(tokens.refresh_token)
         }
-
-
-        if (sort_type === "trips_by_last_date") {
-            // console.log(data.trips_by_last_date, "1")
-            return data.trips_by_last_date
-        }
-
-
-        if (sort_type === "trips_by_name") {
-            // console.log(data.trips_by_name, "2")
-            return data.trips_by_name
-        }
-
-
-        if (sort_type === "trips_by_start_date") {
-            // console.log(data.trips_by_start_date, "3")
-            return data.trips_by_start_date
-        }
-        return data
     }
 
-//delete Trip from Server
+    //delete Trip from Server
     const deleteTrip = async (id_trip) => {
         await axios.delete("http://localhost:8000/api/delete-trip/" + id_trip)
             .then(response => {
@@ -180,23 +149,19 @@ const Home = () => {
             )
     }
 
-
-//Modal Add Trip
+    //Modal Add Trip
     const [modalAddTripOpen, setModalAddTripOpen] = useState(false)
-
     const handleCloseAddTripModal = () => {
         setModalAddTripOpen(false)
         getTrips();
     }
 
-//Modal Details Destination
+    //Modal Details Destination
     const [modalDetailsDest, setModalDetailsDest] = useState(false)
-
+    const [tripModalDetailsDest, setTripModalDetailsDest] = useState(null)
     const handleCloseDetailsDest = () => {
         setModalDetailsDest(false)
     }
-
-    const [tripModalDetailsDest, setTripModalDetailsDest] = useState(null)
 
     const handleOnClick = (id_trip) => {
         for (let i = 0; i < trips.length; i++) {

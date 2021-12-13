@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TripRequest;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -102,13 +103,12 @@ class TripController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
+     * @param int $id_trip
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(TripRequest $id_trip)
     {
-
-        $trip = Trip::find($id);
+        $trip = Trip::find($id_trip);
         $trip->delete();
 
         return "Deleted";
