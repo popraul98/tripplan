@@ -35,6 +35,7 @@ Route::group(["middleware" => ['auth:api']], function () {
         Route::post('/get-trips', [\App\Http\Controllers\TripController::class, 'index']);
         Route::post('/create-trip', [\App\Http\Controllers\TripController::class, 'store']);
         Route::delete('/delete-trip/{id_trip}', [\App\Http\Controllers\TripController::class, 'destroy']);
+        Route::get('/show-trip/{id_trip}', [\App\Http\Controllers\TripController::class, 'show']);
     });
 
     //handle ADMIN routes

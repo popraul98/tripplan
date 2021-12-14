@@ -92,6 +92,7 @@ const AdminPage = () => {
                         refresh_token: response.data.tokens.refresh_token,
                     }));
                     console.log('Tokens was refreshed!')
+                    console.log(response)
                     new_access_token = response.data.tokens.access_token;
                     new_refresh_token = response.data.tokens.refresh_token
                 }

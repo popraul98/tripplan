@@ -1,61 +1,85 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from "axios";
 import {useSelector} from "react-redux";
-import {selectUser} from "../features/userSlice";
+import {selectTokens, selectUser} from "../features/userSlice";
+import {useParams} from "react-router-dom";
 
 
-export default function DetailsDestination({open, children, onClose, trip}) {
+const DetailsDestination = () => {
 
-    // console.log("open modal details destination:", open)
-    // console.log("props:", trip)
+    let {id} = useParams();
+
+    const user = useSelector(selectUser);
+    const tokens = useSelector(selectTokens)
+
+    const fetchTrip = async () => {
+        await axios.post("http://127.0.0.1:8000/api/get-trip/", {
+            headers: {
+                // Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
+                // refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
+            }
+        }).then(function (response) {
+            console.log(response.data)
+        }).catch(function (error) {
+            console.log(error)
+        });
+    }
+
+    useEffect(() => {
+        console.log(id)
+        if (id)
+            fetchTrip()
+    }, [])
 
 
-    if (!open) return null
     return (
-        <div
-            className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-gray-600 bg-opacity-80 transform transition-transform duration-30">
-            <div className="bg-gray-100 shadow rounded-xl w-auto min-w-full p-6">
-                <div className="font-semibold text-gray-700 text-lg mb-4 mt-4 underline pl-4">
-                    Details Destinations
-                </div>
-                <div className="flex justify-between ">
-                    <div className="float-left pl-4">
-                        <h2 className="block text-gray-500 text-sm font-semibold">Destination:</h2>
-                        <p className="font-semibold pl-4  text-gray-600  bg-gray-100 mb-2 bg-opacity-80 rounded-r-full ">
-                            {trip.destination}
-                        </p>
-                        <h2 className="block text-gray-500 text-sm font-semibold">Start Date:</h2>
-                        <p className="font-semibold pl-2  text-gray-600 mb-2 bg-gray-100 bg-opacity-10 rounded-r-full ">
-                            {trip.start_date}
-                        </p>
-                        <h2 className="block text-gray-500 text-sm font-semibold">End Date:</h2>
-                        <p className="font-semibold pl-2  text-gray-600 mb-2 bg-gray-100 bg-opacity-10 rounded-r-full ">
-                            {trip.end_date}
-                        </p>
-                        <h2 className="block text-gray-500 text-sm font-semibold">Comment:</h2>
-                        <p className="font-semibold pl-2  text-gray-600 mb-2 bg-gray-100 bg-opacity-10 rounded-r-full ">
-                            {trip.comment}
-                        </p>
-                    </div>
-                    <div className="float right pr-4">
-                        <iframe
-                            width="450"
-                            height="250"
-                            frameBorder="0"
-                            src={"https://www.google.com/maps/embed/v1/place?key=AIzaSyD1viFL9PIqRrQ159iA5-pGQ_mKQn-tt14&q=" + trip.destination }>
-                            Map Loading
-                        </iframe>
+        <div className="bg-gradient-to-b from-indigo-100 to-transparent">
 
-                    </div>
+            <div className="flex justify-between max-w-2x ">
+                <div className="float-left p-5 max-w-xl">
+                    <button
+                        className=" mb-2 rounded-lg hover:bg-gray-500 px-5 hover:text-gray-800 bg-gray-400 text-white">
+                        <ArrowBackIcon/>
+                    </button>
+                    <p className="p-2 text-white text-2xl max-w-xs bg-gradient-to-r from-blue-400 to-transparent mb-2 bg-opacity-60 rounded-r-3xl ">
+                        {/*{trip.destination}*/}
+                        Elvetia
+                    </p>
+                    <table>
+                        <tr className="">
+                            <th className="text-gray-500 text-sm font-semibold">Start Date:</th>
+                            <th className="text-gray-500 text-sm font-semibold">End Date:</th>
+                        </tr>
+                        <tr>
+                            <td className=" text-gray-600 rounded-r-full ">14-10-2021</td>
+                            <td className=" text-gray-600 rounded-r-full ">14-10-2021</td>
+                        </tr>
+                    </table>
+                    <p className="mt-4 border-t border-gray-300 shadow-t p-2 max-w-lg text-ellipsis text-gray-600 mb-2  rounded-lg ">
+                        {/*{trip.comment}*/}
+                        Comentriu demo commmentariu comen acesta este un comenatariu de proba. Face sau nu face
+                        hidden
+                    </p>
                 </div>
-
-                <button
-                    className="float-right bg-gray-600 rounded-xl text-sm hover:bg-gray-300 hover:text-gray-800 border px-2 m-5 text-white"
-                    onClick={onClose}
-                >
-                    Close
-                </button>
+                <div className="float right ">
+                    {/*<iframe*/}
+                    {/*    width="550"*/}
+                    {/*    height="350"*/}
+                    {/*    frameBorder="0"*/}
+                    {/*    src={"https://www.google.com/maps/embed/v1/place?key=AIzaSyD1viFL9PIqRrQ159iA5-pGQ_mKQn-tt14&q=" + trip.destination}>*/}
+                    {/*    Map Loading*/}
+                    {/*</iframe> */}
+                    <iframe
+                        width="550"
+                        height="350"
+                        src={"https://www.google.com/maps/embed/v1/place?key=AIzaSyD1viFL9PIqRrQ159iA5-pGQ_mKQn-tt14&q=Elvetia"}>
+                    </iframe>
+                </div>
             </div>
+
         </div>
     )
 }
+
+export default DetailsDestination;

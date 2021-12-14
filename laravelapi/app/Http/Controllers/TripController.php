@@ -69,12 +69,14 @@ class TripController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param int $id
+     * @param int $id_trip
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(TripRequest $id_trip)
     {
-        //
+        dd(TripRequest::segment(1));
+        $trip = Trip::find($id_trip->input('id_trip'));
+        return $trip;
     }
 
     /**

@@ -156,23 +156,6 @@ const Home = () => {
         getTrips();
     }
 
-    //Modal Details Destination
-    const [modalDetailsDest, setModalDetailsDest] = useState(false)
-    const [tripModalDetailsDest, setTripModalDetailsDest] = useState(null)
-    const handleCloseDetailsDest = () => {
-        setModalDetailsDest(false)
-    }
-
-    const handleOnClick = (id_trip) => {
-        for (let i = 0; i < trips.length; i++) {
-            if (trips[i].id == id_trip) {
-                setTripModalDetailsDest(trips[i]);
-                break;
-            }
-        }
-        setModalDetailsDest(true);
-    }
-
 //Counter Days Left
     const counterDaysLeft = (date) => {
         const _MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -196,13 +179,6 @@ const Home = () => {
                         Add a new Trip
                     </AddTripModal>
 
-                    <DetailsDestination
-                        open={modalDetailsDest}
-                        trip={tripModalDetailsDest}
-                        onClose={handleCloseDetailsDest}
-                    >
-                        Details
-                    </DetailsDestination>
 
                     <div className="flex justify-between">
                         <button
@@ -276,10 +252,10 @@ const Home = () => {
                                             <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
                                                 <button
                                                     className="font-semibold mb-1 mr-2 text-indigo-600 hover:text-indigo-900"
-                                                    onClick={() => handleOnClick(trip.id)}
+                                                    // onClick={() => handleOnClick(trip.id)}
                                                 >
-                                                    <Link to="/user">Details
-                                                    </Link>
+                                                    {/*<Link to={{pathname: '/home/foo', state: {foo: 'bar'}}}>Details</Link>*/}
+                                                    <Link to={'/home/' + trip.id}>Details</Link>
                                                 </button>
 
                                                 <a href="#"
