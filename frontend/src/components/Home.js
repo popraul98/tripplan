@@ -1,14 +1,11 @@
-import {Link, Navigate, Route, Routes} from "react-router-dom";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {login, logout, selectUser, authorization, selectTokens} from "../features/userSlice";
+import {authorization, logout, selectTokens, selectUser} from "../features/userSlice";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
-import React, {useState, useEffect, ComponentLifecycle} from "react";
+import React, {useEffect, useState} from "react";
 import AddTripModal from "./AddTripModal";
-import DetailsDestination from "./DetailsDestination";
-import Select from "react-select";
 import Login from "./auth/Login";
 
 
@@ -141,12 +138,25 @@ const Home = () => {
 
     //delete Trip from Server
     const deleteTrip = async (id_trip) => {
-        await axios.delete("http://localhost:8000/api/delete-trip/" + id_trip)
-            .then(response => {
-                    console.log('Deleted')
-                    getTrips()
-                }
-            )
+        let recall = false;
+        await axios.delete("http://localhost:8000/api/delete-trip/" + id_trip, {
+            headers: {
+                Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
+                refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
+            }
+        }).then(response => {
+                console.log('Deleted')
+                getTrips()
+            }
+        ).catch(function (error) {
+            console.log(error.response)
+            if (error.response.status === 401)
+                recall = true;
+        });
+        if (recall) {
+            await requestNewRefreshToken(tokens.refresh_token);
+            deleteTrip()
+        }
     }
 
     //Modal Add Trip
@@ -156,7 +166,7 @@ const Home = () => {
         getTrips();
     }
 
-//Counter Days Left
+    //Counter Days Left
     const counterDaysLeft = (date) => {
         const _MS_PER_DAY = 1000 * 60 * 60 * 24;
         date = new Date(date);
@@ -254,7 +264,6 @@ const Home = () => {
                                                     className="font-semibold mb-1 mr-2 text-indigo-600 hover:text-indigo-900"
                                                     // onClick={() => handleOnClick(trip.id)}
                                                 >
-                                                    {/*<Link to={{pathname: '/home/foo', state: {foo: 'bar'}}}>Details</Link>*/}
                                                     <Link to={'/home/' + trip.id}>Details</Link>
                                                 </button>
 

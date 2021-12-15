@@ -50,7 +50,8 @@ export default function AddTripModal({open, children, onClose}) {
                     destination: "",
                     start_date: formatDate(new Date()),
                     end_date: formatDate(new Date()),
-                    comment: ""})
+                    comment: ""
+                })
                 setAddedSuccessfully(true)
             }).catch(error => {
                     console.log(error, "error")

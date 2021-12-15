@@ -74,8 +74,9 @@ class TripController extends Controller
      */
     public function show(TripRequest $id_trip)
     {
-        dd(TripRequest::segment(1));
-        $trip = Trip::find($id_trip->input('id_trip'));
+        $fullUrl = $id_trip;
+        $id = $fullUrl->segment(3);
+        $trip = Trip::find($id);
         return $trip;
     }
 
@@ -110,7 +111,9 @@ class TripController extends Controller
      */
     public function destroy(TripRequest $id_trip)
     {
-        $trip = Trip::find($id_trip);
+        $fullUrl = $id_trip;
+        $id = $fullUrl->segment(3);
+        $trip = Trip::find($id);
         $trip->delete();
 
         return "Deleted";
