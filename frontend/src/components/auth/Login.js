@@ -4,7 +4,7 @@ import {useFormik} from "formik";
 import * as Yup from 'yup';
 import {BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation, Navigate} from "react-router-dom";
 import Register from "./Register";
-import Home from "../Home";
+import UserPage from "../user-interface/UserPage";
 import {useDispatch, useSelector} from "react-redux";
 import {login, selectUser, authorization} from "../../features/userSlice";
 
@@ -40,7 +40,7 @@ const Login = (props) => {
                             refresh_token: response.data.tokens.refresh_token,
                         }))
                         if (response.data.user.role.id === 3)
-                            navigate("/home")
+                            navigate("/user")
                         if (response.data.user.role.id === 2)
                             navigate("/admin")
                         if (response.data.user.role.id === 1)

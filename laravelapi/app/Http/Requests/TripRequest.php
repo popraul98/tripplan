@@ -18,6 +18,8 @@ class TripRequest extends FormRequest
         if (Auth::check()) {
             $user = Auth::user();
             $trip = Trip::find($this->route()->parameter('id_trip'));
+            if($trip === null)
+                return true;
             if ($user->id == $trip->id_user)
                 return true;
             return false;

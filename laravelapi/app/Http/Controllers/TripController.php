@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddTripRequest;
 use App\Http\Requests\TripRequest;
 use App\Models\Trip;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +22,7 @@ class TripController extends Controller
         $id_user = $req->input('user_id');
 
 
-        $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at', 'DESC')->get();
+        $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at', 'ASC')->get();
         $trips_by_name = Trip::byUser($id_user)->orderBy('destination', 'ASC')->get();
         $trips_by_start_date = Trip::byUser($id_user)->orderBy('start_date', 'ASC')->get();
 
@@ -48,7 +50,7 @@ class TripController extends Controller
      * @param \Illuminate\Http\Request $request0
      * 11111     * @return \Illuminate\Http\Response
      */
-    public function store(Request $req)
+    public function store(AddTripRequest $req)
     {
         $id_user = $req->input("id_user");
         $destination = $req->input("destination");
@@ -76,7 +78,14 @@ class TripController extends Controller
     {
         $fullUrl = $id_trip;
         $id = $fullUrl->segment(3);
-        $trip = Trip::find($id);
+        try {
+            $trip = Trip::findOrFail($id);
+        } catch (\Exception $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ],404);
+        }
+
         return $trip;
     }
 

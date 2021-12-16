@@ -1,15 +1,15 @@
 import {Link, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {authorization, logout, selectTokens, selectUser} from "../features/userSlice";
+import {authorization, logout, selectTokens, selectUser} from "../../features/userSlice";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import React, {useEffect, useState} from "react";
-import AddTripModal from "./AddTripModal";
-import Login from "./auth/Login";
+import AddTrip from "./AddTrip";
+import Login from "../auth/Login";
 
 
-const Home = () => {
+const UserPage = () => {
 
     const user = useSelector(selectUser);
     const tokens = useSelector(selectTokens)
@@ -159,13 +159,6 @@ const Home = () => {
         }
     }
 
-    //Modal Add Trip
-    const [modalAddTripOpen, setModalAddTripOpen] = useState(false)
-    const handleCloseAddTripModal = () => {
-        setModalAddTripOpen(false)
-        getTrips();
-    }
-
     //Counter Days Left
     const counterDaysLeft = (date) => {
         const _MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -184,19 +177,13 @@ const Home = () => {
                     You are login as an <span className="font-bold">{user.user.role.name_role}</span></h1>
                 <div className="p-5">
 
-                    {/*---MODALS---*/}
-                    <AddTripModal open={modalAddTripOpen} onClose={handleCloseAddTripModal}>
-                        Add a new Trip
-                    </AddTripModal>
-
-
                     <div className="flex justify-between">
-                        <button
-                            className="bg-gray-400 hover:bg-gray-600 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline"
-                            onClick={() => setModalAddTripOpen(true)}
-                        >
-                            <AddIcon/>Add a new Trips
-                        </button>
+
+                        <Link to="/user/add-trip"
+                              className="bg-gray-400 hover:bg-gray-600 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline">
+                            <AddIcon/>
+                            Add Trip
+                        </Link>
 
                         <select className="border border-gray-300 pl-3 mb-2 rounded-xl text-gray-700"
                             // value={typeSort}
@@ -264,7 +251,7 @@ const Home = () => {
                                                     className="font-semibold mb-1 mr-2 text-indigo-600 hover:text-indigo-900"
                                                     // onClick={() => handleOnClick(trip.id)}
                                                 >
-                                                    <Link to={'/home/' + trip.id}>Details</Link>
+                                                    <Link to={'/user/' + trip.id}>Details</Link>
                                                 </button>
 
                                                 <a href="#"
@@ -303,4 +290,4 @@ const Home = () => {
     )
 }
 
-export default Home;
+export default UserPage;

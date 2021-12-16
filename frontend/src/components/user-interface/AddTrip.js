@@ -1,13 +1,18 @@
 import React, {useState} from "react";
 import axios from "axios";
-import {useSelector} from "react-redux";
-import {selectUser} from "../features/userSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {authorization, selectTokens, selectUser} from "../../features/userSlice";
+import {Link, useNavigate} from 'react-router-dom';
 import DatePicker from 'react-date-picker';
 
-export default function AddTripModal({open, children, onClose}) {
-    // console.log("open modal add trip:", open)
+export default function AddTrip({}) {
 
     const user = useSelector(selectUser);
+    const tokens = useSelector(selectTokens)
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    let new_access_token = "";
+    let new_refresh_token = "";
     const [addedSuccessfully, setAddedSuccessfully] = useState(false)
 
     const formatDate = (date) => {
@@ -42,25 +47,62 @@ export default function AddTripModal({open, children, onClose}) {
 
 
     const addTrip = async (trip) => {
-        console.log(trip)
-        const res = await axios.post("http://127.0.0.1:8000/api/create-trip", trip)
-            .then(response => {
-                setTrip({
-                    id_user: user.user,
-                    destination: "",
-                    start_date: formatDate(new Date()),
-                    end_date: formatDate(new Date()),
-                    comment: ""
-                })
-                setAddedSuccessfully(true)
-            }).catch(error => {
-                    console.log(error, "error")
+        let recall = false;
+        await axios.post("http://127.0.0.1:8000/api/create-trip", trip, {
+            headers: {
+                Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
+                refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
+            }
+        }).then(response => {
+            // console.log(trip.id_user)
+            setTrip({
+                id_user: user.user.id,
+                destination: "",
+                start_date: formatDate(new Date()),
+                end_date: formatDate(new Date()),
+                comment: ""
+            })
+            setAddedSuccessfully(true)
+        }).catch(function (error) {
+                if (error.response.status === 401) {
+                    recall = true;
                 }
-            )
+            }
+        );
 
+        if (recall)
+            if (await requestNewRefreshToken(tokens.refresh_token) !== 401)
+                await addTrip(trip)
     }
 
-    if (!open) return null
+    //Refresh token if needed
+    const requestNewRefreshToken = async (refresh_token) => {
+        return await axios.get("http://127.0.0.1:8000/api/refresh_token", {
+            headers: {
+                refresh_token: refresh_token
+            }
+        }).then(function (response) {
+                //if we have a new refresh token
+                if (response.data.value === true) {
+                    dispatch(authorization({
+                        access_token: response.data.tokens.access_token,
+                        refresh_token: response.data.tokens.refresh_token,
+                    }));
+                    console.log('Tokens was refreshed!')
+                    new_access_token = response.data.tokens.access_token;
+                    new_refresh_token = response.data.tokens.refresh_token
+                }
+            }
+        ).catch(function (error) {
+            console.log(error.response.status, "refresh token expired error")
+            if (error.response.status === 401) {
+                console.log('You gonna be logout')
+                navigate('/', {state: {message: "Your session expired!"}});
+                return 401
+            }
+        });
+    }
+
     return (
         <div
             className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-gray-600 bg-opacity-80 transform transition-transform duration-30">
@@ -117,9 +159,10 @@ export default function AddTripModal({open, children, onClose}) {
                 </form>
                 <button
                     className="float-right bg-gray-400 rounded-xl text-sm hover:bg-gray-600 border px-2 text-white"
-                    onClick={onClose}
                 >
-                    Close
+                    <Link to="/user">
+                        Close
+                    </Link>
                 </button>
             </div>
         </div>

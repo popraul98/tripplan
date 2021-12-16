@@ -44,6 +44,11 @@ class Handler extends ExceptionHandler
                     'message' => json_decode($exception->getMessage()) ?? $exception->getMessage()
                 ], JsonResponse::HTTP_FORBIDDEN);
             }
+            if ($exception instanceof AuthorizationException) {
+                return response()->json([
+                    'message' => json_decode($exception->getMessage()) ?? $exception->getMessage()
+                ], JsonResponse::HTTP_NOT_FOUND);
+            }
         }
         throw $exception;
     }
