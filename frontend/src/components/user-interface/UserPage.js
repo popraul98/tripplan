@@ -172,117 +172,109 @@ const UserPage = () => {
 
     if (user != null)
         return (
-            <div className="content-center bg-gray-100 p-2">
-                <h1>Welcome <span className="font-bold">{user.user.name}</span>.
-                    You are login as an <span className="font-bold">{user.user.role.name_role}</span></h1>
-                <div className="p-5">
-
-                    <div className="flex justify-between">
-
-                        <Link to="/user/add-trip"
-                              className="bg-gray-400 hover:bg-gray-600 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline">
-                            <AddIcon/>
-                            Add Trip
-                        </Link>
-
-                        <select className="border border-gray-300 pl-3 mb-2 rounded-xl text-gray-700"
-                            // value={typeSort}
-                                onChange={(e) => handleSort(e)}
+            <div className="flex justify-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100 h-screen pt-5">
+                <div className="w-2/3">
+                    <div className="flex text-gray-300 justify-between">
+                        <h1>Welcome <span className="font-bold">{user.user.name}</span>. You are login as an
+                            <span className="font-bold"> {user.user.role.name_role}</span>
+                        </h1>
+                        <button
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                            onClick={(e) => handleLogOut(e)}
                         >
-                            <option disabled>Sort by:</option>
-                            {options.map((option) => (
-                                <option value={option.value}>{option.label}</option>
-                            ))}
-                        </select>
+                            LogOut
+                        </button>
                     </div>
-
-                    <div className="-my-2 overflow-x-hidden sm:-mx-6 lg:-mx-8">
-                        <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8 ">
-                            <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg ">
-                                <table className="min-w-full divide-y divide-gray-200 ">
-                                    <thead className="bg-gray-50">
-                                    <tr>
-                                        <th scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Destination
-                                        </th>
-                                        <th scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Start Date
-                                        </th>
-                                        <th scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            End Date
-                                        </th>
-                                        <th scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
-                                            Comment
-                                        </th>
-                                        <th scope="col" className=" px-6 py-3">
-                                        <span
-                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">Actions</span>
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                    {trips.length > 0 ? trips.map((trip) => (
-                                        <tr>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    {trip.destination} <span
-                                                    className="font-light text-xs text-gray-600">
-                                                {counterDaysLeft(trip.start_date) > 0 ? "( " + counterDaysLeft(trip.start_date) + " days left )" : ""}</span>
-                                                </p>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{trip.start_date}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        {trip.end_date}
-                                     </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <p className="truncate w-1/2">{trip.comment}</p>
-                                            </td>
-                                            <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
-                                                <button
-                                                    className="font-semibold mb-1 mr-2 text-indigo-600 hover:text-indigo-900"
-                                                    // onClick={() => handleOnClick(trip.id)}
-                                                >
-                                                    <Link to={'/user/' + trip.id}>Details</Link>
-                                                </button>
-
-                                                <a href="#"
-                                                   className="text-indigo-600 hover:text-indigo-900 mr-1">Edit</a>
-                                                <DeleteIcon
-                                                    className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
-                                                    onClick={() => deleteTrip(trip.id)}
-                                                />
-                                            </td>
-                                        </tr>
-                                    )) : null}
-                                    </tbody>
-                                    {trips.length === 0 ?
-                                        <span className=" p-4 bg-gray-100 flex flex justify-between text-gray-500">You
-                                            don't
-                                            have any records</span> : ""}
-
-                                </table>
-
-                            </div>
+                    <div className="p-5">
+                        <div className="flex justify-between">
+                            <Link to="/user/add-trip"
+                                  className="bg-gray-600 hover:bg-gray-800 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline">
+                                <AddIcon/>
+                                Add Trip
+                            </Link>
+                            <select className="pl-2 mb-2 rounded-lg  bg-gray-600 text-gray-300"
+                                    onChange={(e) => handleSort(e)}
+                            >
+                                <option disabled>Sort by:</option>
+                                {options.map((option) => (
+                                    <option value={option.value}>{option.label}</option>
+                                ))}
+                            </select>
                         </div>
+
+
+                        <table className=" divide-y divide-gray-900 shadow">
+                            <thead className="bg-gray-700">
+                            <tr>
+                                <th scope="col"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Destination
+                                </th>
+                                <th scope="col"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Start Date
+                                </th>
+                                <th scope="col"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    End Date
+                                </th>
+                                <th scope="col"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase  ">
+                                    Comment
+                                </th>
+                                <th scope="col" className=" px-6 py-3">
+                                        <span
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider ">Actions</span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody className="bg-gray-800 divide-y divide-gray-900">
+                            {trips.length > 0 ? trips.map((trip) => (
+                                <tr>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <p className="text-sm font-medium text-gray-300">
+                                            {trip.destination} <span
+                                            className="font-light text-sm text-gray-500">
+                                                {counterDaysLeft(trip.start_date) > 0 ? "( " + counterDaysLeft(trip.start_date) + " days left )" : ""}</span>
+                                        </p>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-300">{trip.start_date}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    {trip.end_date}
+                                                </span>
+                                    </td>
+                                    <td className="px-6 py-4  text-sm text-gray-300">
+                                        <p className="overflow-hidden truncate w-72 ">{trip.comment}</p>
+                                    </td>
+                                    <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
+                                        <button
+                                            className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300">
+                                            <Link to={'/user/' + trip.id}>
+                                                Details
+                                            </Link>
+                                        </button>
+
+                                        <a href="#"
+                                           className="text-gray-600 hover:text-gray-300 mr-1">Edit</a>
+                                        <DeleteIcon
+                                            className="text-gray-600 hover:text-gray-300 cursor-pointer"
+                                            onClick={() => deleteTrip(trip.id)}
+                                        />
+                                    </td>
+                                </tr>
+                            )) : null}
+                            </tbody>
+                            {trips.length === 0 ?
+                                <span className=" p-4 bg-gray-900 flex flex justify-between text-gray-300">
+                                    You don't have any records
+                                </span> : ""}
+                        </table>
                     </div>
                 </div>
-
-                <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                    onClick={(e) => handleLogOut(e)}
-                >
-                    LogOut
-                </button>
-
             </div>
         )
     else return (

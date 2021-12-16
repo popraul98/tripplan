@@ -59,20 +59,21 @@ const Login = (props) => {
 
     return (
 
-        <div className="flex justify-center h-screen items-center ">
+        <div
+            className="flex justify-center h-screen items-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100 ">
 
-            <form className="bg-white shadow-2xl rounded px-8 pt-6 pb-8 mb-4 bg-gray-100 "
+            <form className="bg-gray-800 shadow-2xl rounded px-8 pt-6 pb-8 mb-4 "
                   onSubmit={formik.handleSubmit}>
                 <div className="text-red-400">
                     {location.state ? location.state.message : ""}
                 </div>
                 <h3 className="font-bold text-xl mb-6">Login</h3>
                 <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                    <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="email">
                         Email
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
                         id="email"
                         name="email"
                         type="text"
@@ -88,11 +89,11 @@ const Login = (props) => {
                     </div>
                 </div>
                 <div className="mb-3">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                    <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="password">
                         Password
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="bg-blue-500 shadow appearance-none border rounded w-full py-2 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
                         id="password"
                         name="password"
                         type="password"
