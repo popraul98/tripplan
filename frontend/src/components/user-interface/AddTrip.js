@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {authorization, selectTokens, selectUser} from "../../features/userSlice";
 import {Link, useNavigate} from 'react-router-dom';
 import DatePicker from 'react-date-picker';
+import ButtonHome from "./ButtonHome";
 
 export default function AddTrip({}) {
 
@@ -157,13 +158,11 @@ export default function AddTrip({}) {
                         Add trip
                     </button>
                 </form>
-                <button
-                    className="float-right bg-gray-400 rounded-xl text-sm hover:bg-gray-600 border px-2 text-white"
-                >
-                    <Link to="/user">
-                        Close
-                    </Link>
-                </button>
+
+                <div className="mt-4 float-right">
+                    <ButtonHome/>
+                </div>
+
             </div>
         </div>
     )

@@ -17,10 +17,7 @@ class TripRequest extends FormRequest
     {
         if (Auth::check()) {
             $user = Auth::user();
-            $trip = Trip::find($this->route()->parameter('id_trip'));
-            if($trip === null)
-                return true;
-            if ($user->id == $trip->id_user)
+            if ($user->id == $this->trip->id_user)
                 return true;
             return false;
         }
@@ -35,7 +32,7 @@ class TripRequest extends FormRequest
     public function rules()
     {
         return [
-//            'id' => 'integer|required',
+            //
         ];
     }
 }

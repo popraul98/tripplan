@@ -102,7 +102,7 @@ const UserPage = () => {
     const getTrips = async (sort_type) => {
         let recall = false;
         let user_id = user.user.id
-        await axios.post("http://127.0.0.1:8000/api/get-trips/", {user_id}, {
+        await axios.get("http://127.0.0.1:8000/api/get-trips/" + user_id, {
             headers: {
                 Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
                 refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
@@ -174,33 +174,35 @@ const UserPage = () => {
         return (
             <div className="flex justify-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100 h-screen pt-5">
                 <div className="w-2/3">
-                    <div className="flex text-gray-300 justify-between">
-                        <h1>Welcome <span className="font-bold">{user.user.name}</span>. You are login as an
-                            <span className="font-bold"> {user.user.role.name_role}</span>
+
+                    <div className="flex text-gray-400 justify-between">
+                        <h1>Welcome
+                            <span className="font-bold text-gray-300">  {user.user.name}</span>
+                            . You are logged in as
+                            <span className="font-bold text-gray-300"> {user.user.role.name_role}</span>
                         </h1>
                         <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                            onClick={(e) => handleLogOut(e)}
-                        >
+                            className="bg-blue-700 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                            onClick={(e) => handleLogOut(e)}>
                             LogOut
                         </button>
                     </div>
-                    <div className="p-5">
-                        <div className="flex justify-between">
-                            <Link to="/user/add-trip"
-                                  className="bg-gray-600 hover:bg-gray-800 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline">
-                                <AddIcon/>
-                                Add Trip
-                            </Link>
-                            <select className="pl-2 mb-2 rounded-lg  bg-gray-600 text-gray-300"
-                                    onChange={(e) => handleSort(e)}
-                            >
-                                <option disabled>Sort by:</option>
-                                {options.map((option) => (
-                                    <option value={option.value}>{option.label}</option>
-                                ))}
-                            </select>
-                        </div>
+                    <div className="flex justify-between mt-2">
+                        <Link to="/trips/add-trip"
+                              className="bg-gray-600 hover:bg-gray-800 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline">
+                            <AddIcon/>
+                            Add Trip
+                        </Link>
+                        <select className="pl-2 mb-2 rounded-lg  bg-gray-600 text-gray-300"
+                                onChange={(e) => handleSort(e)}
+                        >
+                            <option disabled>Sort by:</option>
+                            {options.map((option) => (
+                                <option value={option.value}>{option.label}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex justify-center">
 
 
                         <table className=" divide-y divide-gray-900 shadow">
@@ -253,13 +255,13 @@ const UserPage = () => {
                                     <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
                                         <button
                                             className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300">
-                                            <Link to={'/user/' + trip.id}>
+                                            <Link to={'/trips/' + trip.id}>
                                                 Details
                                             </Link>
                                         </button>
 
-                                        <a href="#"
-                                           className="text-gray-600 hover:text-gray-300 mr-1">Edit</a>
+                                        {/*<a href="#"*/}
+                                        {/*   className="text-gray-600 hover:text-gray-300 mr-1">Edit</a>*/}
                                         <DeleteIcon
                                             className="text-gray-600 hover:text-gray-300 cursor-pointer"
                                             onClick={() => deleteTrip(trip.id)}

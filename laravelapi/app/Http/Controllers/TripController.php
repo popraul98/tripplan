@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AddTripRequest;
 use App\Http\Requests\TripRequest;
+use App\Http\Resources\TripResource;
 use App\Models\Trip;
+use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,11 +18,10 @@ class TripController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $req)
+    public function index(User $user)
     {
         //required id user
-        $id_user = $req->input('user_id');
-
+        $id_user = $user->id;
 
         $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at', 'ASC')->get();
         $trips_by_name = Trip::byUser($id_user)->orderBy('destination', 'ASC')->get();
@@ -74,19 +75,9 @@ class TripController extends Controller
      * @param int $id_trip
      * @return \Illuminate\Http\Response
      */
-    public function show(TripRequest $id_trip)
+    public function show(TripRequest $request, Trip $trip)
     {
-        $fullUrl = $id_trip;
-        $id = $fullUrl->segment(3);
-        try {
-            $trip = Trip::findOrFail($id);
-        } catch (\Exception $exception) {
-            return response()->json([
-                'message' => $exception->getMessage()
-            ],404);
-        }
-
-        return $trip;
+        return new TripResource($trip);
     }
 
     /**
@@ -118,11 +109,8 @@ class TripController extends Controller
      * @param int $id_trip
      * @return \Illuminate\Http\Response
      */
-    public function destroy(TripRequest $id_trip)
+    public function destroy(TripRequest $request, Trip $trip)
     {
-        $fullUrl = $id_trip;
-        $id = $fullUrl->segment(3);
-        $trip = Trip::find($id);
         $trip->delete();
 
         return "Deleted";

@@ -40,7 +40,7 @@ const Login = (props) => {
                             refresh_token: response.data.tokens.refresh_token,
                         }))
                         if (response.data.user.role.id === 3)
-                            navigate("/user")
+                            navigate("/trips")
                         if (response.data.user.role.id === 2)
                             navigate("/admin")
                         if (response.data.user.role.id === 1)
@@ -57,6 +57,13 @@ const Login = (props) => {
         }
     });
 
+
+    // if (user.user !== null && user.user.tokens !== null) {
+    //     if (user.user.role.id === 3)
+    //         navigate("/trips")
+    //     if (user.user.role.id === 2)
+    //         navigate("/admin")
+    // } else
     return (
 
         <div
@@ -67,7 +74,7 @@ const Login = (props) => {
                 <div className="text-red-400">
                     {location.state ? location.state.message : ""}
                 </div>
-                <h3 className="font-bold text-xl mb-6">Login</h3>
+                <h3 className="font-bold text-xl text-gray-300 mb-6">Login</h3>
                 <div className="mb-4">
                     <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="email">
                         Email
@@ -120,11 +127,12 @@ const Login = (props) => {
                     >
                         Login
                     </button>
-                    <a href="/resetPasswordRequest" className="underline text-sm text-gray-600 m-2">Do you forgot your
+                    <a href="/resetPasswordRequest" className="underline text-sm text-gray-600 m-2">Do you forgot
+                        your
                         password?</a>
 
                 </div>
-                <div className="text-sm mt-4 text-gray-500 mb-2">You don't have an account yet?</div>
+                <div className="text-sm mt-4 text-gray-600 mb-2">You don't have an account yet?</div>
                 <div className="mt text-sm">
                     <nav>
                         <Link

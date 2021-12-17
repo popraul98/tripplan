@@ -7,18 +7,20 @@ import ResetPasswordForm from "./components/auth/ResetPasswordForm";
 import AdminPage from "./components/AdminPage";
 import DetailsDestination from "./components/user-interface/DetailsDestination";
 import AddTrip from "./components/user-interface/AddTrip";
+import EditTrip from "./components/user-interface/EditTrip";
 
 function App() {
     return (
         <Routes>
             <Route path="/register" element={<Register/>}/>
-            <Route path="/user" exact element={<UserPage/>}/>
+            <Route path="/trips" exact element={<UserPage/>}/>
             <Route path="/admin" element={<AdminPage/>}/>
             <Route path="/resetPasswordRequest" element={<ResetPasswordRequest/>}/>
             <Route path="/resetPasswordForm/:token" element={<ResetPasswordForm/>}/>
             <Route path="/" exact element={<Login/>}/>
-            <Route path="/user/:id/" element={<DetailsDestination/>}/>
-            <Route path="/user/add-trip" element={<AddTrip/>}/>
+            <Route path="/trips/:id/" element={<DetailsDestination/>}/>
+            <Route path="/trips/add-trip" element={<AddTrip/>}/>
+            <Route path="/trips/edit-trip/:id" element={<EditTrip/>}/>
         </Routes>
     );
 }
