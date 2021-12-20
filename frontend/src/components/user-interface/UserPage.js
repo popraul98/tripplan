@@ -7,7 +7,7 @@ import axios from "axios";
 import React, {useEffect, useState} from "react";
 import AddTrip from "./AddTrip";
 import Login from "../auth/Login";
-
+import {DELETE_TRIP, GET_TRIPS, LOGOUT, REFRESH_TOKEN} from "../../config/endpoints";
 
 const UserPage = () => {
 
@@ -26,7 +26,7 @@ const UserPage = () => {
         let recall = false
         if (tokens.access_token) {
             let token_access = (new_access_token ? new_access_token : tokens.access_token);
-            const res = await axios.post("http://127.0.0.1:8000/api/logout", {token_access}, {
+            const res = await axios.post(LOGOUT, {token_access}, {
                 headers: {
                     Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
                     refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
@@ -47,7 +47,7 @@ const UserPage = () => {
 
     //Refresh token if needed
     const requestNewRefreshToken = async (refresh_token) => {
-        return await axios.get("http://127.0.0.1:8000/api/refresh_token", {
+        return await axios.get(REFRESH_TOKEN, {
             headers: {
                 refresh_token: refresh_token
             }
@@ -102,7 +102,7 @@ const UserPage = () => {
     const getTrips = async (sort_type) => {
         let recall = false;
         let user_id = user.user.id
-        await axios.get("http://127.0.0.1:8000/api/get-trips/" + user_id, {
+        await axios.get(GET_TRIPS, {
             headers: {
                 Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
                 refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
@@ -139,7 +139,7 @@ const UserPage = () => {
     //delete Trip from Server
     const deleteTrip = async (id_trip) => {
         let recall = false;
-        await axios.delete("http://localhost:8000/api/delete-trip/" + id_trip, {
+        await axios.delete(DELETE_TRIP + id_trip, {
             headers: {
                 Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
                 refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
@@ -182,7 +182,7 @@ const UserPage = () => {
                             <span className="font-bold text-gray-300"> {user.user.role.name_role}</span>
                         </h1>
                         <button
-                            className="bg-blue-700 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                            className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
                             onClick={(e) => handleLogOut(e)}>
                             LogOut
                         </button>

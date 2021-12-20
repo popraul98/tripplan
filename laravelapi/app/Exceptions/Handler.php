@@ -32,30 +32,30 @@ class Handler extends ExceptionHandler
     ];
 
 
-//    protected function renderJson($request, Throwable $exception)
-//    {
-//        if ($request->expectsJson()) {
-//            if ($exception instanceof AuthenticationException) {
-//                return response()->json([
-//                    'message' => json_decode($exception->getMessage()) ?? $exception->getMessage()
-//                ], JsonResponse::HTTP_UNAUTHORIZED);
-//            }
-//            if ($exception instanceof AuthorizationException) {
-//                return response()->json([
-//                    'message' => json_decode($exception->getMessage()) ?? $exception->getMessage()
-//                ], JsonResponse::HTTP_FORBIDDEN);
-//            }
-//            if ($exception instanceof ModelNotFoundException ) {
-//                return response()->json([
-//                    'message' => json_decode($exception->getMessage()) ?? $exception->getMessage()
-//                ], JsonResponse::HTTP_NOT_FOUND);
-//            }
-//        }
-//        throw $exception;
-//    }
-//
-//    public function render($request, Throwable $exception)
-//    {
-//        return $this->renderJson($request, $exception);
-//    }
+    protected function renderJson($request, Throwable $exception)
+    {
+        if ($request->expectsJson()) {
+            if ($exception instanceof AuthenticationException) {
+                return response()->json([
+                    'message' => json_decode($exception->getMessage()) ?? $exception->getMessage()
+                ], JsonResponse::HTTP_UNAUTHORIZED);
+            }
+            if ($exception instanceof AuthorizationException) {
+                return response()->json([
+                    'message' => json_decode($exception->getMessage()) ?? $exception->getMessage()
+                ], JsonResponse::HTTP_FORBIDDEN);
+            }
+            if ($exception instanceof ModelNotFoundException) {
+                return response()->json([
+                    'message' => json_decode($exception->getMessage()) ?? $exception->getMessage()
+                ], JsonResponse::HTTP_NOT_FOUND);
+            }
+        }
+        throw $exception;
+    }
+
+    public function render($request, Throwable $exception)
+    {
+        return $this->renderJson($request, $exception);
+    }
 }

@@ -4,9 +4,9 @@ import {useFormik} from "formik";
 import * as Yup from 'yup';
 import {BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation, Navigate} from "react-router-dom";
 import Register from "./Register";
-import UserPage from "../user-interface/UserPage";
 import {useDispatch, useSelector} from "react-redux";
 import {login, selectUser, authorization} from "../../features/userSlice";
+import {LOGIN} from '../../config/endpoints.js';
 
 const Login = (props) => {
 
@@ -28,7 +28,7 @@ const Login = (props) => {
         onSubmit: async values => {
             console.log("login submit")
 
-            const res = await axios.post("http://127.0.0.1:8000/api/login", values)
+            const res = await axios.post(LOGIN, values)
                 .then(response => {
                         console.log("login");
                         dispatch(login({
@@ -57,19 +57,24 @@ const Login = (props) => {
         }
     });
 
+    useEffect(() => {
+        if (user) {
+            if (user.user.role.id === 2)
+                navigate("/admin")
+            if (user.user.role.id === 3)
+                navigate("/trips")
+            // if (user.user.role.id === 1)
+            //     navigate("/super-admin")
+        }
+    })
 
-    // if (user.user !== null && user.user.tokens !== null) {
-    //     if (user.user.role.id === 3)
-    //         navigate("/trips")
-    //     if (user.user.role.id === 2)
-    //         navigate("/admin")
-    // } else
+
     return (
 
         <div
             className="flex justify-center h-screen items-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100 ">
 
-            <form className="bg-gray-800 shadow-2xl rounded px-8 pt-6 pb-8 mb-4 "
+            <form className="bg-gray-800 shadow-2xl rounded px-8 pt-6 pb-8 mb-4 rounded-xl"
                   onSubmit={formik.handleSubmit}>
                 <div className="text-red-400">
                     {location.state ? location.state.message : ""}
@@ -80,7 +85,7 @@ const Login = (props) => {
                         Email
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         id="email"
                         name="email"
                         type="text"
@@ -100,7 +105,7 @@ const Login = (props) => {
                         Password
                     </label>
                     <input
-                        className="bg-blue-500 shadow appearance-none border rounded w-full py-2 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         id="password"
                         name="password"
                         type="password"
@@ -122,7 +127,7 @@ const Login = (props) => {
 
                 <div className="flex items-center justify-between">
                     <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         type="submit"
                     >
                         Login
@@ -136,7 +141,7 @@ const Login = (props) => {
                 <div className="mt text-sm">
                     <nav>
                         <Link
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                            className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
                             to="/register"
                         >
                             Register

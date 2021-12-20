@@ -9,6 +9,7 @@ use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class TripController extends Controller
@@ -21,6 +22,7 @@ class TripController extends Controller
     public function index(User $user)
     {
         //required id user
+        $user = Auth::user();
         $id_user = $user->id;
 
         $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at', 'ASC')->get();

@@ -5,6 +5,7 @@ import {authorization, selectTokens, selectUser} from "../../features/userSlice"
 import {Link, useNavigate} from 'react-router-dom';
 import DatePicker from 'react-date-picker';
 import ButtonHome from "./ButtonHome";
+import {ADD_TRIP, REFRESH_TOKEN} from "../../config/endpoints";
 
 export default function AddTrip({}) {
 
@@ -49,7 +50,7 @@ export default function AddTrip({}) {
 
     const addTrip = async (trip) => {
         let recall = false;
-        await axios.post("http://127.0.0.1:8000/api/create-trip", trip, {
+        await axios.post(ADD_TRIP, trip, {
             headers: {
                 Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
                 refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
@@ -78,7 +79,7 @@ export default function AddTrip({}) {
 
     //Refresh token if needed
     const requestNewRefreshToken = async (refresh_token) => {
-        return await axios.get("http://127.0.0.1:8000/api/refresh_token", {
+        return await axios.get(REFRESH_TOKEN, {
             headers: {
                 refresh_token: refresh_token
             }

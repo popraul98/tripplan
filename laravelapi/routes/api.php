@@ -31,11 +31,18 @@ Route::group(["middleware" => ['auth:api']], function () {
     Route::get("/get-user", [\App\Http\Controllers\UserController::class, 'getUser']);
 
     //handle USER routes
-    Route::group(["middleware" => ['isUser']], function () {
-        Route::get('/get-trips/{user}', [\App\Http\Controllers\TripController::class, 'index']);
-        Route::post('/create-trip', [\App\Http\Controllers\TripController::class, 'store']);
-        Route::delete('/delete-trip/{trip}', [\App\Http\Controllers\TripController::class, 'destroy']);
-        Route::get('/show-trip/{trip}', [\App\Http\Controllers\TripController::class, 'show']);
+    //   api/users/{user}/trips
+    Route::group(["prefix" => 'trips', "middleware" => ['isUser']], function () {
+        Route::get('', [\App\Http\Controllers\TripController::class, 'index']);
+        Route::post('', [\App\Http\Controllers\TripController::class, 'store']);
+
+        Route::group(["prefix" => '{trip}'], function () {
+            Route::delete('', [\App\Http\Controllers\TripController::class, 'destroy']);
+            Route::get('', [\App\Http\Controllers\TripController::class, 'show']);
+        });
+
+        Route::delete('{trip}', [\App\Http\Controllers\TripController::class, 'destroy']);
+        Route::get('{trip}', [\App\Http\Controllers\TripController::class, 'show']);
     });
 
     //handle ADMIN routes

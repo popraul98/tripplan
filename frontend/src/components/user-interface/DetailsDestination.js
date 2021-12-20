@@ -7,6 +7,7 @@ import {Link, useNavigate, useParams} from "react-router-dom";
 import Error404 from "./Error404";
 import Error403 from "./Error403";
 import ButtonHome from "./ButtonHome";
+import {DETAILS_TRIP, REFRESH_TOKEN} from "../../config/endpoints";
 
 const DetailsDestination = () => {
 
@@ -24,7 +25,7 @@ const DetailsDestination = () => {
 
     const fetchTrip = async () => {
         let recall = false;
-        await axios.get("http://127.0.0.1:8000/api/show-trip/" + id, {
+        await axios.get(DETAILS_TRIP + id, {
             headers: {
                 Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
                 refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
@@ -52,7 +53,7 @@ const DetailsDestination = () => {
 
     //Refresh token if needed
     const requestNewRefreshToken = async (refresh_token) => {
-        return await axios.get("http://127.0.0.1:8000/api/refresh_token", {
+        return await axios.get(REFRESH_TOKEN, {
             headers: {
                 refresh_token: refresh_token
             }

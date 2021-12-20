@@ -17,19 +17,8 @@ const rootReducer = combineReducers({
     user: userReducer,
 });
 
-//
-// const middlewares = [];
-//
 const composerEnhance = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-//
-// const store = createStore(
-//     rootReducer,
-//     composerEnhance(applyMiddleware(...middlewares))
-// )
-//
-// const persistor = persistStore(store);
-//
-// export { store, persistor };
+
 
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

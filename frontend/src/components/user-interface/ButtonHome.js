@@ -5,7 +5,7 @@ const ButtonHome = () => {
     return (
 
         <Link to="/trips"
-              className="bg-blue-700 px-3 py-2 text-sm text-gray-300 hover:bg-blue-700 rounded-lg">
+              className="bg-blue-700 px-3 py-2 text-sm text-gray-300 hover:bg-blue-600 hover:text-gray-900 rounded-lg">
             Go back to Trips
         </Link>
 

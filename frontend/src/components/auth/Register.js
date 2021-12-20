@@ -5,6 +5,7 @@ import {BrowserRouter as Router, Routes, Route, Link} from "react-router-dom";
 import Login from "./Login";
 import React, {useEffect, useState} from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {REGISTER} from "../../config/endpoints";
 
 const Register = (props) => {
 
@@ -29,7 +30,7 @@ const Register = (props) => {
         }),
         onSubmit: values => {
 
-            axios.post("http://127.0.0.1:8000/api/register", values)
+            axios.post(REGISTER, values)
                 .then(response => {
                     setMessageStatus('You have been registered')
                     setErrorsMessages([]);
