@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
 import {authorization, selectTokens, selectUser} from "../../features/userSlice";
@@ -6,6 +6,10 @@ import {Link, useNavigate} from 'react-router-dom';
 import DatePicker from 'react-date-picker';
 import ButtonHome from "./ButtonHome";
 import {ADD_TRIP, REFRESH_TOKEN} from "../../config/endpoints";
+import PlacesAutocomplete, {
+    geocodeByAddress,
+    getLatLng
+} from "react-places-autocomplete";
 
 export default function AddTrip({}) {
 
@@ -16,6 +20,7 @@ export default function AddTrip({}) {
     let new_access_token = "";
     let new_refresh_token = "";
     const [addedSuccessfully, setAddedSuccessfully] = useState(false)
+    const [address, setAddress] = useState("");
 
     const formatDate = (date) => {
         var d = new Date(date),
@@ -30,12 +35,26 @@ export default function AddTrip({}) {
     }
 
     const [trip, setTrip] = useState({
-        id_user: user.user.id,
+        id_user: "",
         destination: "",
         start_date: formatDate(new Date()),
         end_date: formatDate(new Date()),
         comment: "",
     })
+
+    useEffect(() => {
+        console.log("UseEffects")
+        if (user != null)
+            setTrip({
+                id_user: user.user.id,
+                destination: address,
+                start_date: formatDate(new Date()),
+                end_date: formatDate(new Date()),
+                comment: "",
+            })
+        if (addedSuccessfully === true)
+            setAddedSuccessfully(false);
+    }, [user, address])
 
     const onSubmit = (e) => {
         e.preventDefault()
@@ -47,7 +66,6 @@ export default function AddTrip({}) {
         setAddedSuccessfully(false);
     };
 
-
     const addTrip = async (trip) => {
         let recall = false;
         await axios.post(ADD_TRIP, trip, {
@@ -56,7 +74,6 @@ export default function AddTrip({}) {
                 refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
             }
         }).then(response => {
-            // console.log(trip.id_user)
             setTrip({
                 id_user: user.user.id,
                 destination: "",
@@ -64,6 +81,7 @@ export default function AddTrip({}) {
                 end_date: formatDate(new Date()),
                 comment: ""
             })
+            setAddress("")
             setAddedSuccessfully(true)
         }).catch(function (error) {
                 if (error.response.status === 401) {
@@ -105,57 +123,104 @@ export default function AddTrip({}) {
         });
     }
 
+
+    //DOWN GOOGLE API SEARCH AUTOCOMPLETE
+    const handleSelect = (address, placeId, suggestion) => {
+        setAddress(address)
+    }
+
+
+    const onError = (status, clearSuggestions) => {
+        console.log('Google Maps API returned error with status: ', status)
+        clearSuggestions()
+    }
+
     return (
         <div
-            className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-gray-600 bg-opacity-80 transform transition-transform duration-30">
-            <div className="bg-gray-100 shadow rounded-xl w-1/2  p-6">
-                <div className="font-semibold text-gray-700 text-lg mb-2 underline">
-                    Add your Trip:
+            className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100 transform transition-transform duration-30">
+            <div className="bg-gray-800 shadow rounded-xl w-1/2  p-6">
+
+
+                <div className="font-semibold text-gray-400 text-xl py-3">
+                    Add new trip
                 </div>
                 <div className="font-bold mb-2 text-green-500">
                     {addedSuccessfully ? "Trip added successfully" : ""}
                 </div>
                 <form onSubmit={onSubmit}>
-                    <label className="block text-gray-700 text-sm font-semibold mb-1">Destination</label>
-                    <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 mb-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        placeholder="Destination"
-                        value={trip.destination}
-                        name="destination"
-                        onChange={(e) => onInputChange(e)}
+                    <label className="block text-gray-300 text-sm font-semibold mb-1">Destination</label>
 
-                    />
+                    <PlacesAutocomplete
+                        value={address}
+                        onChange={setAddress}
+                        onSelect={handleSelect}
+                        onError={onError}
+                    >
+                        {({getInputProps, suggestions, getSuggestionItemProps, loading}) => (
+                            <div className="mb-4">
+                                <input
+                                    className=" rounded placeholder-gray-500 w-full py-2 px-3 bg-gray-400 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+                                    {...getInputProps({placeholder: "Destination"})}
+                                />
+                                <div className="">
 
-                    <label className="block text-gray-700 text-sm font-semibold mb-1">Start Date <span
-                        className="text-sm text-gray-600 font-light">(year-month-day)</span></label>
-                    <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 mb-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        placeholder="Start Date"
-                        name="start_date"
-                        value={trip.start_date}
-                        onChange={(e) => onInputChange(e)}
-                    />
+                                    <div className="z-10 absolute rounded">
+                                        {suggestions.map((suggestion) => {
 
-                    <label className="block text-gray-700 text-sm font-semibold mb-1">End Date <span
-                        className="text-sm text-gray-600 font-light">(year-month-day)</span></label>
-                    <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 mb-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        placeholder="End Date"
-                        name="end_date"
-                        value={trip.end_date}
-                        onChange={(e) => onInputChange(e)}
-                    />
+                                            const style = {
+                                                backgroundColor: suggestion.active ? "rgb(29 78 216)" : "#868686",
+                                            }
 
-                    <label className="block text-gray-700 text-sm font-semibold mb-1">Comment</label>
-                    <textarea
-                        className="shadow appearance-none border rounded w-full py-2 px-3 mb-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        placeholder="Write your comment here..."
-                        name="comment"
-                        value={trip.comment}
-                        onChange={(e) => onInputChange(e)}
-                    />
+                                            return (
+                                                <div {...getSuggestionItemProps(suggestion, {style})}>
+                                                    {suggestion.description}
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
 
-                    <button className=" bg-gray-700 rounded-xl hover:bg-gray-600 border px-2 text-white">
+                                </div>
+                            </div>
+                        )}
+                    </PlacesAutocomplete>
+
+                    <div className="mb-4">
+                        <label className="block text-gray-300 text-sm font-semibold mb-1">Start Date <span
+                            className="text-sm text-gray-500 font-light">(year-month-day)</span></label>
+                        <input
+                            className=" appearance-none rounded placeholder-gray-500 w-full py-2 px-3 bg-gray-400 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+                            placeholder="Start Date"
+                            name="start_date"
+                            value={trip.start_date}
+                            onChange={(e) => onInputChange(e)}
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block text-gray-300 text-sm font-semibold mb-1">End Date <span
+                            className="text-sm text-gray-500 font-light">(year-month-day)</span></label>
+                        <input
+                            className=" appearance-none rounded placeholder-gray-500 w-full py-2 px-3 bg-gray-400 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+                            placeholder="End Date"
+                            name="end_date"
+                            value={trip.end_date}
+                            onChange={(e) => onInputChange(e)}
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block text-gray-300 text-sm font-semibold mb-1">Comment</label>
+                        <textarea
+                            className=" appearance-none rounded placeholder-gray-500 w-full py-2 px-3 bg-gray-400 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
+                            placeholder="Write your comment here..."
+                            name="comment"
+                            value={trip.comment}
+                            onChange={(e) => onInputChange(e)}
+                        />
+                    </div>
+
+                    <button
+                        className=" text-gray-300 rounded-xl hover:bg-gray-800 border border-gray-600 px-2 text-white">
                         Add trip
                     </button>
                 </form>
