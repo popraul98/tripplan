@@ -8,6 +8,7 @@ import Error404 from "./Error404";
 import Error403 from "./Error403";
 import ButtonHome from "./ButtonHome";
 import {DETAILS_TRIP, REFRESH_TOKEN} from "../../config/endpoints";
+import RatingStars from "./RatingStars";
 
 const DetailsDestination = () => {
 
@@ -22,6 +23,7 @@ const DetailsDestination = () => {
     const [trip, setTrip] = useState([]);
     const [errorUnauthorized, setErrorUnauthorized] = useState(false);
     const [errorNotFound, setErrorNotFound] = useState(false);
+    const [insights, setInsights] = useState([]);
 
     const fetchTrip = async () => {
         let recall = false;
@@ -33,6 +35,7 @@ const DetailsDestination = () => {
         }).then(function (response) {
             console.log('Token Valabil');
             setTrip(response.data.data)
+            fetchInsights(response.data.data.destination)
         }).catch(function (error) {
             console.log(error.response.status, 'error show trip')
             if (error.response.status === 404)
@@ -47,9 +50,12 @@ const DetailsDestination = () => {
     }
 
     useEffect(() => {
-        if (id && tokens)
+        if (id && tokens) {
             fetchTrip()
+        }
+
     }, [tokens, errorUnauthorized, errorNotFound])
+
 
     //Refresh token if needed
     const requestNewRefreshToken = async (refresh_token) => {
@@ -79,6 +85,27 @@ const DetailsDestination = () => {
         });
     }
 
+    const fetchInsights = async (destination) => {
+        let language = 'en';
+        let key = 'AIzaSyD1viFL9PIqRrQ159iA5-pGQ_mKQn-tt14';
+        const proxyUrl = "https://cors-anywhere.herokuapp.com/"
+        if (destination)
+            await axios.get(proxyUrl +
+                "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + destination + "+things-to-do&language=" + language + "&key=" + key, {
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                        'Access-Control-Allow-Origin': '*',
+                    }
+                }
+            ).then(function (response) {
+                console.log(response.data.results)
+                setInsights(response.data.results)
+            }).catch(function (error) {
+                console.log(error, 'error la insights')
+            });
+    }
+
     if (errorUnauthorized)
         return (
             <Error403/>
@@ -90,73 +117,143 @@ const DetailsDestination = () => {
     else
         return (
             <div
-                className="flex justify-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100 h-screen pt-5">
-                <div className="w-2/3">
-                    <div className="">
-                        <button>
-                            <ButtonHome/>
-                        </button>
-                        <div className="flex justify-around  p-3">
-                            <div className="float-left border rounded-t-2xl border-gray-700 w-1/3">
-                                <h3 className="p-2 pb-4 text-gray-300 italic text-2xl font-semibold">
-                                    {trip.destination}
-                                </h3>
-                                <div className="relative border-t border-gray-700 rounded-t">
-                                    <div className="border-r-2 border-gray-500 absolute h-full top-0"
-                                         style={{'left': '9px'}}></div>
-                                    <ul className="list-none m-0 p-0">
-                                        <li className="mb-5  ">
-                                            <div className="flex group items-center ">
+                className="flex justify-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100 h-screen  pt-5">
+                <div className="w-2/3 ">
+                    <ButtonHome/>
+                    <div className="flex justify-between  py-4">
+                        <div className="float-left border rounded-lg bg-gray-800 shadow border-gray-700 w-1/2 mr-5 ">
+                            <h3 className="p-2 pb-4 text-gray-300 italic text-2xl font-semibold">
+                                {trip.destination}
+                            </h3>
+                            <div className="relative border-t border-gray-700 rounded-t">
+                                <div className="border-r-2 border-gray-500 absolute h-full top-0"
+                                     style={{'left': '9px'}}></div>
+                                <ul className="list-none m-0 p-0">
+                                    <li className="mb-5  ">
+                                        <div className="flex group items-center ">
+                                            <div
+                                                className="bg-gray-500 group-hover:bg-red-700 z-10 rounded-full border-2 border-blue-700 ml-1 h-3 w-3">
                                                 <div
-                                                    className="bg-gray-500 group-hover:bg-red-700 z-10 rounded-full border-2 border-blue-700 ml-1 h-3 w-3">
-                                                    <div
-                                                        className="bg-gray-400 h-0.5 w-5 items-center  ml-3 mt-1"></div>
+                                                    className="bg-gray-400 h-0.5 w-5 items-center  ml-3 mt-1"></div>
+                                            </div>
+                                            <div className="flex-1 ml-4 z-10 ">
+                                                <div
+                                                    className="pl-3 text-gray-300 font-semibold order-1 space-y-2 rounded-lg shadow-only transition-ease lg:w-5/12">
+                                                    Start Date:
                                                 </div>
-                                                <div className="flex-1 ml-4 z-10 ">
-                                                    <div
-                                                        className="pl-3 text-gray-300 font-semibold order-1 space-y-2 rounded-lg shadow-only transition-ease lg:w-5/12">
-                                                        Start Date:
-                                                    </div>
-                                                    <div className="pl-3 text-gray-300">
-                                                        {trip.start_date}
-                                                    </div>
+                                                <div className="pl-3 text-gray-300">
+                                                    {trip.start_date}
                                                 </div>
                                             </div>
-                                        </li>
-                                        <li className="">
-                                            <div className="flex group items-center ">
+                                        </div>
+                                    </li>
+                                    <li className="">
+                                        <div className="flex group items-center ">
+                                            <div
+                                                className="bg-gray-500 group-hover:bg-red-700 z-10 rounded-full border-2 border-blue-700 ml-1 h-3 w-3">
                                                 <div
-                                                    className="bg-gray-500 group-hover:bg-red-700 z-10 rounded-full border-2 border-blue-700 ml-1 h-3 w-3">
-                                                    <div
-                                                        className="bg-gray-400 h-0.5 w-5 items-center  ml-3 mt-1"></div>
+                                                    className="bg-gray-400 h-0.5 w-5 items-center  ml-3 mt-1"></div>
+                                            </div>
+                                            <div className="flex-1 ml-4 z-10">
+                                                <div
+                                                    className="pl-3 text-gray-300 font-semibold order-1 space-y-2 rounded-lg shadow-only transition-ease lg:w-5/12">
+                                                    End Date:
                                                 </div>
-                                                <div className="flex-1 ml-4 z-10">
-                                                    <div
-                                                        className="pl-3 text-gray-300 font-semibold order-1 space-y-2 rounded-lg shadow-only transition-ease lg:w-5/12">
-                                                        End Date:
-                                                    </div>
-                                                    <div className="pl-3 text-gray-300">
-                                                        {trip.end_date}
-                                                    </div>
+                                                <div className="pl-3 text-gray-300">
+                                                    {trip.end_date}
                                                 </div>
                                             </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <p className="border-t border-gray-700 pt-3 text-ellipsis text-gray-300 rounded pl-2">
-                                    {trip.comment}
-                                </p>
+                                        </div>
+                                    </li>
+                                </ul>
                             </div>
+                            <p className="border-t border-gray-700 pt-3 text-ellipsis text-gray-300 rounded pl-2">
+                                {trip.comment}
+                            </p>
+                        </div>
 
-                            <div className="float right ">
-                                <iframe
-                                    width="550"
-                                    height="350"
-                                    src={"https://www.google.com/maps/embed/v1/place?key=AIzaSyD1viFL9PIqRrQ159iA5-pGQ_mKQn-tt14&q=" + trip.destination}>
-                                </iframe>
-                            </div>
+                        <div className="float right ">
+                            <iframe
+                                width="500"
+                                height="350"
+                                src={"https://www.google.com/maps/embed/v1/place?key=AIzaSyD1viFL9PIqRrQ159iA5-pGQ_mKQn-tt14&q=" + trip.destination}>
+                            </iframe>
                         </div>
                     </div>
+                    <div className="flex justify-between py-2 h-96 ">
+                        <div className="float-left border rounded-lg bg-gray-800 shadow border-gray-700 w-1/2 mr-5 ">
+                            <h3 className="p-2 pb-4 text-gray-300 italic text-2xl font-semibold">
+                                {trip.destination}
+                            </h3>
+                            <div className="relative border-t border-gray-700 rounded-t">
+                                <div className="border-r-2 border-gray-500 absolute h-full top-0"
+                                     style={{'left': '9px'}}></div>
+                                <ul className="list-none m-0 p-0">
+                                    <li className="mb-5  ">
+                                        <div className="flex group items-center ">
+                                            <div
+                                                className="bg-gray-500 group-hover:bg-red-700 z-10 rounded-full border-2 border-blue-700 ml-1 h-3 w-3">
+                                                <div
+                                                    className="bg-gray-400 h-0.5 w-5 items-center  ml-3 mt-1"></div>
+                                            </div>
+                                            <div className="flex-1 ml-4 z-10 ">
+                                                <div
+                                                    className="pl-3 text-gray-300 font-semibold order-1 space-y-2 rounded-lg shadow-only transition-ease lg:w-5/12">
+                                                    Start Date:
+                                                </div>
+                                                <div className="pl-3 text-gray-300">
+                                                    {trip.start_date}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li className="">
+                                        <div className="flex group items-center ">
+                                            <div
+                                                className="bg-gray-500 group-hover:bg-red-700 z-10 rounded-full border-2 border-blue-700 ml-1 h-3 w-3">
+                                                <div
+                                                    className="bg-gray-400 h-0.5 w-5 items-center  ml-3 mt-1"></div>
+                                            </div>
+                                            <div className="flex-1 ml-4 z-10">
+                                                <div
+                                                    className="pl-3 text-gray-300 font-semibold order-1 space-y-2 rounded-lg shadow-only transition-ease lg:w-5/12">
+                                                    End Date:
+                                                </div>
+                                                <div className="pl-3 text-gray-300">
+                                                    {trip.end_date}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <p className="border-t border-gray-700 pt-3 text-ellipsis text-gray-300 rounded pl-2">
+                                {trip.comment}
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 overflow-y-scroll -mr-5">
+                            {insights.length > 0 ? insights.map((insight) => (
+                                <div className="bg-gray-700 rounded-lg pb-1">
+                                    <img src={require("../../images/map_grid_template.png").default}
+                                         className='object-none h-32 w-full rounded-t-lg'
+                                         alt="map-grid"
+                                    />
+                                    <div className="pl-1">
+                                        <h3 className="text-gray-300 font-semibold">
+                                            {insight.name}
+                                        </h3>
+                                        <p className="text-xs text-gray-400">
+                                            {insight.formatted_address}
+                                        </p>
+                                        <RatingStars rating={insight.rating}/>
+                                    </div>
+                                </div>
+                            )) : "null"}
+
+
+                        </div>
+                    </div>
+
                 </div>
             </div>
         )
