@@ -1,4 +1,4 @@
-# tripplan is an restful api application with:
+# tripplan is an restful api application
 
 Back-end: Laravel
 Front-end: React Js
