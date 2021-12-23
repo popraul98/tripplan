@@ -1,14 +1,14 @@
 import {Link, Navigate, Route, Routes} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {login, logout, selectUser, authorization, selectTokens} from "../features/userSlice";
+import {login, logout, selectUser, authorization, selectTokens} from "../../features/userSlice";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import React, {useState, useEffect, ComponentLifecycle} from "react";
 import Select from "react-select";
-import Login from "./auth/Login";
-import {DELETE_USER, GET_USERS, LOGOUT, REFRESH_TOKEN} from "../config/endpoints";
+import Login from "../auth/Login";
+import {DELETE_USER, GET_USERS, LOGOUT, REFRESH_TOKEN} from "../../config/endpoints";
 
 
 const AdminPage = () => {
@@ -136,66 +136,66 @@ const AdminPage = () => {
 
     if (user != null)
         return (
-            <div className="content-center bg-gray-100 p-2">
-                <h1>Welcome <span className="font-bold">{user.user.name}</span>.
-                    You are login as an <span className="font-bold">{user.user.role.name_role}</span></h1>
+            <div className="content-center bg-gray-900 min-h-screen p-2">
+                <h1 className="text-gray-400">Welcome
+                    <span className="font-bold text-gray-300">  {user.user.name}</span>
+                    . You are logged in as
+                    <span className="font-bold text-gray-300"> {user.user.role.name_role}</span>
+                </h1>
                 <div className="p-5">
 
                     <div className="-my-2 overflow-x-hidden sm:-mx-6 lg:-mx-8">
-                        <h2 className="px-6 py-3 text-left  font-semibold text-sm font-medium text-gray-500 uppercase tracking-wider">
+                        <h2 className="px-6 py-3 text-left  font-semibold text-sm font-medium text-gray-400 uppercase tracking-wider">
                             List with Users:
                         </h2>
                         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8 ">
-                            <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg ">
-                                <table className="min-w-full divide-y divide-gray-200 ">
-                                    <thead className="bg-gray-50">
+                            <div className="shadow overflow-hidden border-gray-200 sm:rounded-lg ">
+                                <table className="min-w-full divide-y divide-gray-900 ">
+                                    <thead className="bg-gray-700">
                                     <tr>
                                         <th scope="col"
-                                            className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                             Nume User
                                         </th>
                                         <th scope="col"
-                                            className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                             Email User
                                         </th>
                                         <th scope="col"
-                                            className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                             Created At
                                         </th>
 
                                         <th scope="col" className=" px-4 py-3">
                                         <span
-                                            className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">
+                                            className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider ">
                                             Actions
                                         </span>
                                         </th>
                                     </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    <tbody className="bg-gray-800 divide-y divide-gray-900">
                                     {listUsers.length > 0 ? listUsers.map((user) => (
                                         <tr>
                                             <td className="px-4 py-4 whitespace-nowrap">
-                                                <p className="text-sm font-medium text-gray-900">
+                                                <p className="text-sm font-medium text-gray-400">
                                                     {user.name}
                                                 </p>
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{user.email}</div>
+                                                <div className="text-sm text-gray-400">{user.email}</div>
                                             </td>
                                             <td className="px-4 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{user.created_at}</div>
+                                                <div className="text-sm text-gray-400">{user.created_at}</div>
                                             </td>
-                                            <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
-                                                {/*<button*/}
-                                                {/*    className="font-semibold mb-1 mr-2 text-indigo-600 hover:text-indigo-900"*/}
-                                                {/*    // onClick={() => handleOnClick(trip.id)}*/}
-                                                {/*>*/}
-                                                {/*    Details*/}
-                                                {/*</button>*/}
-                                                {/*<a href="#"*/}
-                                                {/*   className="text-indigo-600 hover:text-indigo-900 mr-1">Edit</a>*/}
+                                            <td className="pr-10 py-4  whitespace-nowrap flex text-sm font-medium">
+                                                <Link to={'user/' + user.id}
+                                                      className="pr-2 border-r border-gray-800 text-indigo-600 hover:text-gray-600"
+                                                >
+                                                    User trips
+                                                </Link>
                                                 <DeleteIcon
-                                                    className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
+                                                    className="text-indigo-600 hover:text-gray-600 cursor-pointer "
                                                     onClick={() => deleteUser(user.id)}
                                                 />
                                             </td>
@@ -204,7 +204,7 @@ const AdminPage = () => {
 
                                     </tbody>
                                     {listUsers.length === 0 ?
-                                        <span className=" p-4 bg-gray-100 flex flex justify-between text-gray-500">
+                                        <span className=" p-4 bg-gray-800 flex justify-between text-gray-500">
                                         You don't have any user registered
                                     </span> : ""}
                                 </table>

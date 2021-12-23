@@ -44,9 +44,13 @@ Route::group(["middleware" => ['auth:api']], function () {
     });
 
     //handle ADMIN routes
-    Route::group(["middleware" => ['isAdmin']], function () {
-        Route::get('/get-list-users', [\App\Http\Controllers\AdminPageController::class, 'index']);
-        Route::delete('/delete-user/{id}', [\App\Http\Controllers\AdminPageController::class, 'deleteUser']);
+    Route::group(["prefix" => 'admin', "middleware" => ['isAdmin']], function () {
+        Route::get('', [\App\Http\Controllers\AdminPageController::class, 'index']);
+        Route::group(["prefix" => '/user/{id}'], function () {
+            Route::get('', [\App\Http\Controllers\AdminPageController::class, 'getTripsUser']);
+            Route::delete('', [\App\Http\Controllers\AdminPageController::class, 'deleteUser']);
+        });
+
     });
 });
 

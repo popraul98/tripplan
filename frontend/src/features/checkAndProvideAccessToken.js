@@ -1,4 +1,4 @@
-import AdminPage from "../components/AdminPage";
+import AdminPage from "../components/admin-interface/AdminPage";
 
 export const myFunction = () => {
     console.log("myfunction")

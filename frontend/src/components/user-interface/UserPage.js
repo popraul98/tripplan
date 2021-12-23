@@ -172,7 +172,7 @@ const UserPage = () => {
 
     if (user != null)
         return (
-            <div className="flex justify-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100 h-screen pt-5">
+            <div className="flex justify-center bg-gray-900 min-h-screen pt-5">
                 <div className="w-2/3">
 
                     <div className="flex text-gray-400 justify-between">
@@ -234,7 +234,7 @@ const UserPage = () => {
                             {trips.length > 0 ? trips.map((trip) => (
                                 <tr>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <p className="text-sm font-medium text-gray-300">
+                                        <p className="text-sm font-medium text-gray-300 overflow-hidden truncate w-72">
                                             {trip.destination} <span
                                             className="font-light text-sm text-gray-500">
                                                 {counterDaysLeft(trip.start_date) > 0 ? "( " + counterDaysLeft(trip.start_date) + " days left )" : ""}</span>
@@ -271,7 +271,8 @@ const UserPage = () => {
                             )) : null}
                             </tbody>
                             {trips.length === 0 ?
-                                <span className=" p-4 bg-gray-900 flex flex justify-between text-gray-300">
+                                <span
+                                    className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 flex justify-between text-gray-300">
                                     You don't have any records
                                 </span> : ""}
                         </table>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\Trip;
 use App\Models\User;
 use Carbon\Carbon;
@@ -31,5 +32,14 @@ class AdminPageController extends Controller
             Trip::find($trip->id)->delete();
         }
         User::find($id)->delete();
+    }
+
+    public function getTripsUser($id)
+    {
+        $user = User::find($id);
+
+        return response()->json([
+            'user_and_trips' => new UserResource($user)
+        ]);
     }
 }

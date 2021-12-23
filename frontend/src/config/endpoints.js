@@ -11,5 +11,6 @@ export const DELETE_TRIP = "http://localhost:8000/api/trips/";
 export const DETAILS_TRIP = "http://127.0.0.1:8000/api/trips/";
 
 //Admin Action
-export const GET_USERS = "http://127.0.0.1:8000/api/get-list-users";
-export const DELETE_USER = "http://localhost:8000/api/delete-user/";
+export const GET_USERS = "http://127.0.0.1:8000/api/admin";
+export const DELETE_USER = "http://localhost:8000/api/admin/user/";
+export const GET_USER_TRIPS = "http://localhost:8000/api/admin/user/";
