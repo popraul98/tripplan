@@ -46,8 +46,11 @@ const DetailsDestination = () => {
             if (error.response.status === 401)
                 recall = true;
         });
-        if (recall)
+        if (recall) {
             await requestNewRefreshToken(tokens.refresh_token)
+            fetchTrip();
+        }
+
     }
 
     useEffect(() => {
@@ -100,7 +103,6 @@ const DetailsDestination = () => {
                     }
                 }
             ).then(function (response) {
-                console.log(response.data.results)
                 setInsights(response.data.results)
             }).catch(function (error) {
                 console.log(error, 'error la insights')
@@ -183,7 +185,8 @@ const DetailsDestination = () => {
                     </div>
                     <div className="flex justify-between py-2 h-96 ">
                         <div className="float-left border rounded-lg bg-gray-800 shadow border-gray-700 w-1/2 mr-5 ">
-                            DE IMPLEMENTAT: USER UL POATE SA ISI SALVEZE OBIECTIVELE TURISTICE SAU SA INTERACTIONEZE CU ACESTEA
+                            DE IMPLEMENTAT: USER UL POATE SA ISI SALVEZE OBIECTIVELE TURISTICE SAU SA INTERACTIONEZE CU
+                            ACESTEA
 
                         </div>
                         <div className="grid grid-cols-2 gap-2 overflow-y-auto -mr-5 ">

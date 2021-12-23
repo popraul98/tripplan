@@ -9,6 +9,7 @@ export const GET_TRIPS = "http://127.0.0.1:8000/api/trips";
 export const ADD_TRIP = "http://127.0.0.1:8000/api/trips";
 export const DELETE_TRIP = "http://localhost:8000/api/trips/";
 export const DETAILS_TRIP = "http://127.0.0.1:8000/api/trips/";
+export const EDIT_TRIP = "http://127.0.0.1:8000/api/trips/";
 
 //Admin Action
 export const GET_USERS = "http://127.0.0.1:8000/api/admin";

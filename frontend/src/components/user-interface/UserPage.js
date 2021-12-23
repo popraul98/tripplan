@@ -253,15 +253,16 @@ const UserPage = () => {
                                         <p className="overflow-hidden truncate w-72 ">{trip.comment}</p>
                                     </td>
                                     <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
-                                        <button
-                                            className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300">
-                                            <Link to={'/trips/' + trip.id}>
-                                                Details
-                                            </Link>
-                                        </button>
-
-                                        {/*<a href="#"*/}
-                                        {/*   className="text-gray-600 hover:text-gray-300 mr-1">Edit</a>*/}
+                                        <Link to={'/trips/' + trip.id}
+                                              className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300"
+                                        >
+                                            Details
+                                        </Link>
+                                        <Link to={'edit-trip/' + trip.id}
+                                              className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300"
+                                        >
+                                            Edit
+                                        </Link>
                                         <DeleteIcon
                                             className="text-gray-600 hover:text-gray-300 cursor-pointer"
                                             onClick={() => deleteTrip(trip.id)}

@@ -26,8 +26,8 @@ class AddTripRequest extends FormRequest
         return [
             'id_user' => 'required',
             'destination' => 'required',
-            'start_date' => 'date',
-            'end_date' => 'date',
+            'start_date' => 'date | required',
+            'end_date' => 'date | required',
             'comment' => 'string',
         ];
     }

@@ -96,13 +96,13 @@ class TripController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
+     * @param \Illuminate\Http\Request $trip
+     * @param int $trip
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Trip $trip)
     {
-        //
+        dd($trip);
     }
 
     /**

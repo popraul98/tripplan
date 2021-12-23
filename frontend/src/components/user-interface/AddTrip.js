@@ -1,15 +1,18 @@
 import React, {useEffect, useState} from "react";
 import axios from "axios";
+import {useFormik} from "formik";
+import * as Yup from 'yup';
 import {useDispatch, useSelector} from "react-redux";
-import {authorization, selectTokens, selectUser} from "../../features/userSlice";
+import {authorization, login, selectTokens, selectUser} from "../../features/userSlice";
 import {Link, useNavigate} from 'react-router-dom';
 import DatePicker from 'react-date-picker';
 import ButtonHome from "./ButtonHome";
-import {ADD_TRIP, REFRESH_TOKEN} from "../../config/endpoints";
+import {ADD_TRIP, LOGIN, REFRESH_TOKEN} from "../../config/endpoints";
 import PlacesAutocomplete, {
     geocodeByAddress,
     getLatLng
 } from "react-places-autocomplete";
+
 
 export default function AddTrip({}) {
 
@@ -34,66 +37,44 @@ export default function AddTrip({}) {
         return [year, month, day].join('-');
     }
 
-    const [trip, setTrip] = useState({
-        id_user: "",
-        destination: "",
-        start_date: formatDate(new Date()),
-        end_date: formatDate(new Date()),
-        comment: "",
-    })
-
-    useEffect(() => {
-        console.log("UseEffects")
-        if (user != null)
-            setTrip({
-                id_user: user.user.id,
-                destination: address,
-                start_date: formatDate(new Date()),
-                end_date: formatDate(new Date()),
-                comment: "",
-            })
-        if (addedSuccessfully === true)
-            setAddedSuccessfully(false);
-    }, [user, address])
-
-    const onSubmit = (e) => {
-        e.preventDefault()
-        addTrip(trip)
-    }
-
-    const onInputChange = e => {
-        setTrip({...trip, [e.target.name]: e.target.value});
-        setAddedSuccessfully(false);
-    };
-
-    const addTrip = async (trip) => {
-        let recall = false;
-        await axios.post(ADD_TRIP, trip, {
-            headers: {
-                Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
-                refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
-            }
-        }).then(response => {
-            setTrip({
-                id_user: user.user.id,
-                destination: "",
-                start_date: formatDate(new Date()),
-                end_date: formatDate(new Date()),
-                comment: ""
-            })
-            setAddress("")
-            setAddedSuccessfully(true)
-        }).catch(function (error) {
-                if (error.response.status === 401) {
-                    recall = true;
+    const new_trip = useFormik({
+        initialValues: {
+            id_user: null,
+            destination: address,
+            start_date: formatDate(new Date()),
+            end_date: formatDate(new Date()),
+            comment: "",
+        },
+        validationSchema: Yup.object({
+            id_user: Yup.number().required('Required'),
+            destination: Yup.string().max(50, 'Must be 50 characters or less').required('Required'),
+            start_date: Yup.date('Invalid Date').required('Required'),
+            end_date: Yup.date().required('Required'),
+            comment: Yup.string().max(250, 'Must be 250 characters or less').required('Required'),
+        }),
+        onSubmit: async values => {
+            console.log("add submit")
+            let recall = false;
+            await axios.post(ADD_TRIP, new_trip.values, {
+                headers: {
+                    Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
+                    refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
                 }
-            }
-        );
-
-        if (recall)
-            if (await requestNewRefreshToken(tokens.refresh_token) !== 401)
-                await addTrip(trip)
-    }
+            }).then(response => {
+                resetForm()
+                setAddress("")
+                setAddedSuccessfully(true)
+            }).catch(function (error) {
+                    if (error.response.status === 401) {
+                        recall = true;
+                    }
+                }
+            );
+            if (recall)
+                if (await requestNewRefreshToken(tokens.refresh_token) !== 401)
+                    new_trip.handleSubmit()
+        }
+    });
 
     //Refresh token if needed
     const requestNewRefreshToken = async (refresh_token) => {
@@ -123,12 +104,28 @@ export default function AddTrip({}) {
         });
     }
 
+    const resetForm = () => {
+        new_trip.values.destination = "";
+        new_trip.values.start_date = "";
+        new_trip.values.end_date = "";
+        new_trip.values.comment = "";
+    }
+
+
+    useEffect(() => {
+        console.log("UseEffects")
+        if (user)
+            new_trip.values.id_user = user.user.id;
+        new_trip.values.destination = address;
+        if (addedSuccessfully === true)
+            setAddedSuccessfully(false);
+    }, [user, address])
 
     //DOWN GOOGLE API SEARCH AUTOCOMPLETE
     const handleSelect = (address, placeId, suggestion) => {
         setAddress(address)
+        new_trip.values.destination = address;
     }
-
 
     const onError = (status, clearSuggestions) => {
         console.log('Google Maps API returned error with status: ', status)
@@ -147,10 +144,11 @@ export default function AddTrip({}) {
                 <div className="font-bold mb-2 text-green-500">
                     {addedSuccessfully ? "Trip added successfully" : ""}
                 </div>
-                <form onSubmit={onSubmit}>
+                <form onSubmit={new_trip.handleSubmit}>
                     <label className="block text-gray-300 text-sm font-semibold mb-1">Destination</label>
 
                     <PlacesAutocomplete
+                        name="destination"
                         value={address}
                         onChange={setAddress}
                         onSelect={handleSelect}
@@ -161,7 +159,14 @@ export default function AddTrip({}) {
                                 <input
                                     className=" rounded placeholder-gray-500 w-full py-2 px-3 bg-gray-400 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                                     {...getInputProps({placeholder: "Destination"})}
+                                    name="destination"
+                                    onBlur={new_trip.handleBlur}
                                 />
+                                <div className="text-xs text-red-400 ml-1">
+                                    {new_trip.touched.destination && new_trip.errors.destination ? (
+                                        <div>{new_trip.errors.destination}</div>
+                                    ) : null}
+                                </div>
                                 <div className="">
 
                                     <div className="z-10 absolute rounded">
@@ -191,9 +196,15 @@ export default function AddTrip({}) {
                             className=" appearance-none rounded placeholder-gray-500 w-full py-2 px-3 bg-gray-400 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Start Date"
                             name="start_date"
-                            value={trip.start_date}
-                            onChange={(e) => onInputChange(e)}
+                            onChange={new_trip.handleChange}
+                            onBlur={new_trip.handleBlur}
+                            value={new_trip.values.start_date}
                         />
+                        <div className="text-xs text-red-400 ml-1">
+                            {new_trip.touched.start_date && new_trip.errors.start_date ? (
+                                <div>{new_trip.errors.start_date}</div>
+                            ) : null}
+                        </div>
                     </div>
 
                     <div className="mb-4">
@@ -203,9 +214,15 @@ export default function AddTrip({}) {
                             className=" appearance-none rounded placeholder-gray-500 w-full py-2 px-3 bg-gray-400 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="End Date"
                             name="end_date"
-                            value={trip.end_date}
-                            onChange={(e) => onInputChange(e)}
+                            onChange={new_trip.handleChange}
+                            onBlur={new_trip.handleBlur}
+                            value={new_trip.values.end_date}
                         />
+                        <div className="text-xs text-red-400 ml-1">
+                            {new_trip.touched.end_date && new_trip.errors.end_date ? (
+                                <div>{new_trip.errors.end_date}</div>
+                            ) : null}
+                        </div>
                     </div>
 
                     <div className="mb-4">
@@ -214,9 +231,15 @@ export default function AddTrip({}) {
                             className=" appearance-none rounded placeholder-gray-500 w-full py-2 px-3 bg-gray-400 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Write your comment here..."
                             name="comment"
-                            value={trip.comment}
-                            onChange={(e) => onInputChange(e)}
+                            onChange={new_trip.handleChange}
+                            onBlur={new_trip.handleBlur}
+                            value={new_trip.values.comment}
                         />
+                        <div className="text-xs text-red-400 ml-1">
+                            {new_trip.touched.comment && new_trip.errors.comment ? (
+                                <div>{new_trip.errors.comment}</div>
+                            ) : null}
+                        </div>
                     </div>
 
                     <button
