@@ -1,9 +1,10 @@
 # tripplan is an restful api application
 
 Back-end: Laravel
+
 Front-end: React Js
 
-application role: user and admin.
+application roles: user and admin.
 
 In this web application, user can register with email and login.
 
