@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Trip;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class AddTripRequest extends FormRequest
+class EditTripRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +15,13 @@ class AddTripRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        if (Auth::check()) {
+            $user = Auth::user();
+            $trip = Trip::find($this->id);
+            if ($user->id == $trip->id_user)
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -25,7 +32,7 @@ class AddTripRequest extends FormRequest
     public function rules()
     {
         return [
-            'id_user' => 'required',
+            'id' => 'required',
             'destination' => 'required',
             'start_date' => 'date | required',
             'end_date' => 'date | required',

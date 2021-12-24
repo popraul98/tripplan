@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddTripRequest;
+use App\Http\Requests\EditTripRequest;
 use App\Http\Requests\TripRequest;
 use App\Http\Resources\TripResource;
 use App\Models\Trip;
@@ -100,9 +101,22 @@ class TripController extends Controller
      * @param int $trip
      * @return \Illuminate\Http\Response
      */
-    public function update(Trip $trip)
+    public function update(EditTripRequest $request)
     {
-        dd($trip);
+        try {
+            Trip::find($request->id)
+                ->update([
+                    'destination' => $request->destination,
+                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date,
+                    'comment' => $request->comment
+                ]);
+        } catch (\Exception $e) {
+            echo 'Message: ' . $e->getMessage();
+        }
+        return response()->json([
+            'feedback' => true,
+        ]);
     }
 
     /**

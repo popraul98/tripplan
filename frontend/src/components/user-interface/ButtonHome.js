@@ -4,9 +4,9 @@ import React from "react";
 const ButtonHome = () => {
     return (
 
-        <Link to="/trips"
+        <Link to="/"
               className="bg-blue-700 px-3 py-2 text-sm text-gray-300 hover:bg-blue-600 hover:text-gray-900 rounded-lg">
-            Go back to Trips
+            Take me home
         </Link>
 
     )

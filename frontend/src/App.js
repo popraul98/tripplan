@@ -9,8 +9,8 @@ import DetailsDestination from "./components/user-interface/DetailsDestination";
 import AddTrip from "./components/user-interface/AddTrip";
 import EditTrip from "./components/user-interface/EditTrip";
 import UserTrips from "./components/admin-interface/UserTrips"
-import Error404 from "./components/user-interface/Error404";
-import Page404 from "./components/Page404";
+import PageExceptions from "./features/PageExceptions";
+import React from "react";
 
 function App() {
     return (
@@ -24,13 +24,19 @@ function App() {
             <Route path="/trips" exact element={<UserPage/>}/>
             <Route path="/trips/:id/" element={<DetailsDestination/>}/>
             <Route path="/trips/add-trip" element={<AddTrip/>}/>
-            <Route path="/trips/edit-trip/:id" element={<EditTrip/>}/>
+            <Route path="/trips/:id/edit-trip" element={<EditTrip/>}/>
 
             //admin interface
             <Route path="/admin" element={<AdminPage/>}/>
             <Route path="/admin/user/:id" element={<UserTrips/>}/>
 
-            <Route path="*" element={<Page404/>}/>
+            <Route path="*" element={
+                <PageExceptions
+                    codeError={404}
+                    messageError={'Sorry, this page doesn\'t exist or the URL is wrong.'}
+                    secondMessage={'The page you requested could not be found'}
+                />
+            }/>
         </Routes>
     );
 }

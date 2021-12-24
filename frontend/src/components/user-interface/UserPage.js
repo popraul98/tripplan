@@ -171,115 +171,119 @@ const UserPage = () => {
     }
 
     if (user != null)
-        return (
-            <div className="flex justify-center bg-gray-900 min-h-screen pt-5">
-                <div className="w-2/3">
+        if (user.user.role.id === 3)
+            return (
+                <div className="flex justify-center bg-gray-900 min-h-screen pt-5">
+                    <div className="w-2/3">
 
-                    <div className="flex text-gray-400 justify-between">
-                        <h1>Welcome
-                            <span className="font-bold text-gray-300">  {user.user.name}</span>
-                            . You are logged in as
-                            <span className="font-bold text-gray-300"> {user.user.role.name_role}</span>
-                        </h1>
-                        <button
-                            className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                            onClick={(e) => handleLogOut(e)}>
-                            LogOut
-                        </button>
-                    </div>
-                    <div className="flex justify-between mt-2">
-                        <Link to="/trips/add-trip"
-                              className="bg-gray-600 hover:bg-gray-800 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline">
-                            <AddIcon/>
-                            Add Trip
-                        </Link>
-                        <select className="pl-2 mb-2 rounded-lg  bg-gray-600 text-gray-300"
-                                onChange={(e) => handleSort(e)}
-                        >
-                            <option disabled>Sort by:</option>
-                            {options.map((option) => (
-                                <option value={option.value}>{option.label}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="flex justify-center">
+                        <div className="flex text-gray-400 justify-between">
+                            <h1>Welcome
+                                <span className="font-bold text-gray-300">  {user.user.name}</span>
+                                . You are logged in as
+                                <span className="font-bold text-gray-300"> {user.user.role.name_role}</span>
+                            </h1>
+                            <button
+                                className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                                onClick={(e) => handleLogOut(e)}>
+                                LogOut
+                            </button>
+                        </div>
+                        <div className="flex justify-between mt-2">
+                            <Link to="/trips/add-trip"
+                                  className="bg-gray-600 hover:bg-gray-800 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline">
+                                <AddIcon/>
+                                Add Trip
+                            </Link>
+                            <select className="pl-2 mb-2 rounded-lg  bg-gray-600 text-gray-300"
+                                    onChange={(e) => handleSort(e)}
+                            >
+                                <option disabled>Sort by:</option>
+                                {options.map((option) => (
+                                    <option value={option.value}>{option.label}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex justify-center">
 
 
-                        <table className=" divide-y divide-gray-900 shadow">
-                            <thead className="bg-gray-700">
-                            <tr>
-                                <th scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                    Destination
-                                </th>
-                                <th scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                    Start Date
-                                </th>
-                                <th scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                    End Date
-                                </th>
-                                <th scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase  ">
-                                    Comment
-                                </th>
-                                <th scope="col" className=" px-6 py-3">
+                            <table className=" divide-y divide-gray-900 shadow">
+                                <thead className="bg-gray-700">
+                                <tr>
+                                    <th scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        Destination
+                                    </th>
+                                    <th scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        Start Date
+                                    </th>
+                                    <th scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        End Date
+                                    </th>
+                                    <th scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase  ">
+                                        Comment
+                                    </th>
+                                    <th scope="col" className=" px-6 py-3">
                                         <span
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider ">Actions</span>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody className="bg-gray-800 divide-y divide-gray-900">
-                            {trips.length > 0 ? trips.map((trip) => (
-                                <tr>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <p className="text-sm font-medium text-gray-300 overflow-hidden truncate w-72">
-                                            {trip.destination} <span
-                                            className="font-light text-sm text-gray-500">
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody className="bg-gray-800 divide-y divide-gray-900">
+                                {trips.length > 0 ? trips.map((trip) => (
+                                    <tr>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <p className="text-sm font-medium text-gray-300 overflow-hidden truncate w-72">
+                                                {trip.destination} <span
+                                                className="font-light text-sm text-gray-500">
                                                 {counterDaysLeft(trip.start_date) > 0 ? "( " + counterDaysLeft(trip.start_date) + " days left )" : ""}</span>
-                                        </p>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm text-gray-300">{trip.start_date}</div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                            </p>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm text-gray-300">{trip.start_date}</div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                     {trip.end_date}
                                                 </span>
-                                    </td>
-                                    <td className="px-6 py-4  text-sm text-gray-300">
-                                        <p className="overflow-hidden truncate w-72 ">{trip.comment}</p>
-                                    </td>
-                                    <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
-                                        <Link to={'/trips/' + trip.id}
-                                              className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300"
-                                        >
-                                            Details
-                                        </Link>
-                                        <Link to={'edit-trip/' + trip.id}
-                                              className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300"
-                                        >
-                                            Edit
-                                        </Link>
-                                        <DeleteIcon
-                                            className="text-gray-600 hover:text-gray-300 cursor-pointer"
-                                            onClick={() => deleteTrip(trip.id)}
-                                        />
-                                    </td>
-                                </tr>
-                            )) : null}
-                            </tbody>
-                            {trips.length === 0 ?
-                                <span
-                                    className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 flex justify-between text-gray-300">
+                                        </td>
+                                        <td className="px-6 py-4  text-sm text-gray-300">
+                                            <p className="overflow-hidden truncate w-72 ">{trip.comment}</p>
+                                        </td>
+                                        <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
+                                            <Link to={'/trips/' + trip.id}
+                                                  className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300"
+                                            >
+                                                Details
+                                            </Link>
+                                            <Link to={trip.id + '/edit-trip'}
+                                                  className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <DeleteIcon
+                                                className="text-gray-600 hover:text-gray-300 cursor-pointer"
+                                                onClick={() => deleteTrip(trip.id)}
+                                            />
+                                        </td>
+                                    </tr>
+                                )) : null}
+                                </tbody>
+                                {trips.length === 0 ?
+                                    <span
+                                        className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 flex justify-between text-gray-300">
                                     You don't have any records
                                 </span> : ""}
-                        </table>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )
+        else return (
+            <Login/>
         )
     else return (
         <Login/>

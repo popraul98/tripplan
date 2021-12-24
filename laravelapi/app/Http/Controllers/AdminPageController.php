@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TripRequest;
 use App\Http\Resources\UserResource;
 use App\Models\Trip;
 use App\Models\User;
@@ -36,7 +37,14 @@ class AdminPageController extends Controller
 
     public function getTripsUser($id)
     {
-        $user = User::find($id);
+        try {
+            $user = User::findOrFail($id);
+        } catch (\Exception $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], 404);
+        }
+
 
         return response()->json([
             'user_and_trips' => new UserResource($user)

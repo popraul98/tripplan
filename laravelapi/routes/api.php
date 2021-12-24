@@ -28,7 +28,6 @@ Route::post("/login", [\App\Http\Controllers\UserController::class, 'login']);
 
 Route::group(["middleware" => ['auth:api']], function () {
     Route::post("/logout", [\App\Http\Controllers\UserController::class, 'logout']);
-    Route::get("/get-user", [\App\Http\Controllers\UserController::class, 'getUser']);
 
     //handle USER routes
     //   api/users/{user}/trips
@@ -36,10 +35,11 @@ Route::group(["middleware" => ['auth:api']], function () {
     Route::group(["prefix" => 'trips', "middleware" => ['isUser']], function () {
         Route::get('', [\App\Http\Controllers\TripController::class, 'index']);
         Route::post('', [\App\Http\Controllers\TripController::class, 'store']);
+        Route::put('edit/{trip}', [\App\Http\Controllers\TripController::class, 'update']);
+
         Route::group(["prefix" => '{trip}'], function () {
-            Route::delete('', [\App\Http\Controllers\TripController::class, 'destroy']);
             Route::get('', [\App\Http\Controllers\TripController::class, 'show']);
-            Route::put('', [\App\Http\Controllers\TripController::class, 'update']);
+            Route::delete('', [\App\Http\Controllers\TripController::class, 'destroy']);
         });
 
     });

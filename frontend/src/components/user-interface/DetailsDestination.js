@@ -4,12 +4,11 @@ import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
 import {authorization, selectTokens, selectUser} from "../../features/userSlice";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import Error404 from "./Error404";
-import Error403 from "./Error403";
 import ButtonHome from "./ButtonHome";
 import {DETAILS_TRIP, REFRESH_TOKEN} from "../../config/endpoints";
 import RatingStars from "./RatingStars";
 import {ClipLoader} from "react-spinners";
+import PageExceptions from "../../features/PageExceptions";
 
 const DetailsDestination = () => {
 
@@ -46,10 +45,8 @@ const DetailsDestination = () => {
             if (error.response.status === 401)
                 recall = true;
         });
-        if (recall) {
+        if (recall)
             await requestNewRefreshToken(tokens.refresh_token)
-            fetchTrip();
-        }
 
     }
 
@@ -111,11 +108,19 @@ const DetailsDestination = () => {
 
     if (errorUnauthorized)
         return (
-            <Error403/>
+            <PageExceptions
+                codeError={403}
+                messageError={'This action is unauthorized.'}
+                secondMessage={'Your are not the owner of this trip or the server doesn\'t allow you to take this action!'}
+            />
         )
     if (errorNotFound)
         return (
-            <Error404/>
+            <PageExceptions
+                codeError={404}
+                messageError={'Sorry, this trip doesn\'t exist'}
+                secondMessage={'The page you requested could not be found'}
+            />
         )
     else
         return (

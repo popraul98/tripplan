@@ -6,6 +6,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {DETAILS_TRIP, GET_USER_TRIPS, REFRESH_TOKEN} from "../../config/endpoints";
+import PageExceptions from '../../features/PageExceptions';
 
 const UserTrips = () => {
 
@@ -19,6 +20,8 @@ const UserTrips = () => {
 
     const [trips, setTrips] = useState([])
     const [userDetails, setUserDetails] = useState([])
+    const [errorNotFound, setErrorNotFound] = useState(false);
+
 
     const fetchTrips = async () => {
         let recall = false;
@@ -29,17 +32,14 @@ const UserTrips = () => {
             }
         }).then(function (response) {
             console.log('Token Valabil');
-            console.log(response.data.user_and_trips)
             setTrips(response.data.user_and_trips.trips)
             setUserDetails(response.data.user_and_trips)
         }).catch(function (error) {
-            console.log(error.response.status, 'error show trip')
+            console.log(error.response.status, 'error show trips')
             if (error.response.status === 404)
-                // setErrorNotFound(true);
-                // if (error.response.status === 403)
-                //     setErrorUnauthorized(true)
-                if (error.response.status === 401)
-                    recall = true;
+                setErrorNotFound(true);
+            if (error.response.status === 401)
+                recall = true;
         });
         if (recall)
             await requestNewRefreshToken(tokens.refresh_token)
@@ -49,7 +49,6 @@ const UserTrips = () => {
         if (id && tokens) {
             fetchTrips()
         }
-
     }, [tokens])
 
 
@@ -98,95 +97,106 @@ const UserTrips = () => {
         return Math.floor(((utc1 - utc2) / _MS_PER_DAY) + 1);
     }
 
-    return (
-        <div className="flex justify-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100  min-h-screen pt-5">
-            <div className="w-2/3">
-                <Link to="/admin"
-                      className="text-sm font-semibold bg-blue-400 text-gray-900 py-1 px-3 rounded-lg hover:bg-blue-700"
-                >
-                    Go back
-                </Link>
-                <div className="flex text-gray-400 border border-gray-700 rounded-lg p-4 my-1">
-                    <p className="text-sm pr-2">User details:</p>
-                    <p className="text-sm pr-4">email: <span className="font-bold">{userDetails.email}</span></p>
-                    <p className="text-sm pr-4">nume: <span className="font-bold">{userDetails.name}</span></p>
-                    <p className="text-sm pr-4">nume: <span className="font-bold">user</span></p>
-                    <p className="text-sm pr-4">created at: <span className="font-bold">{userDetails.created_at}</span>
-                    </p>
-                </div>
-                <div className="flex justify-center">
-                    <table className=" divide-y divide-gray-900 shadow">
-                        <thead className="bg-gray-700">
-                        <tr>
-                            <th scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                Destination
-                            </th>
-                            <th scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                Start Date
-                            </th>
-                            <th scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                End Date
-                            </th>
-                            <th scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase  ">
-                                Comment
-                            </th>
-                            <th scope="col" className=" px-6 py-3">
+
+    if (errorNotFound)
+        return (
+            <PageExceptions
+                codeError={404}
+                messageError={"Oops, this user do not exist."}
+            />
+        )
+    else
+        return (
+            <div
+                className="flex justify-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100  min-h-screen pt-5">
+                <div className="w-2/3">
+                    <Link to="/admin"
+                          className="text-sm font-semibold bg-blue-400 text-gray-900 py-1 px-3 rounded-lg hover:bg-blue-700"
+                    >
+                        Go back
+                    </Link>
+                    <div className="flex text-gray-400 border border-gray-700 rounded-lg p-4 my-1">
+                        <p className="text-sm pr-2">User details:</p>
+                        <p className="text-sm pr-4">email: <span className="font-bold">{userDetails.email}</span></p>
+                        <p className="text-sm pr-4">nume: <span className="font-bold">{userDetails.name}</span></p>
+                        <p className="text-sm pr-4">nume: <span className="font-bold">user</span></p>
+                        <p className="text-sm pr-4">created at: <span
+                            className="font-bold">{userDetails.created_at}</span>
+                        </p>
+                    </div>
+                    <div className="flex justify-center">
+                        <table className=" divide-y divide-gray-900 shadow">
+                            <thead className="bg-gray-700">
+                            <tr>
+                                <th scope="col"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Destination
+                                </th>
+                                <th scope="col"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    Start Date
+                                </th>
+                                <th scope="col"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                    End Date
+                                </th>
+                                <th scope="col"
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase  ">
+                                    Comment
+                                </th>
+                                <th scope="col" className=" px-6 py-3">
                                         <span
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider ">Actions</span>
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody className="bg-gray-800 divide-y divide-gray-900">
-                        {trips.length > 0 ? trips.map((trip) => (
-                            <tr>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <p className="text-sm font-medium text-gray-300">
-                                        {trip.destination} <span
-                                        className="font-light text-sm text-gray-500">
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody className="bg-gray-800 divide-y divide-gray-900">
+                            {trips.length > 0 ? trips.map((trip) => (
+                                <tr>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <p className="text-sm font-medium text-gray-300">
+                                            {trip.destination} <span
+                                            className="font-light text-sm text-gray-500">
                                                 {counterDaysLeft(trip.start_date) > 0 ? "( " + counterDaysLeft(trip.start_date) + " days left )" : ""}</span>
-                                    </p>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-300">{trip.start_date}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                        </p>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-300">{trip.start_date}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                     {trip.end_date}
                                                 </span>
-                                </td>
-                                <td className="px-6 py-4  text-sm text-gray-300">
-                                    <p className="overflow-hidden truncate w-72 ">{trip.comment}</p>
-                                </td>
-                                <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
-                                    {/*<button*/}
-                                    {/*    className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300">*/}
-                                    {/*    <Link to={'/admin/user/' + trip.id}>*/}
-                                    {/*        Details*/}
-                                    {/*    </Link>*/}
-                                    {/*</button>*/}
-                                    {/*<DeleteIcon*/}
-                                    {/*    className="text-gray-600 hover:text-gray-300 cursor-pointer"*/}
-                                    {/*    // onClick={() => deleteTrip(trip.id)}*/}
-                                    {/*/>*/}
-                                </td>
-                            </tr>
-                        )) : null}
-                        </tbody>
-                        {trips.length === 0 ?
-                            <span
-                                className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 flex justify-between text-gray-300">
+                                    </td>
+                                    <td className="px-6 py-4  text-sm text-gray-300">
+                                        <p className="overflow-hidden truncate w-72 ">{trip.comment}</p>
+                                    </td>
+                                    <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
+                                        {/*<button*/}
+                                        {/*    className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300">*/}
+                                        {/*    <Link to={'/admin/user/' + trip.id}>*/}
+                                        {/*        Details*/}
+                                        {/*    </Link>*/}
+                                        {/*</button>*/}
+                                        {/*<DeleteIcon*/}
+                                        {/*    className="text-gray-600 hover:text-gray-300 cursor-pointer"*/}
+                                        {/*    // onClick={() => deleteTrip(trip.id)}*/}
+                                        {/*/>*/}
+                                    </td>
+                                </tr>
+                            )) : null}
+                            </tbody>
+                            {trips.length === 0 ?
+                                <span
+                                    className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 flex justify-between text-gray-300">
                                     This user doesn't have any trips.
                                 </span> : ""}
-                    </table>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-    )
+        )
 
 }
 
