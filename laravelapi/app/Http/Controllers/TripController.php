@@ -56,7 +56,9 @@ class TripController extends Controller
      */
     public function store(AddTripRequest $req)
     {
-        $id_user = $req->input("id_user");
+        $user = Auth::user();
+        $id_user = $user->id;
+
         $destination = $req->input("destination");
         $start_date = $req->input("start_date");
         $end_date = $req->input("end_date");
@@ -70,6 +72,7 @@ class TripController extends Controller
             'end_date' => $end_date,
             'comment' => $comment,
         ]);
+
     }
 
     /**

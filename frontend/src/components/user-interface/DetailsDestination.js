@@ -100,6 +100,7 @@ const DetailsDestination = () => {
                     }
                 }
             ).then(function (response) {
+                console.log(response.data.results);
                 setInsights(response.data.results)
             }).catch(function (error) {
                 console.log(error, 'error la insights')
@@ -197,7 +198,8 @@ const DetailsDestination = () => {
                         <div className="grid grid-cols-2 gap-2 overflow-y-auto -mr-5 ">
                             {insights.length > 0 ? insights.map((insight) => (
                                 <div className="bg-gray-700 rounded-lg pb-1">
-                                    <img src={require("../../images/map_grid_template.png").default}
+                                    <img src={insight.icon}
+                                        // src={require("../../images/map_grid_template.png").default}
                                          className='object-none h-32 w-full rounded-t-lg'
                                          alt="map-grid"
                                     />

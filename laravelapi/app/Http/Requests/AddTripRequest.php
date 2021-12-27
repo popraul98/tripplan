@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 
 class AddTripRequest extends FormRequest
@@ -14,7 +16,11 @@ class AddTripRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        if (Auth::check()) {
+            return true;
+        }
+        return false;
+
     }
 
     /**
@@ -25,11 +31,28 @@ class AddTripRequest extends FormRequest
     public function rules()
     {
         return [
-            'id_user' => 'required',
-            'destination' => 'required',
+            'destination' => 'required|string|unique:trips,destination',
             'start_date' => 'date | required',
             'end_date' => 'date | required',
-            'comment' => 'string',
+            'comment' => 'string| max:255',
         ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'destination.required' => 'A destination is required',
+            'destination.unique' => 'This destination is all-ready used.',
+        ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json($validator->errors(), 422));
     }
 }

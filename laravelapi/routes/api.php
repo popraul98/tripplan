@@ -29,9 +29,7 @@ Route::post("/login", [\App\Http\Controllers\UserController::class, 'login']);
 Route::group(["middleware" => ['auth:api']], function () {
     Route::post("/logout", [\App\Http\Controllers\UserController::class, 'logout']);
 
-    //handle USER routes
-    //   api/users/{user}/trips
-
+    //USER routes
     Route::group(["prefix" => 'trips', "middleware" => ['isUser']], function () {
         Route::get('', [\App\Http\Controllers\TripController::class, 'index']);
         Route::post('', [\App\Http\Controllers\TripController::class, 'store']);
@@ -44,7 +42,7 @@ Route::group(["middleware" => ['auth:api']], function () {
 
     });
 
-    //handle ADMIN routes
+    //ADMIN routes
     Route::group(["prefix" => 'admin', "middleware" => ['isAdmin']], function () {
         Route::get('', [\App\Http\Controllers\AdminPageController::class, 'index']);
         Route::group(["prefix" => '/user/{id}'], function () {

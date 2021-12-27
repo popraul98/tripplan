@@ -22,7 +22,8 @@ export default function AddTrip({}) {
     const navigate = useNavigate();
     let new_access_token = "";
     let new_refresh_token = "";
-    const [addedSuccessfully, setAddedSuccessfully] = useState(false)
+    const [addedSuccessfully, setAddedSuccessfully] = useState(false);
+    const [submitErrors, setSubmitErrors] = useState([]);
     const [address, setAddress] = useState("");
 
     const formatDate = (date) => {
@@ -39,14 +40,12 @@ export default function AddTrip({}) {
 
     const new_trip = useFormik({
         initialValues: {
-            id_user: null,
             destination: address,
             start_date: formatDate(new Date()),
             end_date: formatDate(new Date()),
             comment: "",
         },
         validationSchema: Yup.object({
-            id_user: Yup.number().required('Required'),
             destination: Yup.string().max(50, 'Must be 50 characters or less').required('Required'),
             start_date: Yup.date('Invalid Date').required('Required'),
             end_date: Yup.date().required('Required'),
@@ -67,6 +66,10 @@ export default function AddTrip({}) {
             }).catch(function (error) {
                     if (error.response.status === 401) {
                         recall = true;
+                    }
+                    if (error.response.status === 422) {
+                        setSubmitErrors(error.response.data)
+                        console.log(submitErrors)
                     }
                 }
             );
@@ -114,8 +117,6 @@ export default function AddTrip({}) {
 
     useEffect(() => {
         console.log("UseEffects")
-        if (user)
-            new_trip.values.id_user = user.user.id;
         new_trip.values.destination = address;
         if (addedSuccessfully === true)
             setAddedSuccessfully(false);
@@ -143,6 +144,9 @@ export default function AddTrip({}) {
                 </div>
                 <div className="font-bold mb-2 text-green-500">
                     {addedSuccessfully ? "Trip added successfully" : ""}
+                </div>
+                <div className="font-semibold text-sm mb-2 text-red-500 text-opacity-80">
+                    {submitErrors ? submitErrors.destination : null}
                 </div>
                 <form onSubmit={new_trip.handleSubmit}>
                     <label className="block text-gray-300 text-sm font-semibold mb-1">Destination</label>
