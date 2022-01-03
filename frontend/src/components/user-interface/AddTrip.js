@@ -210,7 +210,7 @@ export default function AddTrip({}) {
                             ) : null}
                         </div>
                     </div>
-
+                    <DatePicker  onChange={new_trip.handleChange} />
                     <div className="mb-4">
                         <label className="block text-gray-300 text-sm font-semibold mb-1">End Date <span
                             className="text-sm text-gray-500 font-light">(year-month-day)</span></label>

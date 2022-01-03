@@ -2,12 +2,17 @@ import {Link, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {authorization, logout, selectTokens, selectUser} from "../../features/userSlice";
 import AddIcon from '@mui/icons-material/Add';
+import {Checkbox} from "@material-ui/core";
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import React, {useEffect, useState} from "react";
 import AddTrip from "./AddTrip";
 import Login from "../auth/Login";
 import {DELETE_TRIP, GET_TRIPS, LOGOUT, REFRESH_TOKEN} from "../../config/endpoints";
+import DatePicker from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
+import {CheckBox} from "@mui/icons-material";
 
 const UserPage = () => {
 
@@ -99,9 +104,8 @@ const UserPage = () => {
 
 
     //get Trips from server
-    const getTrips = async (sort_type) => {
+    const getTrips = async () => {
         let recall = false;
-        let user_id = user.user.id
         await axios.get(GET_TRIPS, {
             headers: {
                 Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
@@ -109,28 +113,12 @@ const UserPage = () => {
             }
         }).then(response => {
             console.log("Token Valabil")
-            let data = response.data
-
-            if (!sort_type) {
-                // console.log(data.trips_by_last_date, "1")
-                setTrips(data.trips_by_last_date)
-            }
-            if (sort_type === "trips_by_last_date") {
-                // console.log(data.trips_by_last_date, "1")
-                setTrips(data.trips_by_last_date)
-            }
-            if (sort_type === "trips_by_name") {
-                // console.log(data.trips_by_name, "2")
-                setTrips(data.trips_by_name)
-            }
-            if (sort_type === "trips_by_start_date") {
-                // console.log(data.trips_by_start_date, "3")
-                setTrips(data.trips_by_start_date)
-            }
+            setTrips(response.data.user_trips.trips)
         }).catch(function (error) {
             console.log(error.response.status, 'error get trips')
             recall = true;
         });
+
         if (recall) {
             await requestNewRefreshToken(tokens.refresh_token)
         }
@@ -170,6 +158,8 @@ const UserPage = () => {
         return Math.floor(((utc1 - utc2) / _MS_PER_DAY) + 1);
     }
 
+    const [startDate, setStartDate] = useState(new Date());
+
     if (user != null)
         if (user.user.role.id === 3)
             return (
@@ -194,19 +184,77 @@ const UserPage = () => {
                                 <AddIcon/>
                                 Add Trip
                             </Link>
-                            <select className="pl-2 mb-2 rounded-lg  bg-gray-600 text-gray-300"
-                                    onChange={(e) => handleSort(e)}
-                            >
-                                <option disabled>Sort by:</option>
-                                {options.map((option) => (
-                                    <option value={option.value}>{option.label}</option>
-                                ))}
-                            </select>
+
                         </div>
                         <div className="flex justify-center">
+                            <div className="mr-2 min-w-1/2">
+                                <div className="bg-gray-700 p-2 py-4 rounded">
+                                    <h2 className="text-gray-300 mb-2 font-semibold text-center">Filter</h2>
+                                    <input
+                                        placeholder="Search bar"
+                                        className="rounded py-1 px-2 bg-gray-600"
+                                    />
 
+                                    <p className="mt-4 text-gray-400">Start Date</p>
+                                    <DatePicker
+                                        className="rounded py-1 px-2 bg-gray-600 text-gray-200"
+                                        selected={startDate}
+                                        onChange={(date) => setStartDate(date)}/>
 
-                            <table className=" divide-y divide-gray-900 shadow">
+                                    <p className="mt-4 text-gray-400">End Date</p>
+                                    <DatePicker
+                                        className="rounded py-1 px-2 bg-gray-600 text-gray-200"
+                                        selected={startDate}
+                                        onChange={(date) => setStartDate(date)}/>
+
+                                    <div className="flex mt-2">
+                                        <p className="mt-2 text-gray-400">Trips coming soon</p>
+                                        <Checkbox
+                                            style={{
+                                                color: "#1D4ED8",
+                                            }}
+                                            // checked={checked}
+                                            // onChange={handleChange}
+                                            // inputProps={{ 'aria-label': 'controlled' }}
+                                        />
+                                    </div>
+                                    <div className="flex">
+                                        <p className="mt-2 text-gray-400">Trips ended</p>
+                                        <Checkbox
+                                            style={{
+                                                color: "#1D4ED8",
+                                            }}
+                                            // checked={checked}
+                                            // onChange={handleChange}
+                                            // inputProps={{ 'aria-label': 'controlled' }}
+                                        />
+                                    </div>
+
+                                    <select className="pl-1 rounded py-1 bg-gray-600 text-gray-300"
+                                            onChange={(e) => handleSort(e)}
+                                    >
+                                        <option disabled>Sort by:</option>
+                                        {options.map((option) => (
+                                            <option value={option.value}>{option.label}</option>
+                                        ))}
+                                    </select>
+
+                                    <div className="flex justify-between mt-8">
+                                        <button
+                                            className="bg-blue-700 text-sm hover:bg-blue-800 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                                        >
+                                            Apply filter
+                                        </button>
+                                        <button
+                                            className="bg-gray-800 text-sm hover:bg-gray-900 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                                        >
+                                            Reset
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <table className=" divide-y divide-gray-900 shadow mb-5">
                                 <thead className="bg-gray-700">
                                 <tr>
                                     <th scope="col"
@@ -254,14 +302,14 @@ const UserPage = () => {
                                             <p className="overflow-hidden truncate w-72 ">{trip.comment}</p>
                                         </td>
                                         <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
+
                                             <Link to={'/trips/' + trip.id}
-                                                  className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300"
-                                            >
+                                                  className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300">
                                                 Details
                                             </Link>
+
                                             <Link to={trip.id + '/edit-trip'}
-                                                  className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300"
-                                            >
+                                                  className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300">
                                                 Edit
                                             </Link>
                                             <DeleteIcon

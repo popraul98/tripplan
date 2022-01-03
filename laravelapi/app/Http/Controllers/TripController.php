@@ -6,6 +6,7 @@ use App\Http\Requests\AddTripRequest;
 use App\Http\Requests\EditTripRequest;
 use App\Http\Requests\TripRequest;
 use App\Http\Resources\TripResource;
+use App\Http\Resources\UserResource;
 use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -22,19 +23,23 @@ class TripController extends Controller
      */
     public function index(User $user)
     {
-        //required id user
         $user = Auth::user();
-        $id_user = $user->id;
-
-        $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at', 'ASC')->get();
-        $trips_by_name = Trip::byUser($id_user)->orderBy('destination', 'ASC')->get();
-        $trips_by_start_date = Trip::byUser($id_user)->orderBy('start_date', 'ASC')->get();
 
         return response()->json([
-            'trips_by_last_date' => $trips_by_last_date,
-            'trips_by_name' => $trips_by_name,
-            'trips_by_start_date' => $trips_by_start_date,
+            'user_trips' => new UserResource($user)
         ]);
+
+//        $id_user = $user->id;
+
+//        $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at', 'ASC')->get();
+//        $trips_by_name = Trip::byUser($id_user)->orderBy('destination', 'ASC')->get();
+//        $trips_by_start_date = Trip::byUser($id_user)->orderBy('start_date', 'ASC')->get();
+
+//        return response()->json([
+//            'trips_by_last_date' => $trips_by_last_date,
+//            'trips_by_name' => $trips_by_name,
+//            'trips_by_start_date' => $trips_by_start_date,
+//        ]);
     }
 
     /**

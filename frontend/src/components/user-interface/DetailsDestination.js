@@ -24,6 +24,7 @@ const DetailsDestination = () => {
     const [errorUnauthorized, setErrorUnauthorized] = useState(false);
     const [errorNotFound, setErrorNotFound] = useState(false);
     const [insights, setInsights] = useState([]);
+    const [location, setLocation] = useState("");
 
     const fetchTrip = async () => {
         let recall = false;
@@ -105,6 +106,11 @@ const DetailsDestination = () => {
             }).catch(function (error) {
                 console.log(error, 'error la insights')
             });
+    }
+
+    const selectInsight = (loc) => {
+        console.log(loc)
+        setLocation(loc);
     }
 
     if (errorUnauthorized)
@@ -190,14 +196,24 @@ const DetailsDestination = () => {
                         </div>
                     </div>
                     <div className="flex justify-between py-2 h-96 ">
-                        <div className="float-left border rounded-lg bg-gray-800 shadow border-gray-700 w-1/2 mr-5 ">
-                            DE IMPLEMENTAT: USER UL POATE SA ISI SALVEZE OBIECTIVELE TURISTICE SAU SA INTERACTIONEZE CU
-                            ACESTEA
-
+                        <div className="float-left border rounded-lg bg-gray-800 shadow border-gray-700 w-2/3 mr-5 ">
+                            {location != "" ?
+                                <iframe
+                                    width="100%"
+                                    height="370"
+                                    src={"https://www.google.com/maps/embed/v1/place?key=AIzaSyD1viFL9PIqRrQ159iA5-pGQ_mKQn-tt14&q=" + location}
+                                >
+                                </iframe>
+                                : <div className="text-center text-gray-500">
+                                    click on insight to display it on map
+                                </div>
+                            }
                         </div>
-                        <div className="grid grid-cols-2 gap-2 overflow-y-auto -mr-5 ">
+                        <div className="grid grid-cols-2 gap-2 overflow-y-auto -mr-5  ">
                             {insights.length > 0 ? insights.map((insight) => (
-                                <div className="bg-gray-700 rounded-lg pb-1">
+                                <button type="button"
+                                        onClick={() => selectInsight(insight.name)}
+                                        className="text-left hover:bg-gray-700 bg-gray-800 rounded pb-1">
                                     <img src={insight.icon}
                                         // src={require("../../images/map_grid_template.png").default}
                                          className='object-none h-32 w-full rounded-t-lg'
@@ -212,13 +228,12 @@ const DetailsDestination = () => {
                                         </p>
                                         <RatingStars rating={insight.rating}/>
                                     </div>
-                                </div>
+                                </button>
                             )) : <div className="flex flex-col pt-24 pr-5">
                                 <ClipLoader size={80}/>
                                 <div>.. loading insights</div>
-                            </div>}
-
-
+                            </div>
+                            }
                         </div>
                     </div>
 

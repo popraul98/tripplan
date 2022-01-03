@@ -116,13 +116,6 @@ class UserController extends Controller
         }
     }
 
-    //params [ Authorization - access token-ul, refresh_token]
-//    public function getUser(Request $req)
-//    {
-//        $user = Auth::user();
-//        return $user;
-//    }
-
     public function refreshToken(Request $req)
     {
         $client = DB::table('oauth_clients')
