@@ -79,7 +79,7 @@ const Login = (props) => {
                 <div className="text-red-400">
                     {location.state ? location.state.message : ""}
                 </div>
-                <h3 className="font-bold text-xl text-gray-300 mb-6">Login</h3>
+                <h3 className="font-bold text-xl text-gray-300 mb-6">LOGIN</h3>
                 <div className="mb-4">
                     <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="email">
                         Email
