@@ -22,6 +22,7 @@ class TripResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'comment' => $this->comment,
+            'created_at' =>$this->created_at,
         ];
     }
 }
