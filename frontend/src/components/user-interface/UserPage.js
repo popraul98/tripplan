@@ -13,6 +13,7 @@ import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 import {CheckBox} from "@mui/icons-material";
+import {arrayOf} from "prop-types";
 
 const UserPage = () => {
 
@@ -25,6 +26,10 @@ const UserPage = () => {
 
     //message for expired session
     const [sentMessage, setSentMessage] = useState(false);
+
+    const [trips, setTrips] = useState([])
+    const [copyTrips, setCopyTrips] = useState([]);
+
 
     //logOut & invalidate token after logout
     const handleLogOut = async (e) => {
@@ -79,22 +84,6 @@ const UserPage = () => {
         });
     }
 
-//sort trips
-    const options = [
-        {value: 'trips_by_last_date', label: 'sort by Last Added'},
-        {value: 'trips_by_name', label: 'sort by Name ASC'},
-        {value: 'trips_by_start_date', label: 'sort by Start Date DESC'}
-    ]
-
-    const [typeSort, setTypeSort] = useState(options[0].value)
-    const [trips, setTrips] = useState([])
-
-    const handleSort = (e) => {
-        setTypeSort(e.target.value)
-        getTrips(e.target.value)
-    }
-
-
     // get trips for user
     useEffect(() => {
         console.log("UseEffects")
@@ -114,6 +103,7 @@ const UserPage = () => {
         }).then(response => {
             console.log("Token Valabil")
             setTrips(response.data.user_trips.trips)
+            setCopyTrips(response.data.user_trips.trips)
         }).catch(function (error) {
             console.log(error.response.status, 'error get trips')
             recall = true;
@@ -160,6 +150,105 @@ const UserPage = () => {
 
     const [startDate, setStartDate] = useState(new Date());
 
+    //sort trips
+    const options = [
+        {value: 'sort_by_last_date', label: 'Last Added'},
+        {value: 'sort_by_name', label: 'Name (asc)'},
+        {value: 'sort_by_start_date', label: 'Start Date (desc)'}
+    ]
+
+    const handleSort = (e) => {
+        setTypeSort(e.target.value)
+
+        if (e.target.value === "sort_by_last_date") {
+            trips.sort(function (a, b) {
+                let da = new Date(a.created_at).getTime();
+                let db = new Date(b.created_at).getTime();
+                return da > db ? 1 : da < db ? -1 : 0
+            });
+            console.log(trips)
+        }
+        if (e.target.value === "sort_by_name") {
+            trips.sort(function (a, b) {
+                if (a.destination.toLowerCase() < b.destination.toLowerCase()) {
+                    return -1;
+                }
+                if (a.destination.toLowerCase() > b.destination.toLowerCase()) {
+                    return 1;
+                }
+                return 0;
+            })
+
+        }
+        if (e.target.value === "sort_by_start_date") {
+            trips.sort(function (a, b) {
+                let da = new Date(a.start_date).getTime();
+                let db = new Date(b.start_date).getTime();
+                return da > db ? -1 : da < db ? 1 : 0
+            });
+        }
+
+    }
+    const [typeSort, setTypeSort] = useState(options[0].value)
+
+    // search trips
+    const searchTrips = (searched_item) => {
+        const new_trips = [];
+        setTrips([]);
+        for (let i = 0; i < copyTrips.length; i++) {
+            if (copyTrips[i].destination.toLowerCase().indexOf(searched_item.toLowerCase()) >= 0) {
+                new_trips.push(copyTrips[i]);
+            }
+            setTrips(new_trips);
+        }
+    }
+
+    //filter Trips coming soon
+    const [checkedTripsComingSoon, setCheckedTripsComingSoon] = useState(false);
+    const handleChangeCheckedTripsComingSoon = () => {
+        if (checkedTripsComingSoon) {
+            setCheckedTripsComingSoon(false);
+            setTrips(copyTrips);
+        } else {
+            setCheckedTripsComingSoon(true)
+            if (checkedTripsEnded)
+                setCheckedTripsEnded(false);
+
+            const new_trips = [];
+            for (let i = 0; i < trips.length; i++) {
+                if (counterDaysLeft(trips[i].start_date) > 0)
+                    new_trips.push(trips[i]);
+            }
+            setTrips(new_trips);
+        }
+    }
+
+    //filter Trips ended
+    const [checkedTripsEnded, setCheckedTripsEnded] = useState(false);
+    const handleChangeCheckedTripsEnded = () => {
+        if (checkedTripsEnded) {
+            setCheckedTripsEnded(false);
+            setTrips(copyTrips);
+        } else {
+            setCheckedTripsEnded(true)
+            if (checkedTripsComingSoon)
+                setCheckedTripsComingSoon(false);
+            const new_trips = [];
+            for (let i = 0; i < trips.length; i++) {
+                if (counterDaysLeft(trips[i].start_date) < 0)
+                    new_trips.push(trips[i]);
+            }
+            setTrips(new_trips);
+        }
+    }
+
+    //reset filters
+    const resetFilters = () => {
+        setTrips(copyTrips)
+        setCheckedTripsComingSoon(false)
+        setCheckedTripsEnded(false)
+    }
+
     if (user != null)
         if (user.user.role.id === 3)
             return (
@@ -191,46 +280,48 @@ const UserPage = () => {
                                 <div className="bg-gray-700 p-2 py-4 rounded">
                                     <h2 className="text-gray-300 mb-2 font-semibold text-center">Filter</h2>
                                     <input
+                                        name="search_bar"
+                                        onChange={(e) => searchTrips(e.target.value)}
                                         placeholder="Search bar"
                                         className="rounded py-1 px-2 bg-gray-600"
                                     />
 
-                                    <p className="mt-4 text-gray-400">Start Date</p>
+                                    <p className="mt-4 text-sm text-gray-400">Start Date</p>
                                     <DatePicker
                                         className="rounded py-1 px-2 bg-gray-600 text-gray-200"
                                         selected={startDate}
                                         onChange={(date) => setStartDate(date)}/>
 
-                                    <p className="mt-4 text-gray-400">End Date</p>
+                                    <p className="text-sm text-gray-400">End Date</p>
                                     <DatePicker
                                         className="rounded py-1 px-2 bg-gray-600 text-gray-200"
                                         selected={startDate}
                                         onChange={(date) => setStartDate(date)}/>
+                                    <button
+                                        className="bg-blue-700 text-sm hover:bg-blue-800 text-white mt-2 py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                                    >
+                                        Filter by date
+                                    </button>
+
 
                                     <div className="flex mt-2">
                                         <p className="mt-2 text-gray-400">Trips coming soon</p>
                                         <Checkbox
-                                            style={{
-                                                color: "#1D4ED8",
-                                            }}
-                                            // checked={checked}
-                                            // onChange={handleChange}
-                                            // inputProps={{ 'aria-label': 'controlled' }}
+                                            style={{color: "#1D4ED8",}}
+                                            checked={checkedTripsComingSoon}
+                                            onChange={handleChangeCheckedTripsComingSoon}
                                         />
                                     </div>
                                     <div className="flex">
                                         <p className="mt-2 text-gray-400">Trips ended</p>
                                         <Checkbox
-                                            style={{
-                                                color: "#1D4ED8",
-                                            }}
-                                            // checked={checked}
-                                            // onChange={handleChange}
-                                            // inputProps={{ 'aria-label': 'controlled' }}
+                                            style={{color: "#1D4ED8",}}
+                                            checked={checkedTripsEnded}
+                                            onChange={handleChangeCheckedTripsEnded}
                                         />
                                     </div>
 
-                                    <select className="pl-1 rounded py-1 bg-gray-600 text-gray-300"
+                                    <select className="pl-1 rounded py-1 bg-gray-600 text-gray-300 w-full"
                                             onChange={(e) => handleSort(e)}
                                     >
                                         <option disabled>Sort by:</option>
@@ -239,18 +330,12 @@ const UserPage = () => {
                                         ))}
                                     </select>
 
-                                    <div className="flex justify-between mt-8">
-                                        <button
-                                            className="bg-blue-700 text-sm hover:bg-blue-800 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                                        >
-                                            Apply filter
-                                        </button>
-                                        <button
-                                            className="bg-gray-800 text-sm hover:bg-gray-900 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                                        >
-                                            Reset
-                                        </button>
-                                    </div>
+                                    <button
+                                        className="mt-5 bg-gray-800 text-sm hover:bg-gray-900 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                                        onClick={resetFilters}
+                                    >
+                                        Reset
+                                    </button>
 
                                 </div>
                             </div>
