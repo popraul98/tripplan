@@ -6,14 +6,10 @@ import {Checkbox} from "@material-ui/core";
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import React, {useEffect, useState} from "react";
-import AddTrip from "./AddTrip";
 import Login from "../auth/Login";
 import {DELETE_TRIP, GET_TRIPS, LOGOUT, REFRESH_TOKEN} from "../../config/endpoints";
 import DatePicker from "react-datepicker";
-
 import "react-datepicker/dist/react-datepicker.css";
-import {CheckBox} from "@mui/icons-material";
-import {arrayOf} from "prop-types";
 
 const UserPage = () => {
 
@@ -24,11 +20,10 @@ const UserPage = () => {
     let new_access_token = "";
     let new_refresh_token = "";
 
-    //message for expired session
-    const [sentMessage, setSentMessage] = useState(false);
-
     const [trips, setTrips] = useState([])
     const [copyTrips, setCopyTrips] = useState([]);
+    const [searchBar, setSearchBar] = useState("");
+    const [errorFilterDate, setErrorFilterDate] = useState(false);
 
 
     //logOut & invalidate token after logout
@@ -77,7 +72,6 @@ const UserPage = () => {
             console.log(error.response.status, "refresh token expired error")
             if (error.response.status === 401) {
                 console.log('You gonna be logout')
-                setSentMessage(true);
                 handleLogOut(true);
                 return 401
             }
@@ -90,7 +84,6 @@ const UserPage = () => {
         if (user != null)
             getTrips()
     }, [tokens])
-
 
     //get Trips from server
     const getTrips = async () => {
@@ -148,8 +141,6 @@ const UserPage = () => {
         return Math.floor(((utc1 - utc2) / _MS_PER_DAY) + 1);
     }
 
-    const [startDate, setStartDate] = useState(new Date());
-
     //sort trips
     const options = [
         {value: 'sort_by_last_date', label: 'Last Added'},
@@ -166,7 +157,6 @@ const UserPage = () => {
                 let db = new Date(b.created_at).getTime();
                 return da > db ? 1 : da < db ? -1 : 0
             });
-            console.log(trips)
         }
         if (e.target.value === "sort_by_name") {
             trips.sort(function (a, b) {
@@ -191,8 +181,21 @@ const UserPage = () => {
     }
     const [typeSort, setTypeSort] = useState(options[0].value)
 
+    const formatDate = (date) => {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+        if (month.length < 2)
+            month = '0' + month;
+        if (day.length < 2)
+            day = '0' + day;
+        return [year, month, day].join('-');
+    }
+
     // search trips
     const searchTrips = (searched_item) => {
+        setSearchBar(searched_item)
         const new_trips = [];
         setTrips([]);
         for (let i = 0; i < copyTrips.length; i++) {
@@ -242,11 +245,58 @@ const UserPage = () => {
         }
     }
 
+    //filter by date
+    const [filterStartDate, setFilterStartDate] = useState(null);
+    const [filterEndDate, setFilterEndDate] = useState(null);
+
+    const filterByDates = () => {
+        const new_trips = [];
+        setErrorFilterDate(false);
+
+        if (!filterStartDate && !filterEndDate)
+            setErrorFilterDate(true);
+
+        if (filterStartDate) {
+            let firstDate = formatDate(filterStartDate)
+            if (filterEndDate) {
+                let secondDate = formatDate(filterEndDate)
+
+                if (firstDate > secondDate) {
+                    setErrorFilterDate(true)
+                }
+
+                for (let i = 0; i < trips.length; i++) {
+                    if (trips[i].start_date > firstDate && trips[i].start_date < secondDate)
+                        new_trips.push(trips[i]);
+                }
+            }
+            if (!filterEndDate) {
+                for (let i = 0; i < trips.length; i++) {
+                    if (trips[i].start_date > firstDate)
+                        new_trips.push(trips[i]);
+                }
+            }
+            setTrips(new_trips);
+        }
+        if (!filterStartDate && filterEndDate) {
+            let secondDate = formatDate(filterEndDate)
+            for (let i = 0; i < trips.length; i++) {
+                if (trips[i].start_date < secondDate)
+                    new_trips.push(trips[i]);
+            }
+            setTrips(new_trips);
+        }
+    }
+
     //reset filters
     const resetFilters = () => {
         setTrips(copyTrips)
         setCheckedTripsComingSoon(false)
         setCheckedTripsEnded(false)
+        setFilterStartDate(null)
+        setFilterEndDate(null)
+        setErrorFilterDate(false)
+        setSearchBar("");
     }
 
     if (user != null)
@@ -277,9 +327,10 @@ const UserPage = () => {
                         </div>
                         <div className="flex justify-center">
                             <div className="mr-2 min-w-1/2">
-                                <div className="bg-gray-700 p-2 py-4 rounded">
+                                <div className="bg-gray-700 p-2 py-4 rounded ">
                                     <h2 className="text-gray-300 mb-2 font-semibold text-center">Filter</h2>
                                     <input
+                                        value={searchBar}
                                         name="search_bar"
                                         onChange={(e) => searchTrips(e.target.value)}
                                         placeholder="Search bar"
@@ -289,19 +340,25 @@ const UserPage = () => {
                                     <p className="mt-4 text-sm text-gray-400">Start Date</p>
                                     <DatePicker
                                         className="rounded py-1 px-2 bg-gray-600 text-gray-200"
-                                        selected={startDate}
-                                        onChange={(date) => setStartDate(date)}/>
+                                        selected={filterStartDate}
+                                        onChange={(date) => setFilterStartDate(date)}/>
 
                                     <p className="text-sm text-gray-400">End Date</p>
                                     <DatePicker
                                         className="rounded py-1 px-2 bg-gray-600 text-gray-200"
-                                        selected={startDate}
-                                        onChange={(date) => setStartDate(date)}/>
+                                        selected={filterEndDate}
+                                        onChange={(date) => setFilterEndDate(date)}/>
                                     <button
-                                        className="bg-blue-700 text-sm hover:bg-blue-800 text-white mt-2 py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                                        className="bg-blue-700 text-sm hover:bg-blue-800 text-gray-300 mt-2 px-2 rounded focus:outline-none focus:shadow-outline"
+                                        onClick={filterByDates}
                                     >
                                         Filter by date
                                     </button>
+                                    {errorFilterDate ?
+                                        <p className="text-red-400 text-opacity-60 text-xs">
+                                            Invalid Dates
+                                        </p>
+                                        : ""}
 
 
                                     <div className="flex mt-2">

@@ -21,9 +21,6 @@ const AdminPage = () => {
     let new_refresh_token = "";
     const [listUsers, setListUsers] = useState([]);
 
-    //message for expired session
-    const [sentMessage, setSentMessage] = useState(false);
-
     //logOut & invalidate token after logout
     const handleLogOut = async (e) => {
         let recall = false
@@ -70,7 +67,6 @@ const AdminPage = () => {
             console.log(error.response.status, "refresh token expired error")
             if (error.response.status === 401) {
                 console.log('You gonna be logout')
-                setSentMessage(true);
                 handleLogOut(true);
                 return 401
             }
