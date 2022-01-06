@@ -238,6 +238,7 @@ const DetailsDestination = () => {
                                         <p className="text-xs text-gray-400">
                                             {insight.formatted_address}
                                         </p>
+                                        <p className="text-xs text-gray-500">{insight.rating}</p>
                                         <RatingStars rating={insight.rating}/>
                                     </div>
                                 </button>
