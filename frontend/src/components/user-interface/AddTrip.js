@@ -5,13 +5,13 @@ import * as Yup from 'yup';
 import {useDispatch, useSelector} from "react-redux";
 import {authorization, login, selectTokens, selectUser} from "../../features/userSlice";
 import {Link, useNavigate} from 'react-router-dom';
-import DatePicker from 'react-date-picker';
 import ButtonHome from "./ButtonHome";
 import {ADD_TRIP, LOGIN, REFRESH_TOKEN} from "../../config/endpoints";
 import PlacesAutocomplete, {
     geocodeByAddress,
     getLatLng
 } from "react-places-autocomplete";
+import DatePicker from "react-date-picker";
 
 
 export default function AddTrip({}) {
@@ -63,6 +63,7 @@ export default function AddTrip({}) {
                 resetForm()
                 setAddress("")
                 setAddedSuccessfully(true)
+                setSubmitErrors([])
             }).catch(function (error) {
                     if (error.response.status === 401) {
                         recall = true;
@@ -137,8 +138,6 @@ export default function AddTrip({}) {
         <div
             className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100 transform transition-transform duration-30">
             <div className="bg-gray-800 shadow rounded-xl w-1/2  p-6">
-
-
                 <div className="font-semibold text-gray-400 text-xl py-3">
                     Add new trip
                 </div>
@@ -210,7 +209,7 @@ export default function AddTrip({}) {
                             ) : null}
                         </div>
                     </div>
-                    <DatePicker  onChange={new_trip.handleChange} />
+
                     <div className="mb-4">
                         <label className="block text-gray-300 text-sm font-semibold mb-1">End Date <span
                             className="text-sm text-gray-500 font-light">(year-month-day)</span></label>

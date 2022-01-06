@@ -238,7 +238,7 @@ const UserPage = () => {
                 setCheckedTripsComingSoon(false);
             const new_trips = [];
             for (let i = 0; i < trips.length; i++) {
-                if (counterDaysLeft(trips[i].start_date) < 0)
+                if (counterDaysLeft(trips[i].end_date) < 0)
                     new_trips.push(trips[i]);
             }
             setTrips(new_trips);
@@ -303,8 +303,9 @@ const UserPage = () => {
         if (user.user.role.id === 3)
             return (
                 <div className="flex justify-center bg-gray-900 min-h-screen pt-5">
-                    <div className="w-2/3">
 
+
+                    <div className="w-2/3">
                         <div className="flex text-gray-400 justify-between">
                             <h1>Welcome
                                 <span className="font-bold text-gray-300">  {user.user.name}</span>
@@ -428,17 +429,33 @@ const UserPage = () => {
                                             <p className="text-sm font-medium text-gray-300 overflow-hidden truncate w-72">
                                                 {trip.destination} <span
                                                 className="font-light text-sm text-gray-500">
+                                                {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
+                                                    <span
+                                                        className="px-1 inline-flex text-xs leading-5 rounded-full text-green-300">
+                                                    ongoing
+                                                    </span>
+                                                    : ""
+                                                }
                                                 {counterDaysLeft(trip.start_date) > 0 ? "( " + counterDaysLeft(trip.start_date) + " days left )" : ""}</span>
                                             </p>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-300">{trip.start_date}</div>
+                                            {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
+                                                <span
+                                                    className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    {trip.start_date}
+                                                </span>
+                                                : <div className="text-sm text-gray-300">{trip.start_date}</div>
+                                            }
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
+                                            {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
                                                 <span
                                                     className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                     {trip.end_date}
                                                 </span>
+                                                : <div className="text-sm text-gray-300">{trip.end_date}</div>
+                                            }
                                         </td>
                                         <td className="px-6 py-4  text-sm text-gray-300">
                                             <p className="overflow-hidden truncate w-72 ">{trip.comment}</p>

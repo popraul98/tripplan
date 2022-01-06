@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
@@ -9,6 +9,7 @@ import {DETAILS_TRIP, REFRESH_TOKEN} from "../../config/endpoints";
 import RatingStars from "./RatingStars";
 import {ClipLoader} from "react-spinners";
 import PageExceptions from "../../features/PageExceptions";
+import {useReactToPrint} from "react-to-print";
 
 const DetailsDestination = () => {
 
@@ -113,6 +114,11 @@ const DetailsDestination = () => {
         setLocation(loc);
     }
 
+    const componentRef = useRef();
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+    });
+
     if (errorUnauthorized)
         return (
             <PageExceptions
@@ -135,10 +141,15 @@ const DetailsDestination = () => {
                 className="flex justify-center bg-gray-900 min-h-screen  pt-5">
                 <div className="w-2/3 ">
                     <ButtonHome/>
-                    <div className="flex  py-4">
+
+                    <div ref={componentRef} className="flex py-4">
                         <div className="float-left border rounded-lg bg-gray-800 shadow border-gray-700 w-1/2 mr-5 ">
                             <h3 className="p-2 pb-4 text-gray-300 italic text-2xl font-semibold">
                                 {trip.destination}
+                                <button onClick={handlePrint}
+                                        className="ml-2 bg-blue-700 text-gray-400 bg-opacity-50 text-sm rounded px-1">
+                                    Print
+                                </button>
                             </h3>
                             <div className="relative border-t border-gray-700 rounded-t">
                                 <div className="border-r-2 border-gray-500 absolute h-full top-0"
@@ -195,6 +206,7 @@ const DetailsDestination = () => {
                             </iframe>
                         </div>
                     </div>
+
                     <div className="flex justify-between py-2 h-96 ">
                         <div className="float-left border rounded-lg bg-gray-800 shadow border-gray-700 w-2/3 mr-5 ">
                             {location != "" ?
