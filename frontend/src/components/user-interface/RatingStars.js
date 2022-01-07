@@ -33,7 +33,7 @@ const RatingStars = ({rating}) => {
                 console.log('daa')
                 array_full_stars.push(1);
             }
-            setFullStars([1])
+            setFullStars(array_full_stars)
             array_half_stars.push(1)
             setHalfStars(array_half_stars)
         }
