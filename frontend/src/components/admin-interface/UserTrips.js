@@ -102,7 +102,7 @@ const UserTrips = () => {
         return (
             <PageExceptions
                 codeError={404}
-                messageError={"Oops, this user do not exist."}
+                messageError={"Oops, this user doesn't exist."}
             />
         )
     else

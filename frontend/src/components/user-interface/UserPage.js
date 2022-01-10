@@ -214,13 +214,13 @@ const UserPage = () => {
             setTrips(copyTrips);
         } else {
             setCheckedTripsComingSoon(true)
-            if (checkedTripsEnded)
+            if (checkedTripsEnded) {
                 setCheckedTripsEnded(false);
-
+            }
             const new_trips = [];
-            for (let i = 0; i < trips.length; i++) {
-                if (counterDaysLeft(trips[i].start_date) > 0)
-                    new_trips.push(trips[i]);
+            for (let i = 0; i < copyTrips.length; i++) {
+                if (counterDaysLeft(copyTrips[i].start_date) > 0)
+                    new_trips.push(copyTrips[i]);
             }
             setTrips(new_trips);
         }
@@ -234,12 +234,13 @@ const UserPage = () => {
             setTrips(copyTrips);
         } else {
             setCheckedTripsEnded(true)
-            if (checkedTripsComingSoon)
+            if (checkedTripsComingSoon) {
                 setCheckedTripsComingSoon(false);
+            }
             const new_trips = [];
-            for (let i = 0; i < trips.length; i++) {
-                if (counterDaysLeft(trips[i].end_date) < 0)
-                    new_trips.push(trips[i]);
+            for (let i = 0; i < copyTrips.length; i++) {
+                if (counterDaysLeft(copyTrips[i].end_date) < 0)
+                    new_trips.push(copyTrips[i]);
             }
             setTrips(new_trips);
         }

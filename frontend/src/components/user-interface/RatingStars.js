@@ -52,11 +52,6 @@ const RatingStars = ({rating}) => {
         }
         setEmptyStars(array_empty_stars);
 
-        console.log(rating)
-        console.log(decimal)
-        console.log(array_full_stars, 'full')
-        console.log(array_half_stars, 'half')
-        console.log(array_empty_stars, 'empty')
     }
 
     useEffect(() => {
@@ -68,6 +63,8 @@ const RatingStars = ({rating}) => {
     return (
         <div>
             <div className="flex  text-xs" id="componentRef">
+                <p className="text-xs pr-1 text-gray-500">{rating}/5</p>
+
                 {fullStars ? fullStars.map((item) => (
                     <div>{star}</div>
                 )) : ""}
@@ -86,44 +83,9 @@ const RatingStars = ({rating}) => {
 
 export default RatingStars;
 
-//fas = full star
-//far = half star
-
-// //3.2  3 stele
-// //3.3 - 3.8  3 stele jumate
-// //3.9 - 4 stele
-// //star  <i class="fas fa-star"></i>
-// //half-star   <i class="fas fa-star-half-alt"></i>
-// //empty star    <i class="far fa-star"></i>
-//
-// let rating = 1.3;
-// console.log(rating);
-// let decimal = rating - Math.floor(rating);
-// let stars = document.getElementById("stars");
-//
-// if (decimal < 0.28) {
-//     rating = Math.floor(rating);
-//     for (let i = 1; i <= rating; i++) {
-//         stars.innerHTML = stars.innerHTML + "<i class=\"fas fa-star\"></i>";
-//     }
-// }
-//
-// if (decimal > 0.21 && decimal < 0.88) {
-//     rating = Math.floor(rating);
-//     for (let i = 1; i <= rating; i++) {
-//         stars.innerHTML = stars.innerHTML + "<i class=\"fas fa-star\"></i>";
-//     }
-//     stars.innerHTML = stars.innerHTML + "<i class=\"fas fa-star-half-alt\"></i>";
-// }
-//
-// if (decimal > 0.8) {
-//     rating = Math.ceil(rating);
-//     for (let i = 1; i <= rating; i++) {
-//         stars.innerHTML = stars.innerHTML + "<i class=\"fas fa-star\"></i>";
-//     }
-// }
-//
-// let empty_stars = 5 - stars.childElementCount;
-// for (let i = 1; i <= empty_stars; i++) {
-//     stars.innerHTML = stars.innerHTML + "<i class=\"far fa-star\"></i>";
-// }
+//3.2  3 stele
+//3.3 - 3.8  3 stele jumate
+//3.9 - 4 stele
+//star  <i class="fas fa-star"></i>
+//half-star   <i class="fas fa-star-half-alt"></i>
+//empty star    <i class="far fa-star"></i>
