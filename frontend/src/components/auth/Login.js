@@ -72,7 +72,7 @@ const Login = (props) => {
     return (
 
         <div
-            className="flex justify-center h-screen items-center bg-gradient-to-l bg-gray-900 via-indigo-100 to-gray-100 ">
+            className="flex justify-center h-screen items-center  bg-gray-900 ">
 
             <form className="bg-gray-800 shadow-2xl rounded px-8 pt-6 pb-8 mb-4 rounded-xl"
                   onSubmit={formik.handleSubmit}>

@@ -4,6 +4,11 @@ export const LOGOUT = "http://127.0.0.1:8000/api/logout";
 
 export const REFRESH_TOKEN = "http://127.0.0.1:8000/api/refresh_token";
 
+
+export const RESET_PASSWORD_REQ = "http://127.0.0.1:8000/api/reset-password-request";
+export const RESET_PASSWORD = "http://127.0.0.1:8000/api/reset-password";
+export const VERIFY_TOKEN_RESET_PASSWORD = "http://127.0.0.1:8000/api/check-token-resetPassword";
+
 //User Action
 export const GET_TRIPS = "http://127.0.0.1:8000/api/trips";
 export const ADD_TRIP = "http://127.0.0.1:8000/api/trips";

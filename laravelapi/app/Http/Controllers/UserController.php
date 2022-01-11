@@ -180,8 +180,8 @@ class UserController extends Controller
             });
 
             return response()->json([
-                'message' => 'Check your email!'
-            ]);
+                'message' => 'Check your email'
+            ], 200);
         } catch (\Exception $exception) {
             return response()->json([
                 'message' => $exception->getMessage()
@@ -204,7 +204,6 @@ class UserController extends Controller
                 'message' => 'Valid Token'
             ]);
         }
-
     }
 
     public function resetPassword(ResetRequest $req)
@@ -234,6 +233,6 @@ class UserController extends Controller
 
         return response()->json([
             'message' => "Your password was changed successfully!"
-        ]);
+        ], 200);
     }
 }
