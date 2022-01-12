@@ -335,7 +335,7 @@ const UserPage = () => {
                                         value={searchBar}
                                         name="search_bar"
                                         onChange={(e) => searchTrips(e.target.value)}
-                                        placeholder="Search bar"
+                                        placeholder="Search"
                                         className="rounded py-1 px-2 bg-gray-600"
                                     />
 

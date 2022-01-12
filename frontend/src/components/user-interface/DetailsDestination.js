@@ -109,6 +109,18 @@ const DetailsDestination = () => {
             });
     }
 
+    const formatDate = (date) => {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+        if (month.length < 2)
+            month = '0' + month;
+        if (day.length < 2)
+            day = '0' + day;
+        return [year, month, day].join('-');
+    }
+
     const selectInsight = (loc) => {
         console.log(loc)
         setLocation(loc);
@@ -150,6 +162,9 @@ const DetailsDestination = () => {
                                         className="ml-2 bg-blue-700 text-gray-400 bg-opacity-50 text-sm rounded px-1">
                                     Print
                                 </button>
+                                <p className="pt-3 text-xs text-gray-600 pl-2">
+                                    {trip.created_at}
+                                </p>
                             </h3>
                             <div className="relative border-t border-gray-700 rounded-t">
                                 <div className="border-r-2 border-gray-500 absolute h-full top-0"
