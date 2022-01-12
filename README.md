@@ -11,3 +11,13 @@ In this web application, user can register with email and login.
 User can add/delete/edit his trips.
 
 Admin can see/delete users and theirs trips.
+
+**_installation:_**
+
+/laravelapi/: php artisan serve --port 8001 - LARAVEL PASSPORT REQUIRED
+
+/laravelapi/: php artisan serve
+
+/frontend/: npm run start
+
+mailcatcher
