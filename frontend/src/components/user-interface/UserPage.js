@@ -325,7 +325,6 @@ const UserPage = () => {
                                 <AddIcon/>
                                 Add Trip
                             </Link>
-
                         </div>
                         <div className="flex justify-center">
                             <div className="mr-2 min-w-1/2">
