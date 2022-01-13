@@ -303,10 +303,10 @@ const UserPage = () => {
     if (user != null)
         if (user.user.role.id === 3)
             return (
-                <div className="flex justify-center bg-gray-900 min-h-screen pt-5">
+                <div className="flex justify-center bg-gray-900 min-h-screen pt-5 ">
 
 
-                    <div className="w-2/3">
+                    <div className="">
                         <div className="flex text-gray-400 justify-between">
                             <h1>Welcome
                                 <span className="font-bold text-gray-300">  {user.user.name}</span>
@@ -326,8 +326,8 @@ const UserPage = () => {
                                 Add Trip
                             </Link>
                         </div>
-                        <div className="flex justify-center">
-                            <div className="mr-2 min-w-1/2">
+                        <div className="flex">
+                            <div className=" mr-2">
                                 <div className="bg-gray-700 p-2 py-4 rounded ">
                                     <h2 className="text-gray-300 mb-2 font-semibold text-center">Filter</h2>
                                     <input
@@ -379,7 +379,8 @@ const UserPage = () => {
                                         />
                                     </div>
 
-                                    <select className="pl-1 rounded py-1 bg-gray-600 text-gray-300 w-full"
+
+                                    <select className="pl-1 rounded py-1 bg-gray-600 text-gray-300"
                                             onChange={(e) => handleSort(e)}
                                     >
                                         <option disabled>Sort by:</option>
@@ -389,15 +390,16 @@ const UserPage = () => {
                                     </select>
 
                                     <button
-                                        className="mt-5 bg-gray-800 text-sm hover:bg-gray-900 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                                        className="mt-5 flex bg-gray-800 text-sm hover:bg-gray-900 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline"
                                         onClick={resetFilters}
                                     >
                                         Reset
                                     </button>
 
+
                                 </div>
                             </div>
-                            <table className=" divide-y divide-gray-900 shadow mb-5">
+                            <table className="mb-5">
                                 <thead className="bg-gray-700">
                                 <tr>
                                     <th scope="col"
@@ -426,7 +428,7 @@ const UserPage = () => {
                                 {trips.length > 0 ? trips.map((trip) => (
                                     <tr>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <p className="text-sm font-medium text-gray-300 overflow-hidden truncate w-72">
+                                            <p className="text-sm font-medium text-gray-300 overflow-hidden truncate ">
                                                 {trip.destination} <span
                                                 className="font-light text-sm text-gray-500">
                                                 {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
@@ -458,7 +460,11 @@ const UserPage = () => {
                                             }
                                         </td>
                                         <td className="px-6 py-4  text-sm text-gray-300">
-                                            <p className="overflow-hidden truncate w-72 ">{trip.comment}</p>
+                                            <div className="">
+                                                <p className="truncate w-44">
+                                                    {trip.comment}
+                                                </p>
+                                            </div>
                                         </td>
                                         <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
 

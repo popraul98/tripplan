@@ -72,9 +72,10 @@ const Login = (props) => {
     return (
 
         <div
+
             className="flex justify-center h-screen items-center  bg-gray-900 ">
 
-            <form className="bg-gray-800 shadow-2xl rounded px-8 pt-6 pb-8 mb-4 rounded-xl"
+            <form className="bg-gray-800 px-8 pt-6 pb-8 mb-4 rounded-lg"
                   onSubmit={formik.handleSubmit}>
                 <div className="text-red-400">
                     {location.state ? location.state.message : ""}
@@ -85,7 +86,7 @@ const Login = (props) => {
                         Email
                     </label>
                     <input
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        className="bg-gray-50 text-gray-800 text-sm rounded-lg bg-gray-300 focus:ring-blue-500  block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         id="email"
                         name="email"
                         type="text"
@@ -105,7 +106,7 @@ const Login = (props) => {
                         Password
                     </label>
                     <input
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        className="bg-gray-50 text-gray-800 text-sm rounded-lg bg-gray-300 focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         id="password"
                         name="password"
                         type="password"
@@ -127,7 +128,7 @@ const Login = (props) => {
 
                 <div className="flex items-center justify-between">
                     <button
-                        className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className="bg-gray-600 hover:bg-blue-800 text-gray-300 font-semibold py-1 px-4 rounded focus:outline-none "
                         type="submit"
                     >
                         Login
@@ -141,7 +142,7 @@ const Login = (props) => {
                 <div className="mt text-sm">
                     <nav>
                         <Link
-                            className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                            className="bg-gray-600 hover:bg-blue-800 text-gray-300 font-semibold py-1 px-2 rounded focus:outline-none"
                             to="/register"
                         >
                             Register
