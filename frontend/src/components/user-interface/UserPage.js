@@ -9,6 +9,7 @@ import React, {useEffect, useState} from "react";
 import Login from "../auth/Login";
 import {DELETE_TRIP, GET_TRIPS, LOGOUT, REFRESH_TOKEN} from "../../config/endpoints";
 import DatePicker from "react-datepicker";
+import {Pagination} from "@mui/material";
 import "react-datepicker/dist/react-datepicker.css";
 
 const UserPage = () => {
@@ -24,6 +25,12 @@ const UserPage = () => {
     const [copyTrips, setCopyTrips] = useState([]);
     const [searchBar, setSearchBar] = useState("");
     const [errorFilterDate, setErrorFilterDate] = useState(false);
+
+    //Paginate
+    const [paginate, setPaginate] = useState({
+        total_pages: 0,
+        current_page: 0,
+    })
 
 
     //logOut & invalidate token after logout
@@ -82,21 +89,34 @@ const UserPage = () => {
     useEffect(() => {
         console.log("UseEffects")
         if (user != null)
-            getTrips()
+            getTrips(1)
     }, [tokens])
 
     //get Trips from server
-    const getTrips = async () => {
+    const getTrips = async (page) => {
         let recall = false;
-        await axios.get(GET_TRIPS, {
+        console.log(page,'page')
+        await axios.get(GET_TRIPS + '?page=' + page, {
             headers: {
                 Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
                 refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
             }
         }).then(response => {
             console.log("Token Valabil")
-            setTrips(response.data.user_trips.trips)
+            setTrips(response.data.trips_pag.data)
             setCopyTrips(response.data.user_trips.trips)
+
+            console.log(response.data.trips_pag.current_page)
+            if (response.data.trips_pag.current_page === 1)
+            {
+                console.log('intra aici')
+                setPaginate({
+                    total_pages: response.data.trips_pag.last_page,
+                })
+            }
+
+
+
         }).catch(function (error) {
             console.log(error.response.status, 'error get trips')
             recall = true;
@@ -300,6 +320,15 @@ const UserPage = () => {
         setSearchBar("");
     }
 
+
+    //paginate
+    const setPage = (event, value) => {
+        setPaginate({
+            current_page: value,
+        })
+        getTrips(value)
+    };
+
     if (user != null)
         if (user.user.role.id === 3)
             return (
@@ -321,14 +350,14 @@ const UserPage = () => {
                         </div>
                         <div className="flex justify-between mt-2">
                             <Link to="/trips/add-trip"
-                                  className="bg-gray-600 hover:bg-gray-800 mb-2 text-white font-semibold py-1 px-2 rounded-lg focus:outline-none focus:shadow-outline">
+                                  className="bg-gray-600 hover:bg-gray-800 mb-2 text-white font-semibold py-1 px-2 rounded focus:outline-none focus:shadow-outline">
                                 <AddIcon/>
                                 Add Trip
                             </Link>
                         </div>
                         <div className="flex">
                             <div className=" mr-2">
-                                <div className="bg-gray-700 p-2 py-4 rounded ">
+                                <div className="bg-gray-700 p-2 py-4 ">
                                     <h2 className="text-gray-300 mb-2 font-semibold text-center">Filter</h2>
                                     <input
                                         value={searchBar}
@@ -399,38 +428,39 @@ const UserPage = () => {
 
                                 </div>
                             </div>
-                            <table className="mb-5">
-                                <thead className="bg-gray-700">
-                                <tr>
-                                    <th scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                        Destination
-                                    </th>
-                                    <th scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                        Start Date
-                                    </th>
-                                    <th scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                                        End Date
-                                    </th>
-                                    <th scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase  ">
-                                        Comment
-                                    </th>
-                                    <th scope="col" className=" px-6 py-3">
+                            <div>
+                                <table className="">
+                                    <thead className="bg-gray-700">
+                                    <tr>
+                                        <th scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                            Destination
+                                        </th>
+                                        <th scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                            Start Date
+                                        </th>
+                                        <th scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                            End Date
+                                        </th>
+                                        <th scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase  ">
+                                            Comment
+                                        </th>
+                                        <th scope="col" className=" px-6 py-3">
                                         <span
                                             className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider ">Actions</span>
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody className="bg-gray-800 divide-y divide-gray-900">
-                                {trips.length > 0 ? trips.map((trip) => (
-                                    <tr>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <p className="text-sm font-medium text-gray-300 overflow-hidden truncate ">
-                                                {trip.destination} <span
-                                                className="font-light text-sm text-gray-500">
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody className="bg-gray-800 divide-y divide-gray-900">
+                                    {trips.length > 0 ? trips.map((trip) => (
+                                        <tr>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <p className="text-sm font-medium text-gray-300 overflow-hidden truncate ">
+                                                    {trip.destination} <span
+                                                    className="font-light text-sm text-gray-500">
                                                 {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
                                                     <span
                                                         className="px-1 inline-flex text-xs leading-5 rounded-full text-green-300">
@@ -438,59 +468,67 @@ const UserPage = () => {
                                                     </span>
                                                     : ""
                                                 }
-                                                {counterDaysLeft(trip.start_date) > 0 ? "( " + counterDaysLeft(trip.start_date) + " days left )" : ""}</span>
-                                            </p>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
-                                                <span
-                                                    className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    {counterDaysLeft(trip.start_date) > 0 ? "( " + counterDaysLeft(trip.start_date) + " days left )" : ""}</span>
+                                                </p>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
+                                                    <span
+                                                        className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                     {trip.start_date}
                                                 </span>
-                                                : <div className="text-sm text-gray-300">{trip.start_date}</div>
-                                            }
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
-                                                <span
-                                                    className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    : <div className="text-sm text-gray-300">{trip.start_date}</div>
+                                                }
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
+                                                    <span
+                                                        className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                     {trip.end_date}
                                                 </span>
-                                                : <div className="text-sm text-gray-300">{trip.end_date}</div>
-                                            }
-                                        </td>
-                                        <td className="px-6 py-4  text-sm text-gray-300">
-                                            <div className="">
-                                                <p className="truncate w-44">
-                                                    {trip.comment}
-                                                </p>
-                                            </div>
-                                        </td>
-                                        <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
+                                                    : <div className="text-sm text-gray-300">{trip.end_date}</div>
+                                                }
+                                            </td>
+                                            <td className="px-6 py-4  text-sm text-gray-300">
+                                                <div className="">
+                                                    <p className="truncate w-44">
+                                                        {trip.comment}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                            <td className="pr-10 py-4 whitespace-nowrap flex justify-between text-sm font-medium">
 
-                                            <Link to={'/trips/' + trip.id}
-                                                  className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300">
-                                                Details
-                                            </Link>
+                                                <Link to={'/trips/' + trip.id}
+                                                      className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300">
+                                                    Details
+                                                </Link>
 
-                                            <Link to={trip.id + '/edit-trip'}
-                                                  className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300">
-                                                Edit
-                                            </Link>
-                                            <DeleteIcon
-                                                className="text-gray-600 hover:text-gray-300 cursor-pointer"
-                                                onClick={() => deleteTrip(trip.id)}
-                                            />
-                                        </td>
-                                    </tr>
-                                )) : null}
-                                </tbody>
-                                {trips.length === 0 ?
-                                    <span
-                                        className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 flex justify-between text-gray-300">
+                                                <Link to={trip.id + '/edit-trip'}
+                                                      className="font-semibold mb-1 mr-2 text-gray-600 hover:text-gray-300">
+                                                    Edit
+                                                </Link>
+                                                <DeleteIcon
+                                                    className="text-gray-600 hover:text-gray-300 cursor-pointer"
+                                                    onClick={() => deleteTrip(trip.id)}
+                                                />
+                                            </td>
+                                        </tr>
+                                    )) : null}
+                                    </tbody>
+                                    {trips.length === 0 ?
+                                        <span
+                                            className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 flex justify-between text-gray-300">
                                     You don't have any records
                                 </span> : ""}
-                            </table>
+                                </table>
+                                <div className="bg-gray-700">
+                                    <Pagination
+                                        count={paginate.total_pages}
+                                        onChange={setPage}
+                                        color="primary"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

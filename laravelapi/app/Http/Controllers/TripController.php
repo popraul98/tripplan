@@ -26,7 +26,9 @@ class TripController extends Controller
         $user = Auth::user();
 
         return response()->json([
-            'user_trips' => new UserResource($user)
+            'trips_pag' => Trip::byUser($user->id)->Paginate(5),
+            'user_trips' => new UserResource($user),
+
         ]);
 
 //        $id_user = $user->id;
