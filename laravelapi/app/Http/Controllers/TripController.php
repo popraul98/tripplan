@@ -9,6 +9,7 @@ use App\Http\Resources\TripResource;
 use App\Http\Resources\UserResource;
 use App\Models\Trip;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,8 +26,12 @@ class TripController extends Controller
     {
         $user = Auth::user();
 
+        $today_date = Carbon::today();
+
         return response()->json([
-            'trips_pag' => Trip::byUser($user->id)->Paginate(5),
+            'trips_pag' => Trip::byUser($user->id)->Paginate(2),
+            'trips_coming_soon' => Trip::byUser($user->id)->where('start_date', '>', $today_date)->Paginate(2),
+            'trips_ended' => Trip::byUser($user->id)->where('end_date', '<', $today_date)->Paginate(2),
             'user_trips' => new UserResource($user),
 
         ]);

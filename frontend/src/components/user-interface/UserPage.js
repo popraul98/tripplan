@@ -25,6 +25,7 @@ const UserPage = () => {
     const [copyTrips, setCopyTrips] = useState([]);
     const [searchBar, setSearchBar] = useState("");
     const [errorFilterDate, setErrorFilterDate] = useState(false);
+    const [eventFilter, setEventFilter] = useState("");
 
     //Paginate
     const [paginate, setPaginate] = useState({
@@ -90,34 +91,49 @@ const UserPage = () => {
         console.log("UseEffects")
         if (user != null)
             getTrips(1)
-    }, [tokens])
+    }, [tokens, eventFilter])
+
 
     //get Trips from server
     const getTrips = async (page) => {
         let recall = false;
-        console.log(page,'page')
         await axios.get(GET_TRIPS + '?page=' + page, {
             headers: {
                 Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
                 refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
             }
         }).then(response => {
-            console.log("Token Valabil")
-            setTrips(response.data.trips_pag.data)
-            setCopyTrips(response.data.user_trips.trips)
+                console.log("Token Valabil")
 
-            console.log(response.data.trips_pag.current_page)
-            if (response.data.trips_pag.current_page === 1)
-            {
-                console.log('intra aici')
-                setPaginate({
-                    total_pages: response.data.trips_pag.last_page,
-                })
+                console.log(eventFilter, 'eventFilter')
+                console.log(response.data)
+
+                switch (eventFilter) {
+                    case 'coming_soon':
+                        setTrips(response.data.trips_coming_soon.data)
+                        setCopyTrips(response.data.trips_coming_soon.data)
+                        setPaginate({
+                            total_pages: response.data.trips_coming_soon.last_page,
+                        })
+                        break;
+                    case 'ended':
+                        setTrips(response.data.trips_ended.data)
+                        setCopyTrips(response.data.trips_ended.data)
+                        setPaginate({
+                            total_pages: response.data.trips_ended.last_page,
+                        })
+                        break;
+                    default:
+                        setTrips(response.data.trips_pag.data)
+                        setCopyTrips(response.data.trips_pag.data)
+                        setPaginate({
+                            total_pages: response.data.trips_pag.last_page,
+                        })
+                        setEventFilter('');
+                }
+
             }
-
-
-
-        }).catch(function (error) {
+        ).catch(function (error) {
             console.log(error.response.status, 'error get trips')
             recall = true;
         });
@@ -127,7 +143,7 @@ const UserPage = () => {
         }
     }
 
-    //delete Trip from Server
+//delete Trip from Server
     const deleteTrip = async (id_trip) => {
         let recall = false;
         await axios.delete(DELETE_TRIP + id_trip, {
@@ -150,7 +166,7 @@ const UserPage = () => {
         }
     }
 
-    //Counter Days Left
+//Counter Days Left
     const counterDaysLeft = (date) => {
         const _MS_PER_DAY = 1000 * 60 * 60 * 24;
         date = new Date(date);
@@ -161,7 +177,7 @@ const UserPage = () => {
         return Math.floor(((utc1 - utc2) / _MS_PER_DAY) + 1);
     }
 
-    //sort trips
+//sort trips
     const options = [
         {value: 'sort_by_last_date', label: 'Last Added'},
         {value: 'sort_by_name', label: 'Name (asc)'},
@@ -213,7 +229,7 @@ const UserPage = () => {
         return [year, month, day].join('-');
     }
 
-    // search trips
+// search trips
     const searchTrips = (searched_item) => {
         setSearchBar(searched_item)
         const new_trips = [];
@@ -226,47 +242,43 @@ const UserPage = () => {
         }
     }
 
-    //filter Trips coming soon
+//filter Trips coming soon
     const [checkedTripsComingSoon, setCheckedTripsComingSoon] = useState(false);
     const handleChangeCheckedTripsComingSoon = () => {
         if (checkedTripsComingSoon) {
             setCheckedTripsComingSoon(false);
-            setTrips(copyTrips);
+            setEventFilter('');
         } else {
             setCheckedTripsComingSoon(true)
             if (checkedTripsEnded) {
                 setCheckedTripsEnded(false);
             }
-            const new_trips = [];
-            for (let i = 0; i < copyTrips.length; i++) {
-                if (counterDaysLeft(copyTrips[i].start_date) > 0)
-                    new_trips.push(copyTrips[i]);
-            }
-            setTrips(new_trips);
+            setEventFilter('coming_soon');
         }
     }
 
-    //filter Trips ended
+//filter Trips ended
     const [checkedTripsEnded, setCheckedTripsEnded] = useState(false);
     const handleChangeCheckedTripsEnded = () => {
         if (checkedTripsEnded) {
             setCheckedTripsEnded(false);
-            setTrips(copyTrips);
+            setEventFilter('');
         } else {
             setCheckedTripsEnded(true)
             if (checkedTripsComingSoon) {
                 setCheckedTripsComingSoon(false);
             }
-            const new_trips = [];
-            for (let i = 0; i < copyTrips.length; i++) {
-                if (counterDaysLeft(copyTrips[i].end_date) < 0)
-                    new_trips.push(copyTrips[i]);
-            }
-            setTrips(new_trips);
+            setEventFilter('ended');
+            // const new_trips = [];
+            // for (let i = 0; i < copyTrips.length; i++) {
+            //     if (counterDaysLeft(copyTrips[i].end_date) < 0)
+            //         new_trips.push(copyTrips[i]);
+            // }
+            // setTrips(new_trips);
         }
     }
 
-    //filter by date
+//filter by date
     const [filterStartDate, setFilterStartDate] = useState(null);
     const [filterEndDate, setFilterEndDate] = useState(null);
 
@@ -309,7 +321,7 @@ const UserPage = () => {
         }
     }
 
-    //reset filters
+//reset filters
     const resetFilters = () => {
         setTrips(copyTrips)
         setCheckedTripsComingSoon(false)
@@ -318,14 +330,12 @@ const UserPage = () => {
         setFilterEndDate(null)
         setErrorFilterDate(false)
         setSearchBar("");
+
     }
 
 
-    //paginate
+//paginate
     const setPage = (event, value) => {
-        setPaginate({
-            current_page: value,
-        })
         getTrips(value)
     };
 
@@ -378,12 +388,14 @@ const UserPage = () => {
                                         className="rounded py-1 px-2 bg-gray-600 text-gray-200"
                                         selected={filterEndDate}
                                         onChange={(date) => setFilterEndDate(date)}/>
-                                    <button
-                                        className="bg-blue-700 text-sm hover:bg-blue-800 text-gray-300 mt-2 px-2 rounded focus:outline-none focus:shadow-outline"
-                                        onClick={filterByDates}
-                                    >
-                                        Filter by date
-                                    </button>
+                                    <div>
+                                        <button
+                                            className="bg-blue-700 text-sm hover:bg-blue-800 text-gray-300 mt-2 px-2 rounded"
+                                            onClick={filterByDates}
+                                        >
+                                            Filter by date
+                                        </button>
+                                    </div>
                                     {errorFilterDate ?
                                         <p className="text-red-400 text-opacity-60 text-xs">
                                             Invalid Dates
@@ -409,7 +421,7 @@ const UserPage = () => {
                                     </div>
 
 
-                                    <select className="pl-1 rounded py-1 bg-gray-600 text-gray-300"
+                                    <select className="pl-1 rounded py-1 bg-gray-600 text-gray-300 w-48"
                                             onChange={(e) => handleSort(e)}
                                     >
                                         <option disabled>Sort by:</option>
@@ -458,18 +470,17 @@ const UserPage = () => {
                                     {trips.length > 0 ? trips.map((trip) => (
                                         <tr>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <p className="text-sm font-medium text-gray-300 overflow-hidden truncate ">
-                                                    {trip.destination} <span
-                                                    className="font-light text-sm text-gray-500">
-                                                {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
-                                                    <span
-                                                        className="px-1 inline-flex text-xs leading-5 rounded-full text-green-300">
-                                                    ongoing
-                                                    </span>
-                                                    : ""
-                                                }
-                                                    {counterDaysLeft(trip.start_date) > 0 ? "( " + counterDaysLeft(trip.start_date) + " days left )" : ""}</span>
+                                                <p className="text-sm w-52 font-medium text-gray-300 overflow-hidden truncate ">
+                                                    {trip.destination}
                                                 </p>
+                                                <div className="font-light text-xs text-gray-500">
+                                                    {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
+                                                        <p className="inline-flex  text-xs text-green-300">
+                                                            ongoing
+                                                        </p>
+                                                        : ""}
+                                                    {counterDaysLeft(trip.start_date) > 0 ? "( " + counterDaysLeft(trip.start_date) + " days left )" : ""}</div>
+
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {trip.start_date < formatDate(new Date()) && trip.end_date > formatDate(new Date()) ?
