@@ -22,31 +22,38 @@ class TripController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(User $user)
+    public function index(User $user, Request $req)
     {
         $user = Auth::user();
+        $filter_start_date = $req->input('filterStartDate');
+        $filter_end_date = $req->input('filterEndDate');
+        $filter_by_date = null;
 
-        $today_date = Carbon::today();
+        if ($filter_start_date > '2000-01-01') {
+            if ($filter_end_date > '2000-01-01')
+                $filter_by_date = Trip::byUser($user->id)->whereBetween('start_date', [$filter_start_date, $filter_end_date])->Paginate(4);
+
+            else
+                $filter_by_date = Trip::byUser($user->id)->where('start_date', '>', $filter_start_date)->Paginate(4);
+        } else if ($filter_end_date > '2000-01-01')
+            $filter_by_date = Trip::byUser($user->id)->where('start_date', '<', $filter_end_date)->Paginate(4);
+
 
         return response()->json([
-            'trips_pag' => Trip::byUser($user->id)->Paginate(2),
-            'trips_coming_soon' => Trip::byUser($user->id)->where('start_date', '>', $today_date)->Paginate(2),
-            'trips_ended' => Trip::byUser($user->id)->where('end_date', '<', $today_date)->Paginate(2),
+            'trips_pag' => Trip::byUser($user->id)->Paginate(4),
+            'trips_coming_soon' => Trip::byUser($user->id)->where('start_date', '>', Carbon::today())->Paginate(4),
+            'trips_ended' => Trip::byUser($user->id)->where('end_date', '<', Carbon::today())->Paginate(4),
+
+            'filter_by_date' => $filter_by_date,
+
+            'trips_sort_by_name' => Trip::byUser($user->id)->orderBy('destination', 'ASC')->Paginate(4),
+            'trips_sort_by_start_date' => Trip::byUser($user->id)->orderBy('start_date', 'DESC')->Paginate(4),
+            'trips_sort_by_last_added' => Trip::byUser($user->id)->orderBy('created_at', 'ASC')->Paginate(4),
+
             'user_trips' => new UserResource($user),
 
         ]);
 
-//        $id_user = $user->id;
-
-//        $trips_by_last_date = Trip::byUser($id_user)->orderBy('created_at', 'ASC')->get();
-//        $trips_by_name = Trip::byUser($id_user)->orderBy('destination', 'ASC')->get();
-//        $trips_by_start_date = Trip::byUser($id_user)->orderBy('start_date', 'ASC')->get();
-
-//        return response()->json([
-//            'trips_by_last_date' => $trips_by_last_date,
-//            'trips_by_name' => $trips_by_name,
-//            'trips_by_start_date' => $trips_by_start_date,
-//        ]);
     }
 
     /**

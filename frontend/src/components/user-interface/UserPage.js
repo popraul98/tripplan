@@ -97,7 +97,13 @@ const UserPage = () => {
     //get Trips from server
     const getTrips = async (page) => {
         let recall = false;
+
         await axios.get(GET_TRIPS + '?page=' + page, {
+            params: {
+                filterStartDate: formatDate(filterStartDate),
+                filterEndDate: formatDate(filterEndDate),
+
+            },
             headers: {
                 Authorization: "Bearer " + (new_access_token ? new_access_token : tokens.access_token),
                 refresh_token: (new_refresh_token ? new_refresh_token : tokens.refresh_token),
@@ -105,7 +111,6 @@ const UserPage = () => {
         }).then(response => {
                 console.log("Token Valabil")
 
-                console.log(eventFilter, 'eventFilter')
                 console.log(response.data)
 
                 switch (eventFilter) {
@@ -121,6 +126,34 @@ const UserPage = () => {
                         setCopyTrips(response.data.trips_ended.data)
                         setPaginate({
                             total_pages: response.data.trips_ended.last_page,
+                        })
+                        break;
+                    case 'sort_by_last_date':
+                        setTrips(response.data.trips_sort_by_last_added.data)
+                        setCopyTrips(response.data.trips_sort_by_last_added.data)
+                        setPaginate({
+                            total_pages: response.data.trips_sort_by_last_added.last_page,
+                        })
+                        break;
+                    case 'sort_by_name':
+                        setTrips(response.data.trips_sort_by_name.data)
+                        setCopyTrips(response.data.trips_sort_by_name.data)
+                        setPaginate({
+                            total_pages: response.data.trips_sort_by_name.last_page,
+                        })
+                        break;
+                    case 'sort_by_start_date':
+                        setTrips(response.data.trips_sort_by_start_date.data)
+                        setCopyTrips(response.data.trips_sort_by_start_date.data)
+                        setPaginate({
+                            total_pages: response.data.trips_sort_by_start_date.last_page,
+                        })
+                        break;
+                    case 'filter_by_date':
+                        setTrips(response.data.filter_by_date.data)
+                        setCopyTrips(response.data.filter_by_date.data)
+                        setPaginate({
+                            total_pages: response.data.filter_by_date.last_page,
                         })
                         break;
                     default:
@@ -188,31 +221,42 @@ const UserPage = () => {
         setTypeSort(e.target.value)
 
         if (e.target.value === "sort_by_last_date") {
-            trips.sort(function (a, b) {
-                let da = new Date(a.created_at).getTime();
-                let db = new Date(b.created_at).getTime();
-                return da > db ? 1 : da < db ? -1 : 0
-            });
+            setEventFilter('sort_by_last_date')
         }
         if (e.target.value === "sort_by_name") {
-            trips.sort(function (a, b) {
-                if (a.destination.toLowerCase() < b.destination.toLowerCase()) {
-                    return -1;
-                }
-                if (a.destination.toLowerCase() > b.destination.toLowerCase()) {
-                    return 1;
-                }
-                return 0;
-            })
-
+            setEventFilter('sort_by_name')
         }
         if (e.target.value === "sort_by_start_date") {
-            trips.sort(function (a, b) {
-                let da = new Date(a.start_date).getTime();
-                let db = new Date(b.start_date).getTime();
-                return da > db ? -1 : da < db ? 1 : 0
-            });
+            setEventFilter('sort_by_start_date')
         }
+
+        //sortare veche pe front
+        // if (e.target.value === "sort_by_last_date") {
+        //     trips.sort(function (a, b) {
+        //         let da = new Date(a.created_at).getTime();
+        //         let db = new Date(b.created_at).getTime();
+        //         return da > db ? 1 : da < db ? -1 : 0
+        //     });
+        // }
+        // if (e.target.value === "sort_by_name") {
+        //     trips.sort(function (a, b) {
+        //         if (a.destination.toLowerCase() < b.destination.toLowerCase()) {
+        //             return -1;
+        //         }
+        //         if (a.destination.toLowerCase() > b.destination.toLowerCase()) {
+        //             return 1;
+        //         }
+        //         return 0;
+        //     })
+        //
+        // }
+        // if (e.target.value === "sort_by_start_date") {
+        //     trips.sort(function (a, b) {
+        //         let da = new Date(a.start_date).getTime();
+        //         let db = new Date(b.start_date).getTime();
+        //         return da > db ? -1 : da < db ? 1 : 0
+        //     });
+        // }
 
     }
     const [typeSort, setTypeSort] = useState(options[0].value)
@@ -283,7 +327,6 @@ const UserPage = () => {
     const [filterEndDate, setFilterEndDate] = useState(null);
 
     const filterByDates = () => {
-        const new_trips = [];
         setErrorFilterDate(false);
 
         if (!filterStartDate && !filterEndDate)
@@ -296,29 +339,55 @@ const UserPage = () => {
 
                 if (firstDate > secondDate) {
                     setErrorFilterDate(true)
+                } else {
+                    setEventFilter('filter_by_date');
                 }
+            }
+            setEventFilter('filter_by_date');
 
-                for (let i = 0; i < trips.length; i++) {
-                    if (trips[i].start_date > firstDate && trips[i].start_date < secondDate)
-                        new_trips.push(trips[i]);
-                }
-            }
-            if (!filterEndDate) {
-                for (let i = 0; i < trips.length; i++) {
-                    if (trips[i].start_date > firstDate)
-                        new_trips.push(trips[i]);
-                }
-            }
-            setTrips(new_trips);
         }
         if (!filterStartDate && filterEndDate) {
-            let secondDate = formatDate(filterEndDate)
-            for (let i = 0; i < trips.length; i++) {
-                if (trips[i].start_date < secondDate)
-                    new_trips.push(trips[i]);
-            }
-            setTrips(new_trips);
+            setEventFilter('filter_by_date');
         }
+
+        //filtrare veche pe front
+        // const new_trips = [];
+        //
+        // setErrorFilterDate(false);
+        //
+        // if (!filterStartDate && !filterEndDate)
+        //     setErrorFilterDate(true);
+        //
+        // if (filterStartDate) {
+        //     let firstDate = formatDate(filterStartDate)
+        //     if (filterEndDate) {
+        //         let secondDate = formatDate(filterEndDate)
+        //
+        //         if (firstDate > secondDate) {
+        //             setErrorFilterDate(true)
+        //         }
+        //
+        //         for (let i = 0; i < trips.length; i++) {
+        //             if (trips[i].start_date > firstDate && trips[i].start_date < secondDate)
+        //                 new_trips.push(trips[i]);
+        //         }
+        //     }
+        //     if (!filterEndDate) {
+        //         for (let i = 0; i < trips.length; i++) {
+        //             if (trips[i].start_date > firstDate)
+        //                 new_trips.push(trips[i]);
+        //         }
+        //     }
+        //     setTrips(new_trips);
+        // }
+        // if (!filterStartDate && filterEndDate) {
+        //     let secondDate = formatDate(filterEndDate)
+        //     for (let i = 0; i < trips.length; i++) {
+        //         if (trips[i].start_date < secondDate)
+        //             new_trips.push(trips[i]);
+        //     }
+        //     setTrips(new_trips);
+        // }
     }
 
 //reset filters
@@ -331,6 +400,7 @@ const UserPage = () => {
         setErrorFilterDate(false)
         setSearchBar("");
 
+        setEventFilter('');
     }
 
 
