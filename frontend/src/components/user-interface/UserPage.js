@@ -111,8 +111,6 @@ const UserPage = () => {
         }).then(response => {
                 console.log("Token Valabil")
 
-                console.log(response.data)
-
                 switch (eventFilter) {
                     case 'coming_soon':
                         setTrips(response.data.trips_coming_soon.data)
